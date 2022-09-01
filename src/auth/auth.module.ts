@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
 import { UsersModule } from '../users/users.module';
-import { LocalStrategy } from './strategies/local.strategy';
+import { LocalStrategy, JwtStrategy } from './strategies';
 import { JWT_EXPIRE_TIME } from './constants';
 import config from '../config';
 
@@ -26,7 +26,7 @@ import config from '../config';
       inject: [config.KEY],
     }),
   ],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
