@@ -10,8 +10,6 @@ export class AuthService {
   ) {}
 
   findAll() {
-    const envVariable = this.configService.test;
-    console.log(envVariable);
     return 'hello';
   }
 }

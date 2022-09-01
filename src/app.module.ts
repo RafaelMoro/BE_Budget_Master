@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { DatabaseModule } from './database/database.module';
 import config from './config';
 
 @Module({
@@ -15,11 +16,16 @@ import config from './config';
       load: [config],
       isGlobal: true,
       validationSchema: Joi.object({
-        TEST: Joi.string().required(),
+        CLUSTER: Joi.string().required(),
+        MONGO_USER: Joi.string().required(),
+        MONGO_PWD: Joi.string().required(),
+        MONGO_DB_NAME: Joi.string().required(),
+        MONGO_CONNECTION: Joi.string().required(),
       }),
     }),
     AuthModule,
     UsersModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
