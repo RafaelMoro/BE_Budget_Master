@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-
 import config from './config';
 
 @Module({
@@ -12,6 +13,9 @@ import config from './config';
       envFilePath: '.env',
       load: [config],
       isGlobal: true,
+      validationSchema: Joi.object({
+        TEST: Joi.string().required(),
+      }),
     }),
     AuthModule,
   ],
