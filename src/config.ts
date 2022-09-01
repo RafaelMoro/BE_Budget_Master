@@ -8,4 +8,5 @@ export default registerAs('config', () => ({
     password: process.env.MONGO_PWD,
     connection: process.env.MONGO_CONNECTION,
   },
+  jwtKey: process.env.JWT_KEY,
 }));
