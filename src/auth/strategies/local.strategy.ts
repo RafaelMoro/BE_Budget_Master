@@ -8,7 +8,9 @@ import { LOCAL_STRATEGY } from '../constants';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, LOCAL_STRATEGY) {
   constructor(private authService: AuthService) {
-    super();
+    super({
+      usernameField: 'email',
+    });
   }
 
   async validate(email: string, password: string) {
