@@ -28,11 +28,23 @@ export class UsersService {
   }
 
   async update(changes: UpdateUserDto) {
-    const { email } = changes;
-    const userId = await this.findByEmail(email);
-    return this.userModel
-      .findByIdAndUpdate(userId, { $set: changes }, { new: true })
+    const { email, password } = changes;
+    const passwordHashed = await bcrypt.hash(password, 10);
+    console.log('password hashed', passwordHashed);
+    const newChanges = { email, passwordHashed };
+    const user = await this.findByEmail(email);
+    console.log('user', user);
+    const userId = user?._id.toString();
+    console.log(userId);
+    const doc = await this.userModel
+      .findByIdAndUpdate(
+        user._id,
+        { $set: { password: passwordHashed } },
+        { new: true },
+      )
       .exec();
+    console.log(doc);
+    return doc;
   }
 
   remove(id: string) {
