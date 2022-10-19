@@ -30,9 +30,9 @@ export class UsersController {
     return this.usersService.create(payload);
   }
 
-  @Put(':userId')
-  updateUser(@Param('userId') userId: string, @Body() payload: UpdateUserDto) {
-    return this.usersService.update(userId, payload);
+  @Put()
+  updateUser(@Body() payload: UpdateUserDto) {
+    return this.usersService.update(payload);
   }
 
   @Delete(':userId')
