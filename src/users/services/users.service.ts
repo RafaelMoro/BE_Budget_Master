@@ -52,15 +52,15 @@ export class UsersService {
   }
 
   async resetPassword(payload: ResetPasswordUserDto) {
-    // recieve user's email
     const { email } = payload;
-    // findbyemail the user
     const user = await this.findByEmail(email);
-    // Generate JWT token
+    if (!user) return null;
+
     const payloadToken: PayloadToken = { sub: user.id };
-    const oneTimeToken = this.jwtService.sign(payloadToken);
-    console.log(oneTimeToken);
-    //   The token should expire in 24 hours.
+    return {
+      oneTimeToken: this.jwtService.sign(payloadToken),
+      user,
+    };
     // Save the token into the user
   }
 

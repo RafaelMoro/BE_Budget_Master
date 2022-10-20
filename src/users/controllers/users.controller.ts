@@ -31,6 +31,7 @@ export class UsersController {
 
   @Post()
   createUser(@Body() payload: CreateUserDto) {
+    console.log(payload);
     return this.usersService.create(payload);
   }
 
