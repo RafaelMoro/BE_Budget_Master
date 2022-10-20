@@ -13,3 +13,10 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class ResetPasswordUserDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email: string;
+}

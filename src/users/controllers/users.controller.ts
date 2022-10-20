@@ -9,7 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  ResetPasswordUserDto,
+} from '../dtos/users.dto';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Public } from '../../auth/decorators/public.decorator';
@@ -38,5 +42,11 @@ export class UsersController {
   @Delete(':userId')
   remove(@Param('userId') userId: string) {
     return this.usersService.remove(userId);
+  }
+
+  @Public()
+  @Post('/reset-password')
+  resetPassword(@Body() payload: ResetPasswordUserDto) {
+    return this.usersService.resetPassword(payload);
   }
 }

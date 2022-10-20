@@ -22,6 +22,7 @@ import config from './config';
         MONGO_DB_NAME: Joi.string().required(),
         MONGO_CONNECTION: Joi.string().required(),
         JWT_KEY: Joi.string().required(),
+        ONE_TIME_JWT_KEY: Joi.string().required(),
         PUBLIC_KEY: Joi.string().required(),
       }),
     }),
