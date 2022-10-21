@@ -17,6 +17,9 @@ export class User extends Document {
 
   @Prop()
   middleName: string;
+
+  @Prop()
+  oneTimeToken: string;
 }
 
 export interface ForgotPasswordPayload {

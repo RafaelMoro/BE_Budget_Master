@@ -62,8 +62,12 @@ export class UsersService {
     const { firstName, lastName } = user;
     const payloadToken: PayloadToken = { sub: user.id };
     const oneTimeToken = this.jwtService.sign(payloadToken);
+    await this.userModel.updateOne(
+      { _id: user.id },
+      { oneTimeToken },
+      { multi: true },
+    );
 
-    // arreglar que user tambien pasa el password hasheado
     const emailPayload: MailForgotPasswordDto = {
       email,
       hostname,
@@ -71,7 +75,6 @@ export class UsersService {
       lastName,
       oneTimeToken,
     };
-    // Save the token into the user
     await this.mailService.sendUserForgotPasswordEmail(emailPayload);
   }
 
