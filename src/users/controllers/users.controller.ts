@@ -1,5 +1,6 @@
 import {
   Body,
+  Req,
   Controller,
   Delete,
   Get,
@@ -8,6 +9,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 import {
   CreateUserDto,
@@ -17,6 +19,7 @@ import {
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Public } from '../../auth/decorators/public.decorator';
+import { User } from '../entities/users.entity';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -47,7 +50,13 @@ export class UsersController {
 
   @Public()
   @Post('/reset-password')
-  resetPassword(@Body() payload: ResetPasswordUserDto) {
+  resetPassword(@Req() request: Request) {
+    const {
+      body: { email },
+      hostname,
+    } = request;
+    const payload: ResetPasswordUserDto = { email, hostname };
+    // falta cambiar el servicio de reset Password del payload
     return this.usersService.resetPassword(payload);
   }
 }

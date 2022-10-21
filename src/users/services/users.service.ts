@@ -11,12 +11,14 @@ import {
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
 import { PayloadToken } from '../../auth/interfaces';
+import { MailService } from '../../mail/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   findAll() {
@@ -52,15 +54,18 @@ export class UsersService {
   }
 
   async resetPassword(payload: ResetPasswordUserDto) {
-    const { email } = payload;
+    const { email, hostname } = payload;
     const user = await this.findByEmail(email);
+    console.log(email, hostname);
+    console.log(user);
     if (!user) return null;
 
     const payloadToken: PayloadToken = { sub: user.id };
-    return {
-      oneTimeToken: this.jwtService.sign(payloadToken),
-      user,
-    };
+    const oneTimeToken = this.jwtService.sign(payloadToken);
+
+    // arreglar que user tambien pasa el password hasheado
+    console.log(user, hostname, oneTimeToken);
+    await this.mailService.sendUserForgotPasswordEmail(email);
     // Save the token into the user
   }
 

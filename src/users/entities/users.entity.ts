@@ -10,4 +10,10 @@ export class User extends Document {
   password: string;
 }
 
+export interface ForgotPasswordPayload {
+  oneTimeToken: string;
+  hostname: string;
+  user: User;
+}
+
 export const UsersSchema = SchemaFactory.createForClass(User);

@@ -8,6 +8,7 @@ import { JWT_ONE_TIME_EXPIRE_TIME } from '../auth/constants';
 import { UsersController } from './controllers/users.controller';
 import { User, UsersSchema } from './entities/users.entity';
 import { UsersService } from './services/users.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersService } from './services/users.service';
       },
       inject: [config.KEY],
     }),
+    MailModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

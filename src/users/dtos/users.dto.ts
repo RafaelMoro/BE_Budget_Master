@@ -19,4 +19,8 @@ export class ResetPasswordUserDto {
   @IsNotEmpty()
   @IsEmail()
   readonly email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly hostname: string;
 }
