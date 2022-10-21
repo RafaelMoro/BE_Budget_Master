@@ -13,10 +13,10 @@ import { join } from 'path';
       useFactory: (configServices: ConfigType<typeof config>) => {
         return {
           transport: {
-            host: 'smtp.gmail.com',
+            host: configServices.mailer.smtpHost,
             secure: true,
             ignoreTLS: true,
-            port: 465,
+            port: Number(configServices.mailer.smtpPort),
             auth: {
               user: configServices.mailer.email,
               pass: configServices.mailer.pwd,

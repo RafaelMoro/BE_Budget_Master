@@ -27,6 +27,8 @@ import config from './config';
         PUBLIC_KEY: Joi.string().required(),
         MAILER_MAIL: Joi.string().required(),
         MAILER_PWD: Joi.string().required(),
+        SMTP_HOST: Joi.string().required(),
+        SMTP_PORT: Joi.string().required(),
       }),
     }),
     AuthModule,
