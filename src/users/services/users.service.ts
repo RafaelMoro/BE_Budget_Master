@@ -12,6 +12,7 @@ import {
 import { User } from '../entities/users.entity';
 import { PayloadToken } from '../../auth/interfaces';
 import { MailService } from '../../mail/mail.service';
+import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
 
 @Injectable()
 export class UsersService {
@@ -56,17 +57,22 @@ export class UsersService {
   async resetPassword(payload: ResetPasswordUserDto) {
     const { email, hostname } = payload;
     const user = await this.findByEmail(email);
-    console.log(email, hostname);
-    console.log(user);
     if (!user) return null;
 
+    const { firstName, lastName } = user;
     const payloadToken: PayloadToken = { sub: user.id };
     const oneTimeToken = this.jwtService.sign(payloadToken);
 
     // arreglar que user tambien pasa el password hasheado
-    console.log(user, hostname, oneTimeToken);
-    await this.mailService.sendUserForgotPasswordEmail(email);
+    const emailPayload: MailForgotPasswordDto = {
+      email,
+      hostname,
+      firstName,
+      lastName,
+      oneTimeToken,
+    };
     // Save the token into the user
+    await this.mailService.sendUserForgotPasswordEmail(emailPayload);
   }
 
   remove(id: string) {

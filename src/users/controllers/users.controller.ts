@@ -55,7 +55,6 @@ export class UsersController {
       hostname,
     } = request;
     const payload: ResetPasswordUserDto = { email, hostname };
-    // falta cambiar el servicio de reset Password del payload
     return this.usersService.resetPassword(payload);
   }
 }
