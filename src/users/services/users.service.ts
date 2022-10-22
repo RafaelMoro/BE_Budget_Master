@@ -81,27 +81,32 @@ export class UsersService {
     await this.mailService.sendUserForgotPasswordEmail(emailPayload);
   }
 
-  async resetPassword(oneTimeToken: string, password: string) {
-    // verificar que el token no haya expirado.
+  verifyToken(token: string) {
     try {
-      const tokenVerified = this.jwtService.verify(oneTimeToken);
-      const userId = tokenVerified.sub;
-      const user = await this.userModel.findOne({ _id: userId }).exec();
-      const { email } = user;
-
-      const userOneTimeToken = user.oneTimeToken;
-      if (oneTimeToken !== userOneTimeToken) {
-        return null;
-      }
-      await this.update({ email, password });
-    } catch (err) {
-      if (err?.message === 'jwt expired') {
+      return this.jwtService.verify(token);
+    } catch (error) {
+      if (error?.message === 'jwt expired') {
         throw new BadRequestException('JWT Expired');
       }
-      if (err?.message === 'jwt malformed') {
+      if (error?.message === 'jwt malformed') {
         throw new BadRequestException('Invalid JWT');
       }
     }
+  }
+
+  async resetPassword(oneTimeToken: string, password: string) {
+    const tokenVerified = this.verifyToken(oneTimeToken);
+    if (!tokenVerified) throw new BadRequestException('Invalid JWT');
+
+    const userId = tokenVerified.sub;
+    const user = await this.userModel.findOne({ _id: userId }).exec();
+    const { email } = user;
+
+    const userOneTimeToken = user.oneTimeToken;
+    if (oneTimeToken !== userOneTimeToken)
+      throw new BadRequestException('Wrong JWT');
+
+    await this.update({ email, password });
   }
 
   remove(id: string) {
