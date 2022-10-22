@@ -14,7 +14,8 @@ import { Request } from 'express';
 import {
   CreateUserDto,
   UpdateUserDto,
-  ResetPasswordUserDto,
+  ForgotPasswordUserDto,
+  ResetPasswordDto,
 } from '../dtos/users.dto';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -48,13 +49,23 @@ export class UsersController {
   }
 
   @Public()
-  @Post('/reset-password')
-  resetPassword(@Req() request: Request) {
+  @Post('/forgot-password')
+  forgotPassword(@Req() request: Request) {
     const {
       body: { email },
       hostname,
     } = request;
-    const payload: ResetPasswordUserDto = { email, hostname };
-    return this.usersService.resetPassword(payload);
+    const payload: ForgotPasswordUserDto = { email, hostname };
+    return this.usersService.forgotPassword(payload);
+  }
+
+  @Public()
+  @Post('/reset-password/:oneTimeToken')
+  resetPassword(
+    @Param('oneTimeToken') oneTimeToken: string,
+    @Body() changes: ResetPasswordDto,
+  ) {
+    const { password } = changes;
+    return this.usersService.resetPassword(oneTimeToken, password);
   }
 }

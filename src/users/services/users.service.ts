@@ -3,11 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { BadRequestException } from '@nestjs/common';
 
 import {
   CreateUserDto,
   UpdateUserDto,
-  ResetPasswordUserDto,
+  ForgotPasswordUserDto,
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
 import { PayloadToken } from '../../auth/interfaces';
@@ -39,8 +40,10 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  // crear un metodo de update para cambiar firstname middlename o secondname
   async update(changes: UpdateUserDto) {
     const { email, password } = changes;
+    console.log(email, password);
     const passwordHashed = await bcrypt.hash(password, 10);
     const user = await this.findByEmail(email);
     const userId = user?._id.toString();
@@ -54,7 +57,7 @@ export class UsersService {
       .exec();
   }
 
-  async resetPassword(payload: ResetPasswordUserDto) {
+  async forgotPassword(payload: ForgotPasswordUserDto) {
     const { email, hostname } = payload;
     const user = await this.findByEmail(email);
     if (!user) return null;
@@ -76,6 +79,29 @@ export class UsersService {
       oneTimeToken,
     };
     await this.mailService.sendUserForgotPasswordEmail(emailPayload);
+  }
+
+  async resetPassword(oneTimeToken: string, password: string) {
+    // verificar que el token no haya expirado.
+    try {
+      const tokenVerified = this.jwtService.verify(oneTimeToken);
+      const userId = tokenVerified.sub;
+      const user = await this.userModel.findOne({ _id: userId }).exec();
+      const { email } = user;
+
+      const userOneTimeToken = user.oneTimeToken;
+      if (oneTimeToken !== userOneTimeToken) {
+        return null;
+      }
+      await this.update({ email, password });
+    } catch (err) {
+      if (err?.message === 'jwt expired') {
+        throw new BadRequestException('JWT Expired');
+      }
+      if (err?.message === 'jwt malformed') {
+        throw new BadRequestException('Invalid JWT');
+      }
+    }
   }
 
   remove(id: string) {

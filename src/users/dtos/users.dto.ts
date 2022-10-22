@@ -25,7 +25,7 @@ export class CreateUserDto {
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-export class ResetPasswordUserDto {
+export class ForgotPasswordUserDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
@@ -34,4 +34,10 @@ export class ResetPasswordUserDto {
   @IsString()
   @IsNotEmpty()
   readonly hostname: string;
+}
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly password: string;
 }
