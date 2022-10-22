@@ -23,10 +23,6 @@ export class UsersService {
     private mailService: MailService,
   ) {}
 
-  findAll() {
-    return this.userModel.find().exec();
-  }
-
   async create(data: CreateUserDto) {
     const userModel = new this.userModel(data);
     const passwordHashed = await bcrypt.hash(userModel.password, 10);
@@ -41,7 +37,7 @@ export class UsersService {
   }
 
   // crear un metodo de update para cambiar firstname middlename o secondname
-  async update(changes: UpdateUserDto) {
+  async updatePassword(changes: UpdateUserDto) {
     const { email, password } = changes;
     const passwordHashed = await bcrypt.hash(password, 10);
     const user = await this.findByEmail(email);
@@ -109,10 +105,11 @@ export class UsersService {
       { _id: user.id },
       { $unset: { oneTimeToken: '' } },
     );
-    await this.update({ email, password });
+    await this.updatePassword({ email, password });
   }
 
-  remove(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  async remove(email: string) {
+    const userId = await this.findByEmail(email);
+    return this.userModel.findByIdAndDelete(userId);
   }
 }

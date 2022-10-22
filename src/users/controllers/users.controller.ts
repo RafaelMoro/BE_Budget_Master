@@ -3,24 +3,21 @@ import {
   Req,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
 
 import {
   CreateUserDto,
-  UpdateUserDto,
   ForgotPasswordUserDto,
   ResetPasswordDto,
+  DeleteUserDto,
 } from '../dtos/users.dto';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Public } from '../../auth/decorators/public.decorator';
-import { User } from '../entities/users.entity';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -28,24 +25,15 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Public()
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Post()
   createUser(@Body() payload: CreateUserDto) {
     return this.usersService.create(payload);
   }
 
-  @Put()
-  updateUser(@Body() payload: UpdateUserDto) {
-    return this.usersService.update(payload);
-  }
-
-  @Delete(':userId')
-  remove(@Param('userId') userId: string) {
-    return this.usersService.remove(userId);
+  @Delete()
+  remove(@Body() changes: DeleteUserDto) {
+    const { email } = changes;
+    return this.usersService.remove(email);
   }
 
   @Public()
