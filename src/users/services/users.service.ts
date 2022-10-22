@@ -43,7 +43,6 @@ export class UsersService {
   // crear un metodo de update para cambiar firstname middlename o secondname
   async update(changes: UpdateUserDto) {
     const { email, password } = changes;
-    console.log(email, password);
     const passwordHashed = await bcrypt.hash(password, 10);
     const user = await this.findByEmail(email);
     const userId = user?._id.toString();
@@ -106,6 +105,10 @@ export class UsersService {
     if (oneTimeToken !== userOneTimeToken)
       throw new BadRequestException('Wrong JWT');
 
+    await this.userModel.updateOne(
+      { _id: user.id },
+      { $unset: { oneTimeToken: '' } },
+    );
     await this.update({ email, password });
   }
 
