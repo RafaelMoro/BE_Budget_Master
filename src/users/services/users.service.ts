@@ -7,7 +7,7 @@ import { BadRequestException } from '@nestjs/common';
 
 import {
   CreateUserDto,
-  UpdateUserDto,
+  UpdateUserPasswordDto,
   ForgotPasswordUserDto,
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
@@ -37,15 +37,13 @@ export class UsersService {
   }
 
   // crear un metodo de update para cambiar firstname middlename o secondname
-  async updatePassword(changes: UpdateUserDto) {
-    const { email, password } = changes;
+  async updatePassword(changes: UpdateUserPasswordDto) {
+    const { uid, password } = changes;
     const passwordHashed = await bcrypt.hash(password, 10);
-    const user = await this.findByEmail(email);
-    const userId = user?._id.toString();
 
     return this.userModel
       .findByIdAndUpdate(
-        userId,
+        uid,
         { $set: { password: passwordHashed } },
         { new: true },
       )
@@ -94,9 +92,12 @@ export class UsersService {
 
     const userId = tokenVerified.sub;
     const user = await this.userModel.findOne({ _id: userId }).exec();
-    const { email } = user;
+    if (!user) throw new BadRequestException('The user does not exist');
+    const { _id } = user;
 
     const userOneTimeToken = user.oneTimeToken;
+    if (!userOneTimeToken) throw new BadRequestException('JWT not found');
+
     if (oneTimeToken !== userOneTimeToken)
       throw new BadRequestException('Wrong JWT');
 
@@ -104,7 +105,7 @@ export class UsersService {
       { _id: user.id },
       { $unset: { oneTimeToken: '' } },
     );
-    await this.updatePassword({ email, password });
+    await this.updatePassword({ uid: _id, password });
   }
 
   async remove(email: string) {
