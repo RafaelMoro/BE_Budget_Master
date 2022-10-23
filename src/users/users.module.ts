@@ -4,7 +4,7 @@ import { ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 import config from '../config';
-import { JWT_ONE_TIME_EXPIRE_TIME } from '../auth/constants';
+import { JWT_ONE_TIME_EXPIRE_TIME } from './constants';
 import { UsersController } from './controllers/users.controller';
 import { User, UsersSchema } from './entities/users.entity';
 import { UsersService } from './services/users.service';

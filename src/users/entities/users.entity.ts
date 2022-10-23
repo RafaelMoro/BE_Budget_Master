@@ -22,10 +22,4 @@ export class User extends Document {
   oneTimeToken: string;
 }
 
-export interface ForgotPasswordPayload {
-  oneTimeToken: string;
-  hostname: string;
-  user: User;
-}
-
 export const UsersSchema = SchemaFactory.createForClass(User);

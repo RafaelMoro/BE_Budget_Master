@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/entities/users.entity';
-import { PayloadToken } from '../interfaces';
+import { generateJWT } from '../../utils';
 import config from '../../config';
 
 @Injectable()
@@ -28,10 +28,10 @@ export class AuthService {
     return null;
   }
 
-  generateJWT(user: User) {
-    const payload: PayloadToken = { sub: user.id };
+  generateJWTAuth(user: User) {
+    const accessToken = generateJWT(user, this.jwtService);
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken,
       user,
     };
   }

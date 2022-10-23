@@ -11,9 +11,9 @@ import {
   ForgotPasswordUserDto,
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
-import { PayloadToken } from '../../auth/interfaces';
 import { MailService } from '../../mail/mail.service';
 import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
+import { generateJWT } from '../../utils';
 
 @Injectable()
 export class UsersService {
@@ -54,12 +54,11 @@ export class UsersService {
 
   async forgotPassword(payload: ForgotPasswordUserDto) {
     const { email, hostname } = payload;
-    const user = await this.findByEmail(email);
+    const user: User = await this.findByEmail(email);
     if (!user) return null;
 
     const { firstName, lastName } = user;
-    const payloadToken: PayloadToken = { sub: user.id };
-    const oneTimeToken = this.jwtService.sign(payloadToken);
+    const oneTimeToken = generateJWT(user, this.jwtService);
     await this.userModel.updateOne(
       { _id: user.id },
       { oneTimeToken },
