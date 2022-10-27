@@ -13,6 +13,7 @@ import {
 import { User } from '../entities/users.entity';
 import { MailService } from '../../mail/mail.service';
 import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
+import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
 
 @Injectable()
@@ -71,6 +72,8 @@ export class UsersService {
       oneTimeToken,
     };
     await this.mailService.sendUserForgotPasswordEmail(emailPayload);
+    const response: IResponse = { response: 'email sent' };
+    return response;
   }
 
   verifyToken(token: string) {
@@ -106,6 +109,8 @@ export class UsersService {
       { $unset: { oneTimeToken: '' } },
     );
     await this.updatePassword({ uid: _id, password });
+    const response: IResponse = { response: 'password reset successfully' };
+    return response;
   }
 
   async remove(email: string) {
