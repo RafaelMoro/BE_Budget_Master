@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
@@ -15,6 +15,8 @@ import { MailService } from '../../mail/mail.service';
 import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
 import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
+import config from '../../config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +24,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
     private mailService: MailService,
+    @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -53,6 +56,11 @@ export class UsersService {
 
   async forgotPassword(payload: ForgotPasswordDto) {
     const { email, hostname } = payload;
+    const { frontendPort } = this.configService;
+    const completeHostname =
+      hostname === 'localhost'
+        ? `http://${hostname}:${frontendPort}`
+        : `https://${hostname}`;
 
     const user: User = await this.findByEmail(email);
     if (!user) throw new NotFoundException('User not found');
@@ -67,7 +75,7 @@ export class UsersService {
 
     const emailPayload: MailForgotPasswordDto = {
       email,
-      hostname,
+      hostname: completeHostname,
       firstName,
       lastName,
       oneTimeToken,

@@ -9,7 +9,7 @@ export class MailService {
 
   async sendUserForgotPasswordEmail(payload: MailForgotPasswordDto) {
     const { oneTimeToken, hostname, email, firstName, lastName } = payload;
-    const url = `${hostname}/users/reset-password/${oneTimeToken}`;
+    const url = `${hostname}/reset-password/${oneTimeToken}`;
 
     // Change email for name of the user.
     await this.mailerService.sendMail({

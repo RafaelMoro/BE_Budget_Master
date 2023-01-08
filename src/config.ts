@@ -11,6 +11,7 @@ export default registerAs('config', () => ({
   jwtKey: process.env.JWT_KEY,
   jwtOneTimeKey: process.env.ONE_TIME_JWT_KEY,
   publicKey: process.env.PUBLIC_KEY,
+  frontendPort: process.env.FRONTEND_PORT,
   mailer: {
     email: process.env.MAILER_MAIL,
     pwd: process.env.MAILER_PWD,
