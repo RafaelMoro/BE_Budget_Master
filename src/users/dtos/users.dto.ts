@@ -35,7 +35,7 @@ export class UpdateUserPasswordDto {
   readonly uid: string;
 }
 
-export class ForgotPasswordUserDto {
+export class ForgotPasswordDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
@@ -44,6 +44,13 @@ export class ForgotPasswordUserDto {
   @IsString()
   @IsNotEmpty()
   readonly hostname: string;
+}
+
+export class ForgotPasswordBodyDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email: string;
 }
 
 export class ResetPasswordDto {

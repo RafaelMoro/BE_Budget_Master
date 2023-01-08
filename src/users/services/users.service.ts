@@ -8,7 +8,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import {
   CreateUserDto,
   UpdateUserPasswordDto,
-  ForgotPasswordUserDto,
+  ForgotPasswordDto,
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
 import { MailService } from '../../mail/mail.service';
@@ -51,7 +51,7 @@ export class UsersService {
       .exec();
   }
 
-  async forgotPassword(payload: ForgotPasswordUserDto) {
+  async forgotPassword(payload: ForgotPasswordDto) {
     const { email, hostname } = payload;
 
     const user: User = await this.findByEmail(email);

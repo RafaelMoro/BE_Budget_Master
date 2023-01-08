@@ -11,9 +11,10 @@ import { Request } from 'express';
 
 import {
   CreateUserDto,
-  ForgotPasswordUserDto,
+  ForgotPasswordDto,
   ResetPasswordDto,
   DeleteUserDto,
+  ForgotPasswordBodyDto,
 } from '../dtos/users.dto';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -38,13 +39,14 @@ export class UsersController {
 
   @Public()
   @Post('/forgot-password')
-  forgotPassword(@Req() request: Request) {
-    const {
-      body: { email },
-      hostname,
-    } = request;
-    const payload: ForgotPasswordUserDto = { email, hostname };
-    return this.usersService.forgotPassword(payload);
+  forgotPassword(
+    @Req() request: Request,
+    @Body() payload: ForgotPasswordBodyDto,
+  ) {
+    const { hostname } = request;
+    const { email } = payload;
+    const values: ForgotPasswordDto = { email, hostname };
+    return this.usersService.forgotPassword(values);
   }
 
   @Public()
