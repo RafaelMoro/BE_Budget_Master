@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import {
   CreateUserDto,
@@ -53,8 +53,9 @@ export class UsersService {
 
   async forgotPassword(payload: ForgotPasswordUserDto) {
     const { email, hostname } = payload;
+
     const user: User = await this.findByEmail(email);
-    if (!user) return null;
+    if (!user) throw new NotFoundException('User not found');
 
     const { firstName, lastName } = user;
     const oneTimeToken = generateJWT(user, this.jwtService);
