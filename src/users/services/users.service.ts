@@ -27,17 +27,23 @@ export class UsersService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
+  async findByEmail(email: string) {
+    return this.userModel.findOne({ email }).exec();
+  }
+
   async create(data: CreateUserDto) {
+    //Verify if the user exists with the same email.
+    const { email } = data;
+    const user = await this.findByEmail(email);
+    if (user) throw new BadRequestException('User with that email exists');
+
     const userModel = new this.userModel(data);
     const passwordHashed = await bcrypt.hash(userModel.password, 10);
     userModel.password = passwordHashed;
     const modelSaved = await userModel.save();
-    const { password, ...rta } = modelSaved.toJSON();
+    const { email: emailModel } = modelSaved.toJSON();
+    const rta = { emailModel, message: 'User created' };
     return rta;
-  }
-
-  async findByEmail(email: string) {
-    return this.userModel.findOne({ email }).exec();
   }
 
   // crear un metodo de update para cambiar firstname middlename o secondname
