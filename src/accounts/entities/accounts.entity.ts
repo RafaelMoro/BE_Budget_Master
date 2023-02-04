@@ -11,7 +11,7 @@ export class Account extends Document {
   accountType: string;
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  user: User | Types.ObjectId;
+  sub: User | Types.ObjectId;
 }
 
 export const AccountsSchema = SchemaFactory.createForClass(Account);

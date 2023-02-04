@@ -10,9 +10,10 @@ export class CreateAccountDto {
   @IsNotEmpty()
   readonly accountType: string;
 
+  // sub is the user id.
   @IsNotEmpty()
   @IsMongoId()
-  readonly user: string;
+  readonly sub: string;
 }
 
 export class UpdateAccountDto extends PartialType(CreateAccountDto) {}
