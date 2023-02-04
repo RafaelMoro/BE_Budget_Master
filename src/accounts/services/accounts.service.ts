@@ -15,4 +15,8 @@ export class AccountsService {
     const newModel = new this.accountModel(data);
     return newModel.save();
   }
+
+  findByUser(sub: string) {
+    return this.accountModel.find({ sub: sub }).exec();
+  }
 }
