@@ -35,8 +35,13 @@ export class AccountsService {
     }
   }
 
-  findByUser(sub: string) {
-    return this.accountModel.find({ sub: sub }).exec();
+  async findByUser(sub: string) {
+    try {
+      const user = await this.accountModel.find({ sub: sub }).exec();
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async update(id: string, changes: UpdateAccountDto) {
