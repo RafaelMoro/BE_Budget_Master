@@ -129,7 +129,12 @@ export class UsersService {
   }
 
   async remove(email: string) {
-    const userId = await this.findByEmail(email);
-    return this.userModel.findByIdAndDelete(userId);
+    try {
+      const userId = await this.findByEmail(email);
+      const userDeleted = await this.userModel.findByIdAndDelete(userId);
+      return userDeleted;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

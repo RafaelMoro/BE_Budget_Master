@@ -39,13 +39,23 @@ export class AccountsService {
     return this.accountModel.find({ sub: sub }).exec();
   }
 
-  update(id: string, changes: UpdateAccountDto) {
-    return this.accountModel
-      .findByIdAndUpdate(id, { $set: changes }, { new: true })
-      .exec();
+  async update(id: string, changes: UpdateAccountDto) {
+    try {
+      const updatedAccount = await this.accountModel
+        .findByIdAndUpdate(id, { $set: changes }, { new: true })
+        .exec();
+      return updatedAccount;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  remove(id: string) {
-    return this.accountModel.findByIdAndDelete(id);
+  async remove(id: string) {
+    try {
+      const accountDeleted = await this.accountModel.findByIdAndDelete(id);
+      return accountDeleted;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
