@@ -1,6 +1,19 @@
-import { Body, Controller, Post, Get, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  UseGuards,
+  Param,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { CreateAccountDto, GetAccountsByUserDto } from '../dtos/accounts.dto';
+import {
+  CreateAccountDto,
+  GetAccountsByUserDto,
+  UpdateAccountDto,
+} from '../dtos/accounts.dto';
 import { AccountsService } from '../services/accounts.service';
 
 @UseGuards(JwtAuthGuard)
@@ -17,5 +30,15 @@ export class AccountsController {
   @Post()
   create(@Body() payload: CreateAccountDto) {
     return this.accountsService.create(payload);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() payload: UpdateAccountDto) {
+    return this.accountsService.update(id, payload);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.accountsService.remove(id);
   }
 }

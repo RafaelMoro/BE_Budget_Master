@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account } from '../entities/accounts.entity';
-import { CreateAccountDto } from '../dtos/accounts.dto';
+import { CreateAccountDto, UpdateAccountDto } from '../dtos/accounts.dto';
 
 @Injectable()
 export class AccountsService {
@@ -18,5 +18,15 @@ export class AccountsService {
 
   findByUser(sub: string) {
     return this.accountModel.find({ sub: sub }).exec();
+  }
+
+  update(id: string, changes: UpdateAccountDto) {
+    return this.accountModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
+  }
+
+  remove(id: string) {
+    return this.accountModel.findByIdAndDelete(id);
   }
 }
