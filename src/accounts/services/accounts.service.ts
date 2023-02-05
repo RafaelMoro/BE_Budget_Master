@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -11,9 +11,28 @@ export class AccountsService {
     @InjectModel(Account.name) private accountModel: Model<Account>,
   ) {}
 
-  create(data: CreateAccountDto) {
-    const newModel = new this.accountModel(data);
-    return newModel.save();
+  async createOne(data: CreateAccountDto) {
+    try {
+      const newModel = new this.accountModel(data);
+      const model = await newModel.save();
+      return model;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createMultipleAccounts(data: CreateAccountDto[]) {
+    try {
+      const newModels = data.map((account) => {
+        return new this.accountModel(account);
+      });
+      const savedModels = await Promise.all(
+        newModels.map((account) => account.save()),
+      );
+      return savedModels;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   findByUser(sub: string) {

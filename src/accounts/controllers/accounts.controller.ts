@@ -29,7 +29,12 @@ export class AccountsController {
 
   @Post()
   create(@Body() payload: CreateAccountDto) {
-    return this.accountsService.create(payload);
+    return this.accountsService.createOne(payload);
+  }
+
+  @Post('/multiple')
+  createMultiple(@Body() payload: CreateAccountDto[]) {
+    return this.accountsService.createMultipleAccounts(payload);
   }
 
   @Put(':id')
