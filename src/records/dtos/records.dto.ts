@@ -49,3 +49,9 @@ export class CreateRecordDto {
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {}
+
+export class GetRecordsByAccountDto {
+  @IsNotEmpty()
+  @IsMongoId()
+  readonly account: string;
+}

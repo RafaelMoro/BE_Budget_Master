@@ -37,8 +37,8 @@ export class AccountsService {
 
   async findByUser(sub: string) {
     try {
-      const user = await this.accountModel.find({ sub: sub }).exec();
-      return user;
+      const accounts = await this.accountModel.find({ sub: sub }).exec();
+      return accounts;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
