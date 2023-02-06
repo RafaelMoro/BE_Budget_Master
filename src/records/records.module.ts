@@ -15,5 +15,6 @@ import { RecordsService } from './services/records.service';
   ],
   controllers: [RecordsController],
   providers: [RecordsService],
+  exports: [RecordsService],
 })
 export class RecordsModule {}

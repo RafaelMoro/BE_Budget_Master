@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Record } from '../entities/records.entity';
+import { RECORDS_NOT_FOUND } from '../constants';
 import {
   CreateRecordDto,
   UpdateRecordDto,
@@ -41,8 +42,11 @@ export class RecordsService {
       const records = await this.recordModel
         .find({ account: accountId })
         .exec();
-      if (records.length === 0)
-        throw new BadRequestException('No records found with that account id');
+      if (records.length === 0) {
+        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
+        // it would break the service to delete an account with no records.
+        return RECORDS_NOT_FOUND;
+      }
       return records;
     } catch (error) {
       throw new BadRequestException(error.message);
