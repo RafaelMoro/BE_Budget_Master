@@ -47,10 +47,11 @@ export class RecordsService {
     }
   }
 
-  async update(id: string, changes: UpdateRecordDto) {
+  async update(changes: UpdateRecordDto) {
     try {
+      const { recordId } = changes;
       const updatedRecord = await this.recordModel
-        .findByIdAndUpdate(id, { $set: changes }, { new: true })
+        .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
         .exec();
       return updatedRecord;
     } catch (error) {

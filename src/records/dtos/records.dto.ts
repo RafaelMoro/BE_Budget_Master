@@ -48,7 +48,11 @@ export class CreateRecordDto {
   readonly budget: string;
 }
 
-export class UpdateRecordDto extends PartialType(CreateRecordDto) {}
+export class UpdateRecordDto extends PartialType(CreateRecordDto) {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly recordId: string;
+}
 
 export class GetRecordsByAccountDto {
   @IsNotEmpty()

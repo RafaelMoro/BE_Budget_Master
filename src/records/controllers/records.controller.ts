@@ -43,9 +43,9 @@ export class RecordsController {
     return this.recordsService.deleteMultipleRecords(payload);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateRecordDto) {
-    return this.recordsService.update(id, payload);
+  @Put()
+  update(@Body() payload: UpdateRecordDto) {
+    return this.recordsService.update(payload);
   }
 
   @Delete()
