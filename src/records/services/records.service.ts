@@ -73,7 +73,11 @@ export class RecordsService {
           ),
         ),
       );
-      return updatedRecords;
+      const checkUpdatedRecords = updatedRecords.map((record, index) => {
+        if (!record) return `record id ${changes[index].recordId} not found`;
+        return record;
+      });
+      return checkUpdatedRecords;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -96,7 +100,11 @@ export class RecordsService {
       const deletedRecords = await Promise.all(
         recordsIds.map((id) => this.recordModel.findByIdAndDelete(id)),
       );
-      return deletedRecords;
+      const checkDeletedRecords = deletedRecords.map((record, index) => {
+        if (!record) return `record id ${records[index].recordId} not found`;
+        return record;
+      });
+      return checkDeletedRecords;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
