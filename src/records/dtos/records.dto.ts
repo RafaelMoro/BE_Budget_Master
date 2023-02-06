@@ -57,11 +57,11 @@ export class UpdateRecordDto extends PartialType(CreateRecordDto) {
 export class GetRecordsByAccountDto {
   @IsNotEmpty()
   @IsMongoId()
-  readonly account: string;
+  readonly accountId: string;
 }
 
 export class DeleteRecordDto {
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
-  readonly record: string;
+  readonly recordId: string;
 }

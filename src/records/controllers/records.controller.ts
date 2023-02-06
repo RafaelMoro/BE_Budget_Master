@@ -34,8 +34,8 @@ export class RecordsController {
 
   @Get()
   findByAccount(@Body() payload: GetRecordsByAccountDto) {
-    const { account } = payload;
-    return this.recordsService.findByAccount(account);
+    const { accountId } = payload;
+    return this.recordsService.findByAccount(accountId);
   }
 
   @Delete('/multiple')

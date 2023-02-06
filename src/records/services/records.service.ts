@@ -41,6 +41,8 @@ export class RecordsService {
       const records = await this.recordModel
         .find({ account: accountId })
         .exec();
+      if (records.length === 0)
+        throw new BadRequestException('No records found with that account id');
       return records;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -62,8 +64,9 @@ export class RecordsService {
 
   async remove(payload: DeleteRecordDto) {
     try {
-      const { record: recordId } = payload;
+      const { recordId } = payload;
       const recordDeleted = await this.recordModel.findByIdAndDelete(recordId);
+      if (!recordDeleted) throw new BadRequestException('Record not found');
       return recordDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -72,7 +75,7 @@ export class RecordsService {
 
   async deleteMultipleRecords(records: DeleteRecordDto[]) {
     try {
-      const recordsIds = records.map((record) => record.record);
+      const recordsIds = records.map((record) => record.recordId);
       const deletedRecords = await Promise.all(
         recordsIds.map((id) => this.recordModel.findByIdAndDelete(id)),
       );
