@@ -6,6 +6,7 @@ import {
   IsMongoId,
   IsDate,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateRecordDto {
@@ -21,6 +22,7 @@ export class CreateRecordDto {
   readonly price: number;
 
   @IsDate()
+  @Type(() => Date)
   @IsNotEmpty()
   readonly date: Date;
 
@@ -38,7 +40,7 @@ export class CreateRecordDto {
   @IsArray()
   readonly peopleDebt: string[];
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   readonly account: string;
 

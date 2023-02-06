@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+import { Account } from '../../accounts/entities/accounts.entity';
+
 @Schema()
 export class Record extends Document {
   @Prop({ required: true })
@@ -12,7 +14,7 @@ export class Record extends Document {
   @Prop({ required: true })
   price: number;
 
-  @Prop({ required: true })
+  @Prop({ type: Date })
   date: Date;
 
   @Prop({ required: true })
@@ -27,9 +29,11 @@ export class Record extends Document {
   @Prop()
   peopleDebt: string[];
 
-  @Prop({ required: true })
-  account: string;
+  @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
+  account: Account | Types.ObjectId;
 
   @Prop()
   budget: string[];
 }
+
+export const RecordsSchema = SchemaFactory.createForClass(Record);
