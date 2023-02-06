@@ -43,6 +43,11 @@ export class RecordsController {
     return this.recordsService.deleteMultipleRecords(payload);
   }
 
+  @Put('/multiple')
+  updateMultiple(@Body() payload: UpdateRecordDto[]) {
+    return this.recordsService.updateMultipleRecords(payload);
+  }
+
   @Put()
   update(@Body() payload: UpdateRecordDto) {
     return this.recordsService.update(payload);

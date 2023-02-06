@@ -62,6 +62,23 @@ export class RecordsService {
     }
   }
 
+  async updateMultipleRecords(changes: UpdateRecordDto[]) {
+    try {
+      const updatedRecords = await Promise.all(
+        changes.map((change) =>
+          this.recordModel.findByIdAndUpdate(
+            change.recordId,
+            { $set: change },
+            { new: true },
+          ),
+        ),
+      );
+      return updatedRecords;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async remove(payload: DeleteRecordDto) {
     try {
       const { recordId } = payload;
