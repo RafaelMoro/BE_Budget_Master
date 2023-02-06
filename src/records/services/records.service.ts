@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Record } from '../entities/records.entity';
-import { CreateRecordDto } from '../dtos/records.dto';
+import { CreateRecordDto, UpdateRecordDto } from '../dtos/records.dto';
 
 @Injectable()
 export class RecordsService {
@@ -24,6 +24,26 @@ export class RecordsService {
         .find({ account: accountId })
         .exec();
       return records;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async update(id: string, changes: UpdateRecordDto) {
+    try {
+      const updatedRecord = await this.recordModel
+        .findByIdAndUpdate(id, { $set: changes }, { new: true })
+        .exec();
+      return updatedRecord;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      const recordDeleted = await this.recordModel.findByIdAndDelete(id);
+      return recordDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
