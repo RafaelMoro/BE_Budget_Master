@@ -11,7 +11,7 @@ import {
 
 import {
   CreateRecordDto,
-  DeleteMultipleRecordsDto,
+  DeleteRecordDto,
   GetRecordsByAccountDto,
   UpdateRecordDto,
 } from '../dtos/records.dto';
@@ -39,7 +39,7 @@ export class RecordsController {
   }
 
   @Delete('/multiple')
-  deleteMultiple(@Body() payload: DeleteMultipleRecordsDto[]) {
+  deleteMultiple(@Body() payload: DeleteRecordDto[]) {
     return this.recordsService.deleteMultipleRecords(payload);
   }
 
@@ -48,8 +48,8 @@ export class RecordsController {
     return this.recordsService.update(id, payload);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recordsService.remove(id);
+  @Delete()
+  remove(@Body() payload: DeleteRecordDto) {
+    return this.recordsService.remove(payload);
   }
 }

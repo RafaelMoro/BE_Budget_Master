@@ -5,7 +5,7 @@ import { Record } from '../entities/records.entity';
 import {
   CreateRecordDto,
   UpdateRecordDto,
-  DeleteMultipleRecordsDto,
+  DeleteRecordDto,
 } from '../dtos/records.dto';
 
 @Injectable()
@@ -58,16 +58,17 @@ export class RecordsService {
     }
   }
 
-  async remove(id: string) {
+  async remove(payload: DeleteRecordDto) {
     try {
-      const recordDeleted = await this.recordModel.findByIdAndDelete(id);
+      const { record: recordId } = payload;
+      const recordDeleted = await this.recordModel.findByIdAndDelete(recordId);
       return recordDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async deleteMultipleRecords(records: DeleteMultipleRecordsDto[]) {
+  async deleteMultipleRecords(records: DeleteRecordDto[]) {
     try {
       const recordsIds = records.map((record) => record.record);
       const deletedRecords = await Promise.all(

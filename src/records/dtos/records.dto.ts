@@ -56,7 +56,7 @@ export class GetRecordsByAccountDto {
   readonly account: string;
 }
 
-export class DeleteMultipleRecordsDto {
+export class DeleteRecordDto {
   @IsString()
   @IsNotEmpty()
   readonly record: string;
