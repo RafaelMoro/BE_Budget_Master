@@ -53,6 +53,7 @@ export class RecordsService {
       const updatedRecord = await this.recordModel
         .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
         .exec();
+      if (!updatedRecord) throw new BadRequestException('Record not found');
       return updatedRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
