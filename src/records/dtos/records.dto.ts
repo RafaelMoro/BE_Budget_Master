@@ -55,3 +55,9 @@ export class GetRecordsByAccountDto {
   @IsMongoId()
   readonly account: string;
 }
+
+export class DeleteMultipleRecordsDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly record: string;
+}

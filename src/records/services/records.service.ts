@@ -2,7 +2,11 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Record } from '../entities/records.entity';
-import { CreateRecordDto, UpdateRecordDto } from '../dtos/records.dto';
+import {
+  CreateRecordDto,
+  UpdateRecordDto,
+  DeleteMultipleRecordsDto,
+} from '../dtos/records.dto';
 
 @Injectable()
 export class RecordsService {
@@ -58,6 +62,18 @@ export class RecordsService {
     try {
       const recordDeleted = await this.recordModel.findByIdAndDelete(id);
       return recordDeleted;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async deleteMultipleRecords(records: DeleteMultipleRecordsDto[]) {
+    try {
+      const recordsIds = records.map((record) => record.record);
+      const deletedRecords = await Promise.all(
+        recordsIds.map((id) => this.recordModel.findByIdAndDelete(id)),
+      );
+      return deletedRecords;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
