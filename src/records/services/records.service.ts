@@ -18,6 +18,20 @@ export class RecordsService {
     }
   }
 
+  async createMultipleRecords(data: CreateRecordDto[]) {
+    try {
+      const newModels = data.map((account) => {
+        return new this.recordModel(account);
+      });
+      const savedModels = await Promise.all(
+        newModels.map((account) => account.save()),
+      );
+      return savedModels;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async findByAccount(accountId: string) {
     try {
       const records = await this.recordModel

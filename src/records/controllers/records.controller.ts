@@ -26,6 +26,11 @@ export class RecordsController {
     return this.recordsService.createOne(payload);
   }
 
+  @Post('/multiple')
+  createMultiple(@Body() payload: CreateRecordDto[]) {
+    return this.recordsService.createMultipleRecords(payload);
+  }
+
   @Get()
   findByAccount(@Body() payload: GetRecordsByAccountDto) {
     const { account } = payload;
