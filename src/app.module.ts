@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { MailModule } from './mail/mail.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { RecordsModule } from './records/records.module';
 import config from './config';
 
 @Module({
@@ -37,6 +38,7 @@ import config from './config';
     DatabaseModule,
     MailModule,
     AccountsModule,
+    RecordsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
