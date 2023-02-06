@@ -4,7 +4,6 @@ import {
   Post,
   Get,
   UseGuards,
-  Param,
   Put,
   Delete,
 } from '@nestjs/common';
@@ -13,6 +12,7 @@ import {
   CreateAccountDto,
   GetAccountsByUserDto,
   UpdateAccountDto,
+  DeleteAccountDto,
 } from '../dtos/accounts.dto';
 import { AccountsService } from '../services/accounts.service';
 
@@ -42,8 +42,8 @@ export class AccountsController {
     return this.accountsService.update(payload);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.accountsService.remove(id);
+  @Delete()
+  remove(@Body() payload: DeleteAccountDto) {
+    return this.accountsService.remove(payload);
   }
 }

@@ -27,3 +27,9 @@ export class GetAccountsByUserDto {
   @IsMongoId()
   readonly sub: string;
 }
+
+export class DeleteAccountDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly accountId: string;
+}

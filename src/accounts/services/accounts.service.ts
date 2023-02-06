@@ -3,7 +3,11 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account } from '../entities/accounts.entity';
-import { CreateAccountDto, UpdateAccountDto } from '../dtos/accounts.dto';
+import {
+  CreateAccountDto,
+  UpdateAccountDto,
+  DeleteAccountDto,
+} from '../dtos/accounts.dto';
 
 @Injectable()
 export class AccountsService {
@@ -57,9 +61,13 @@ export class AccountsService {
     }
   }
 
-  async remove(id: string) {
+  async remove(payload: DeleteAccountDto) {
     try {
-      const accountDeleted = await this.accountModel.findByIdAndDelete(id);
+      const { accountId } = payload;
+      const accountDeleted = await this.accountModel.findByIdAndDelete(
+        accountId,
+      );
+      if (!accountDeleted) throw new BadRequestException('Account not found');
       return accountDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
