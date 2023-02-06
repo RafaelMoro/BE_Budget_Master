@@ -44,11 +44,13 @@ export class AccountsService {
     }
   }
 
-  async update(id: string, changes: UpdateAccountDto) {
+  async update(changes: UpdateAccountDto) {
     try {
+      const { accountId } = changes;
       const updatedAccount = await this.accountModel
-        .findByIdAndUpdate(id, { $set: changes }, { new: true })
+        .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();
+      if (!updatedAccount) throw new BadRequestException('Account not found');
       return updatedAccount;
     } catch (error) {
       throw new BadRequestException(error.message);

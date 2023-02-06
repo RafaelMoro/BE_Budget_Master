@@ -37,9 +37,9 @@ export class AccountsController {
     return this.accountsService.createMultipleAccounts(payload);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateAccountDto) {
-    return this.accountsService.update(id, payload);
+  @Put()
+  update(@Body() payload: UpdateAccountDto) {
+    return this.accountsService.update(payload);
   }
 
   @Delete(':id')

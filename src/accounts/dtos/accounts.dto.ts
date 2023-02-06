@@ -16,7 +16,11 @@ export class CreateAccountDto {
   readonly sub: string;
 }
 
-export class UpdateAccountDto extends PartialType(CreateAccountDto) {}
+export class UpdateAccountDto extends PartialType(CreateAccountDto) {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly accountId: string;
+}
 
 export class GetAccountsByUserDto {
   @IsNotEmpty()
