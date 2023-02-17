@@ -11,11 +11,11 @@ import {
 import {
   CreateRecordDto,
   DeleteRecordDto,
-  GetRecordsByAccountDto,
   UpdateRecordDto,
 } from '../dtos/records.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
+import { Param } from '@nestjs/common/decorators';
 @UseGuards(JwtAuthGuard)
 @Controller('records')
 export class RecordsController {
@@ -31,9 +31,8 @@ export class RecordsController {
     return this.recordsService.createMultipleRecords(payload);
   }
 
-  @Get()
-  findByAccount(@Body() payload: GetRecordsByAccountDto) {
-    const { accountId } = payload;
+  @Get(':accountId')
+  findByAccount(@Param('accountId') accountId: string) {
     return this.recordsService.findByAccount(accountId);
   }
 
