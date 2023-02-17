@@ -1,14 +1,22 @@
-import { IsString, IsNotEmpty, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, IsMongoId, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
-  readonly accountName: string;
+  readonly title: string;
 
   @IsString()
   @IsNotEmpty()
   readonly accountType: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly amount: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly backgroundColor: string;
 
   // sub is the user id.
   @IsNotEmpty()

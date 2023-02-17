@@ -5,10 +5,16 @@ import { User } from '../../users/entities/users.entity';
 @Schema()
 export class Account extends Document {
   @Prop({ required: true })
-  accountName: string;
+  title: string;
 
   @Prop({ required: true })
   accountType: string;
+
+  @Prop({ required: true })
+  backgroundColor: string;
+
+  @Prop({ required: true })
+  amount: number;
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   sub: User | Types.ObjectId;
