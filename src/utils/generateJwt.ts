@@ -4,6 +4,8 @@ import { User } from '../users/entities/users.entity';
 import { PayloadToken } from '../interfaces';
 
 export const generateJWT = (user: User, jwtService: JwtService) => {
-  const payload: PayloadToken = { sub: user.id };
+  const mongoId = user._id;
+  const mongoIdString = mongoId.toString();
+  const payload: PayloadToken = { sub: mongoIdString };
   return jwtService.sign(payload);
 };

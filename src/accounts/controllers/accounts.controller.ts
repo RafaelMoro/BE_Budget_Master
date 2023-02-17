@@ -6,11 +6,11 @@ import {
   UseGuards,
   Put,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
   CreateAccountDto,
-  GetAccountsByUserDto,
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
@@ -22,9 +22,9 @@ export class AccountsController {
   constructor(private accountsService: AccountsService) {}
 
   @Get()
-  findByUser(@Body() payload: GetAccountsByUserDto) {
-    const { sub } = payload;
-    return this.accountsService.findByUser(sub);
+  findByUser(@Request() req) {
+    const userId = req.user.sub;
+    return this.accountsService.findByUser(userId);
   }
 
   @Post()
