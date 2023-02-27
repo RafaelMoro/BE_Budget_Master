@@ -18,6 +18,10 @@ export class CreateAccountDto {
   @IsNotEmpty()
   readonly backgroundColor: string;
 
+  @IsString()
+  @IsNotEmpty()
+  readonly color: string;
+
   // sub is the user id.
   @IsNotEmpty()
   @IsMongoId()

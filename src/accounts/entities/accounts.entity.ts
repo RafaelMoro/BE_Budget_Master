@@ -14,6 +14,9 @@ export class Account extends Document {
   backgroundColor: string;
 
   @Prop({ required: true })
+  color: string;
+
+  @Prop({ required: true })
   amount: number;
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
