@@ -29,10 +29,11 @@ export class AccountsService {
     }
   }
 
-  async createMultipleAccounts(data: CreateAccountDto[]) {
+  async createMultipleAccounts(data: CreateAccountDto[], userId: string) {
     try {
       const newModels = data.map((account) => {
-        return new this.accountModel(account);
+        const completeData = { ...account, sub: userId };
+        return new this.accountModel(completeData);
       });
       const savedModels = await Promise.all(
         newModels.map((account) => account.save()),

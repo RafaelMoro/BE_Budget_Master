@@ -34,8 +34,9 @@ export class AccountsController {
   }
 
   @Post('/multiple')
-  createMultiple(@Body() payload: CreateAccountDto[]) {
-    return this.accountsService.createMultipleAccounts(payload);
+  createMultiple(@Body() payload: CreateAccountDto[], @Request() req) {
+    const userId = req.user.sub;
+    return this.accountsService.createMultipleAccounts(payload, userId);
   }
 
   @Put()
