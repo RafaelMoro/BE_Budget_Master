@@ -28,8 +28,9 @@ export class AccountsController {
   }
 
   @Post()
-  create(@Body() payload: CreateAccountDto) {
-    return this.accountsService.createOne(payload);
+  create(@Body() payload: CreateAccountDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.accountsService.createOne(payload, userId);
   }
 
   @Post('/multiple')

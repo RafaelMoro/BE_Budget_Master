@@ -21,11 +21,6 @@ export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
   readonly color: string;
-
-  // sub is the user id.
-  @IsNotEmpty()
-  @IsMongoId()
-  readonly sub: string;
 }
 
 export class UpdateAccountDto extends PartialType(CreateAccountDto) {

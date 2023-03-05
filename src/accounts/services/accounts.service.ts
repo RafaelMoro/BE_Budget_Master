@@ -18,9 +18,10 @@ export class AccountsService {
     private recordsService: RecordsService,
   ) {}
 
-  async createOne(data: CreateAccountDto) {
+  async createOne(data: CreateAccountDto, userId: string) {
     try {
-      const newModel = new this.accountModel(data);
+      const completeData = { ...data, sub: userId };
+      const newModel = new this.accountModel(completeData);
       const model = await newModel.save();
       return model;
     } catch (error) {
