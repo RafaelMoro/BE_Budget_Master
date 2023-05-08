@@ -2,18 +2,44 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AccountRecord } from '../entities/records.entity';
+import { Expense } from '../entities/expenses.entity';
+import { Income } from '../entities/incomes.entity';
 import { RECORDS_NOT_FOUND } from '../constants';
 import {
   CreateRecordDto,
   UpdateRecordDto,
   DeleteRecordDto,
 } from '../dtos/records.dto';
+import { CreateExpenseDto } from '../dtos/expenses.dto';
+import { CreateIncomeDto } from '../dtos/incomes.dto';
 
 @Injectable()
 export class RecordsService {
   constructor(
     @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
+    @InjectModel(Expense.name) private expenseModel: Model<Expense>,
+    @InjectModel(Income.name) private incomeModel: Model<Income>,
   ) {}
+
+  async createOneExpense(data: CreateExpenseDto) {
+    try {
+      const newModel = new this.expenseModel(data);
+      const model = await newModel.save();
+      return model;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createOneIncome(data: CreateIncomeDto) {
+    try {
+      const newModel = new this.incomeModel(data);
+      const model = await newModel.save();
+      return model;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 
   async createOne(data: CreateRecordDto) {
     try {

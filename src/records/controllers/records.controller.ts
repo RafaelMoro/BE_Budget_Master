@@ -13,6 +13,8 @@ import {
   DeleteRecordDto,
   UpdateRecordDto,
 } from '../dtos/records.dto';
+import { CreateExpenseDto } from '../dtos/expenses.dto';
+import { CreateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
 import { Param } from '@nestjs/common/decorators';
@@ -20,6 +22,16 @@ import { Param } from '@nestjs/common/decorators';
 @Controller('records')
 export class RecordsController {
   constructor(private recordsService: RecordsService) {}
+
+  @Post('/expense')
+  createExpense(@Body() payload: CreateExpenseDto) {
+    return this.recordsService.createOneExpense(payload);
+  }
+
+  @Post('/income')
+  createIncome(@Body() payload: CreateIncomeDto) {
+    return this.recordsService.createOneIncome(payload);
+  }
 
   @Post()
   create(@Body() payload: CreateRecordDto) {
