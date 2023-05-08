@@ -33,6 +33,11 @@ export class RecordsController {
     return this.recordsService.createOneIncome(payload);
   }
 
+  @Get('/income/:accountId')
+  findIncomeByAccount(@Param('accountId') accountId: string) {
+    return this.recordsService.findIncomeByAccount(accountId);
+  }
+
   @Post()
   create(@Body() payload: CreateRecordDto) {
     return this.recordsService.createOne(payload);

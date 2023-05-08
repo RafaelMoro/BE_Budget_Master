@@ -41,6 +41,23 @@ export class RecordsService {
     }
   }
 
+  async findIncomeByAccount(accountId: string) {
+    try {
+      const income = await this.incomeModel
+        .find({ account: accountId })
+        .populate('expensesPaid')
+        .exec();
+      if (income.length === 0) {
+        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
+        // it would break the service to delete an account with no records.
+        return 'Income not found';
+      }
+      return income;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async createOne(data: CreateRecordDto) {
     try {
       const newModel = new this.recordModel(data);
