@@ -5,9 +5,24 @@ import {
   IsArray,
   IsMongoId,
   IsDate,
+  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
+
+export class IndebtedPeople {
+  @IsNotEmpty()
+  name: string;
+
+  @IsNotEmpty()
+  amount: number;
+
+  @IsNotEmpty()
+  amountPayed: number;
+
+  @IsNotEmpty()
+  isPayed: boolean;
+}
 
 export class CreateRecordDto {
   @IsString()
@@ -19,7 +34,7 @@ export class CreateRecordDto {
 
   @IsNumber()
   @IsNotEmpty()
-  readonly price: number;
+  readonly amount: number;
 
   @IsDate()
   @Type(() => Date)
@@ -37,15 +52,16 @@ export class CreateRecordDto {
   @IsArray()
   readonly tag: string[];
 
-  @IsArray()
-  readonly peopleDebt: string[];
+  @ValidateNested()
+  @Type(() => IndebtedPeople)
+  readonly indebtedPeople: IndebtedPeople[];
 
   @IsMongoId()
   @IsNotEmpty()
   readonly account: string;
 
-  @IsString()
-  readonly budget: string;
+  @IsArray()
+  readonly budget: string[];
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {

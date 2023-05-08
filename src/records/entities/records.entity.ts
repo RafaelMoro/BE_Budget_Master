@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 import { Account } from '../../accounts/entities/accounts.entity';
 
 @Schema()
-export class Record extends Document {
+export class AccountRecord extends Document {
   @Prop({ required: true })
   shortName: string;
 
@@ -12,7 +12,7 @@ export class Record extends Document {
   description: string;
 
   @Prop({ required: true })
-  price: number;
+  amount: number;
 
   @Prop({ type: Date })
   date: Date;
@@ -26,8 +26,17 @@ export class Record extends Document {
   @Prop()
   tag: string[];
 
-  @Prop()
-  peopleDebt: string[];
+  @Prop({
+    type: [
+      {
+        name: { type: String },
+        amount: { type: Number },
+        amountPayed: { type: Number },
+        isPayed: { type: Boolean },
+      },
+    ],
+  })
+  indebtedPeople: Types.Array<Record<'string | boolean | number', any>>;
 
   @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
   account: Account | Types.ObjectId;
@@ -36,4 +45,4 @@ export class Record extends Document {
   budget: string[];
 }
 
-export const RecordsSchema = SchemaFactory.createForClass(Record);
+export const RecordsSchema = SchemaFactory.createForClass(AccountRecord);

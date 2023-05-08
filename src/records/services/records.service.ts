@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Record } from '../entities/records.entity';
+import { AccountRecord } from '../entities/records.entity';
 import { RECORDS_NOT_FOUND } from '../constants';
 import {
   CreateRecordDto,
@@ -11,7 +11,9 @@ import {
 
 @Injectable()
 export class RecordsService {
-  constructor(@InjectModel(Record.name) private recordModel: Model<Record>) {}
+  constructor(
+    @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
+  ) {}
 
   async createOne(data: CreateRecordDto) {
     try {
