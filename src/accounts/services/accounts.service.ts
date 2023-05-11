@@ -68,7 +68,8 @@ export class AccountsService {
 
   async remove(payload: DeleteAccountDto) {
     try {
-      const deletedRecords = null;
+      let expenseRecords = null;
+      let incomesRecords = null;
       const { accountId } = payload;
 
       // Check if the account has records.
@@ -77,19 +78,34 @@ export class AccountsService {
       const incomesRelatedToAccount =
         await this.recordsService.findRecordsByAccount(accountId, true);
 
-      // If the account has records, then execute this code.
-      // if (
-      //   expensesRelatedToAccount !== EXPENSE_NOT_FOUND ||
-      //   incomesRelatedToAccount !== INCOME_NOT_FOUND
-      // ) {
-      //   // Return records id as object each as expected to the service delete multiple records.
-      //   const expensesIds = expensesRelatedToAccount.map((record) => {
-      //     return { recordId: record._id };
-      //   });
-      //   deletedRecords = await this.recordsService.deleteMultipleRecords(
-      //     recordsIds,
-      //   );
-      // }
+      // If the account has expenses, then delete expenses.
+      if (
+        expensesRelatedToAccount !== EXPENSE_NOT_FOUND &&
+        expensesRelatedToAccount !== INCOME_NOT_FOUND
+      ) {
+        // Return each record id as object as expected to the service delete multiple records.
+        const expensesIds = expensesRelatedToAccount.map((record) => {
+          return { recordId: record._id };
+        });
+        expenseRecords = await this.recordsService.deleteMultipleRecords(
+          expensesIds,
+        );
+      }
+
+      // If the account has incomes, then delete incomes.
+      if (
+        incomesRelatedToAccount !== EXPENSE_NOT_FOUND &&
+        incomesRelatedToAccount !== INCOME_NOT_FOUND
+      ) {
+        // Return records id as object each as expected to the service delete multiple records.
+        const incomesIds = incomesRelatedToAccount.map((record) => {
+          return { recordId: record._id };
+        });
+        incomesRecords = await this.recordsService.deleteMultipleRecords(
+          incomesIds,
+          true,
+        );
+      }
 
       // After deleting records related to this account if found, delete the account.
       const accountDeleted = await this.accountModel.findByIdAndDelete(
@@ -98,7 +114,8 @@ export class AccountsService {
       if (!accountDeleted) throw new BadRequestException('Account not found');
       return {
         ...accountDeleted.toJSON(),
-        deletedRecords: deletedRecords,
+        deletedExpenses: expenseRecords,
+        deletedIncomes: incomesRecords,
       };
     } catch (error) {
       throw new BadRequestException(error.message);

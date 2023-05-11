@@ -36,7 +36,6 @@ export class RecordsController {
 
   @Get('/expenses/:accountId')
   findExpenseByAccount(@Param('accountId') accountId: string) {
-    console.log('estoy en incomes/accountid');
     return this.recordsService.findRecordsByAccount(accountId);
   }
 
