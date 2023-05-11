@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 
 import { DeleteRecordDto, UpdateRecordDto } from '../dtos/records.dto';
-import { CreateExpenseDto } from '../dtos/expenses.dto';
-import { CreateIncomeDto } from '../dtos/incomes.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
+import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
 import { Param } from '@nestjs/common/decorators';
@@ -60,9 +60,14 @@ export class RecordsController {
     return this.recordsService.updateMultipleRecords(payload);
   }
 
-  @Put()
-  update(@Body() payload: UpdateRecordDto) {
-    return this.recordsService.update(payload);
+  @Put('/expenses')
+  updateExpense(@Body() payload: UpdateExpenseDto) {
+    return this.recordsService.updateRecord(payload);
+  }
+
+  @Put('/incomes')
+  updateIncome(@Body() payload: UpdateIncomeDto) {
+    return this.recordsService.updateRecord(payload, true);
   }
 
   @Delete()

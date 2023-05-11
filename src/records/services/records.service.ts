@@ -6,8 +6,8 @@ import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import { UpdateRecordDto, DeleteRecordDto } from '../dtos/records.dto';
-import { CreateExpenseDto } from '../dtos/expenses.dto';
-import { CreateIncomeDto } from '../dtos/incomes.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
+import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 
 @Injectable()
 export class RecordsService {
@@ -73,26 +73,20 @@ export class RecordsService {
     }
   }
 
-  async createMultipleIncomes(data: CreateIncomeDto[]) {
-    try {
-      const newModels = data.map((account) => {
-        return new this.recordModel(account);
-      });
-      const savedModels = await Promise.all(
-        newModels.map((account) => account.save()),
-      );
-      return savedModels;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async update(changes: UpdateRecordDto) {
+  async updateRecord(
+    changes: UpdateIncomeDto | UpdateExpenseDto,
+    isIncome = false,
+  ) {
     try {
       const { recordId } = changes;
-      const updatedRecord = await this.recordModel
-        .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
-        .exec();
+      const updatedRecord = !isIncome
+        ? await this.expenseModel
+            .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
+            .exec()
+        : await this.incomeModel
+            .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
+            .exec();
+
       if (!updatedRecord) throw new BadRequestException('Record not found');
       return updatedRecord;
     } catch (error) {
