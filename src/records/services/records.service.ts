@@ -5,11 +5,7 @@ import { AccountRecord } from '../entities/records.entity';
 import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { RECORDS_NOT_FOUND } from '../constants';
-import {
-  CreateRecordDto,
-  UpdateRecordDto,
-  DeleteRecordDto,
-} from '../dtos/records.dto';
+import { UpdateRecordDto, DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto } from '../dtos/incomes.dto';
 
@@ -21,19 +17,14 @@ export class RecordsService {
     @InjectModel(Income.name) private incomeModel: Model<Income>,
   ) {}
 
-  async createOneExpense(data: CreateExpenseDto) {
+  async createOneRecord(
+    data: CreateExpenseDto | CreateIncomeDto,
+    isIncome = false,
+  ) {
     try {
-      const newModel = new this.expenseModel(data);
-      const model = await newModel.save();
-      return model;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async createOneIncome(data: CreateIncomeDto) {
-    try {
-      const newModel = new this.incomeModel(data);
+      const newModel = !isIncome
+        ? new this.expenseModel(data)
+        : new this.incomeModel(data);
       const model = await newModel.save();
       return model;
     } catch (error) {
@@ -58,17 +49,37 @@ export class RecordsService {
     }
   }
 
-  async createOne(data: CreateRecordDto) {
+  async findExpenseByAccount(accountId: string) {
     try {
-      const newModel = new this.recordModel(data);
-      const model = await newModel.save();
-      return model;
+      const expense = await this.expenseModel
+        .find({ account: accountId })
+        .exec();
+      if (expense.length === 0) {
+        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
+        // it would break the service to delete an account with no records.
+        return 'Expense not found';
+      }
+      return expense;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async createMultipleRecords(data: CreateRecordDto[]) {
+  async createMultipleExpenses(data: CreateExpenseDto[]) {
+    try {
+      const newModels = data.map((account) => {
+        return new this.recordModel(account);
+      });
+      const savedModels = await Promise.all(
+        newModels.map((account) => account.save()),
+      );
+      return savedModels;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createMultipleIncomes(data: CreateIncomeDto[]) {
     try {
       const newModels = data.map((account) => {
         return new this.recordModel(account);

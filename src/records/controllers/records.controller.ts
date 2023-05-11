@@ -8,11 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 
-import {
-  CreateRecordDto,
-  DeleteRecordDto,
-  UpdateRecordDto,
-} from '../dtos/records.dto';
+import { DeleteRecordDto, UpdateRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -23,29 +19,29 @@ import { Param } from '@nestjs/common/decorators';
 export class RecordsController {
   constructor(private recordsService: RecordsService) {}
 
-  @Post('/expense')
+  @Post('/expenses')
   createExpense(@Body() payload: CreateExpenseDto) {
-    return this.recordsService.createOneExpense(payload);
+    return this.recordsService.createOneRecord(payload);
   }
 
-  @Post('/income')
+  @Post('/incomes')
   createIncome(@Body() payload: CreateIncomeDto) {
-    return this.recordsService.createOneIncome(payload);
+    return this.recordsService.createOneRecord(payload, true);
   }
 
-  @Get('/income/:accountId')
+  @Get('/incomes/:accountId')
   findIncomeByAccount(@Param('accountId') accountId: string) {
     return this.recordsService.findIncomeByAccount(accountId);
   }
 
-  @Post()
-  create(@Body() payload: CreateRecordDto) {
-    return this.recordsService.createOne(payload);
+  @Post('/expenses/multiple')
+  createMultipleExpenses(@Body() payload: CreateExpenseDto[]) {
+    return this.recordsService.createMultipleExpenses(payload);
   }
 
-  @Post('/multiple')
-  createMultiple(@Body() payload: CreateRecordDto[]) {
-    return this.recordsService.createMultipleRecords(payload);
+  @Post('/incomes/multiple')
+  createMultiple(@Body() payload: CreateIncomeDto[]) {
+    return this.recordsService.createMultipleIncomes(payload);
   }
 
   @Get(':accountId')
