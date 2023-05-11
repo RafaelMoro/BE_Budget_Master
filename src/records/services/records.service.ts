@@ -52,11 +52,18 @@ export class RecordsService {
     }
   }
 
-  async createMultipleExpenses(data: CreateExpenseDto[]) {
+  async createMultipleRecords(
+    data: CreateExpenseDto[] | CreateIncomeDto[],
+    isIncome = false,
+  ) {
     try {
-      const newModels = data.map((account) => {
-        return new this.recordModel(account);
-      });
+      const newModels = !isIncome
+        ? data.map((account) => {
+            return new this.expenseModel(account);
+          })
+        : data.map((account) => {
+            return new this.incomeModel(account);
+          });
       const savedModels = await Promise.all(
         newModels.map((account) => account.save()),
       );

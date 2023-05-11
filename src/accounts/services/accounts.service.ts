@@ -73,9 +73,9 @@ export class AccountsService {
 
       // Check if the account has records.
       const expensesRelatedToAccount =
-        await this.recordsService.findRecordByAccount(accountId);
+        await this.recordsService.findRecordsByAccount(accountId);
       const incomesRelatedToAccount =
-        await this.recordsService.findRecordByAccount(accountId, true);
+        await this.recordsService.findRecordsByAccount(accountId, true);
 
       // If the account has records, then execute this code.
       // if (

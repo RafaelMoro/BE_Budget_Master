@@ -42,12 +42,12 @@ export class RecordsController {
 
   @Post('/expenses/multiple')
   createMultipleExpenses(@Body() payload: CreateExpenseDto[]) {
-    return this.recordsService.createMultipleExpenses(payload);
+    return this.recordsService.createMultipleRecords(payload);
   }
 
   @Post('/incomes/multiple')
   createMultiple(@Body() payload: CreateIncomeDto[]) {
-    return this.recordsService.createMultipleIncomes(payload);
+    return this.recordsService.createMultipleRecords(payload, true);
   }
 
   @Delete('/multiple')
