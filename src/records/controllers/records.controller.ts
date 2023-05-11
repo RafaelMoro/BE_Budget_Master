@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 
-import { DeleteRecordDto, UpdateRecordDto } from '../dtos/records.dto';
+import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -75,8 +75,13 @@ export class RecordsController {
     return this.recordsService.updateRecord(payload, true);
   }
 
-  @Delete()
-  remove(@Body() payload: DeleteRecordDto) {
-    return this.recordsService.remove(payload);
+  @Delete('/expenses')
+  removeExpense(@Body() payload: DeleteRecordDto) {
+    return this.recordsService.removeRecord(payload);
+  }
+
+  @Delete('/incomes')
+  removeIncome(@Body() payload: DeleteRecordDto) {
+    return this.recordsService.removeRecord(payload, true);
   }
 }

@@ -5,7 +5,7 @@ import { AccountRecord } from '../entities/records.entity';
 import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
-import { UpdateRecordDto, DeleteRecordDto } from '../dtos/records.dto';
+import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 
@@ -124,10 +124,12 @@ export class RecordsService {
     }
   }
 
-  async remove(payload: DeleteRecordDto) {
+  async removeRecord(payload: DeleteRecordDto, isIncome = false) {
     try {
       const { recordId } = payload;
-      const recordDeleted = await this.recordModel.findByIdAndDelete(recordId);
+      const recordDeleted = !isIncome
+        ? await this.expenseModel.findByIdAndDelete(recordId)
+        : await this.incomeModel.findByIdAndDelete(recordId);
       if (!recordDeleted) throw new BadRequestException('Record not found');
       return recordDeleted;
     } catch (error) {
