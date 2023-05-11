@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AccountRecord } from '../entities/records.entity';
 import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
-import { RECORDS_NOT_FOUND } from '../constants';
+import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import { UpdateRecordDto, DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto } from '../dtos/incomes.dto';
@@ -32,34 +32,21 @@ export class RecordsService {
     }
   }
 
-  async findIncomeByAccount(accountId: string) {
+  async findRecordsByAccount(accountId: string, isIncome = false) {
     try {
-      const income = await this.incomeModel
-        .find({ account: accountId })
-        .populate('expensesPaid')
-        .exec();
-      if (income.length === 0) {
+      const record = !isIncome
+        ? await this.expenseModel.find({ account: accountId }).exec()
+        : await this.incomeModel
+            .find({ account: accountId })
+            .populate('expensesPaid')
+            .exec();
+      if (record.length === 0) {
         // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
         // it would break the service to delete an account with no records.
-        return 'Income not found';
+        const message = !isIncome ? EXPENSE_NOT_FOUND : INCOME_NOT_FOUND;
+        return message;
       }
-      return income;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async findExpenseByAccount(accountId: string) {
-    try {
-      const expense = await this.expenseModel
-        .find({ account: accountId })
-        .exec();
-      if (expense.length === 0) {
-        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
-        // it would break the service to delete an account with no records.
-        return 'Expense not found';
-      }
-      return expense;
+      return record;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -88,22 +75,6 @@ export class RecordsService {
         newModels.map((account) => account.save()),
       );
       return savedModels;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async findByAccount(accountId: string) {
-    try {
-      const records = await this.recordModel
-        .find({ account: accountId })
-        .exec();
-      if (records.length === 0) {
-        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
-        // it would break the service to delete an account with no records.
-        return RECORDS_NOT_FOUND;
-      }
-      return records;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

@@ -31,7 +31,13 @@ export class RecordsController {
 
   @Get('/incomes/:accountId')
   findIncomeByAccount(@Param('accountId') accountId: string) {
-    return this.recordsService.findIncomeByAccount(accountId);
+    return this.recordsService.findRecordsByAccount(accountId, true);
+  }
+
+  @Get('/expenses/:accountId')
+  findExpenseByAccount(@Param('accountId') accountId: string) {
+    console.log('estoy en incomes/accountid');
+    return this.recordsService.findRecordsByAccount(accountId);
   }
 
   @Post('/expenses/multiple')
@@ -42,11 +48,6 @@ export class RecordsController {
   @Post('/incomes/multiple')
   createMultiple(@Body() payload: CreateIncomeDto[]) {
     return this.recordsService.createMultipleIncomes(payload);
-  }
-
-  @Get(':accountId')
-  findByAccount(@Param('accountId') accountId: string) {
-    return this.recordsService.findByAccount(accountId);
   }
 
   @Delete('/multiple')

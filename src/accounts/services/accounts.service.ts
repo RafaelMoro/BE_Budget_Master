@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account } from '../entities/accounts.entity';
-import { RECORDS_NOT_FOUND } from '../../records/constants';
+import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../../records/constants';
 import { RecordsService } from '../../records/services/records.service';
 import {
   CreateAccountDto,
@@ -68,24 +68,28 @@ export class AccountsService {
 
   async remove(payload: DeleteAccountDto) {
     try {
-      let deletedRecords = null;
+      const deletedRecords = null;
       const { accountId } = payload;
 
       // Check if the account has records.
-      const recordsRelatedToAccount = await this.recordsService.findByAccount(
-        accountId,
-      );
+      const expensesRelatedToAccount =
+        await this.recordsService.findRecordByAccount(accountId);
+      const incomesRelatedToAccount =
+        await this.recordsService.findRecordByAccount(accountId, true);
 
       // If the account has records, then execute this code.
-      if (recordsRelatedToAccount !== RECORDS_NOT_FOUND) {
-        // Return records id as object each as expected to the service delete multiple records.
-        const recordsIds = recordsRelatedToAccount.map((record) => {
-          return { recordId: record._id };
-        });
-        deletedRecords = await this.recordsService.deleteMultipleRecords(
-          recordsIds,
-        );
-      }
+      // if (
+      //   expensesRelatedToAccount !== EXPENSE_NOT_FOUND ||
+      //   incomesRelatedToAccount !== INCOME_NOT_FOUND
+      // ) {
+      //   // Return records id as object each as expected to the service delete multiple records.
+      //   const expensesIds = expensesRelatedToAccount.map((record) => {
+      //     return { recordId: record._id };
+      //   });
+      //   deletedRecords = await this.recordsService.deleteMultipleRecords(
+      //     recordsIds,
+      //   );
+      // }
 
       // After deleting records related to this account if found, delete the account.
       const accountDeleted = await this.accountModel.findByIdAndDelete(
