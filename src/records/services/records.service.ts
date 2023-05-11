@@ -137,12 +137,16 @@ export class RecordsService {
     }
   }
 
-  async deleteMultipleRecords(records: DeleteRecordDto[]) {
+  async deleteMultipleRecords(records: DeleteRecordDto[], isIncome = false) {
     try {
       const recordsIds = records.map((record) => record.recordId);
-      const deletedRecords = await Promise.all(
-        recordsIds.map((id) => this.recordModel.findByIdAndDelete(id)),
-      );
+      const deletedRecords = !isIncome
+        ? await Promise.all(
+            recordsIds.map((id) => this.expenseModel.findByIdAndDelete(id)),
+          )
+        : await Promise.all(
+            recordsIds.map((id) => this.incomeModel.findByIdAndDelete(id)),
+          );
       const checkDeletedRecords = deletedRecords.map((record, index) => {
         if (!record) return `record id ${records[index].recordId} not found`;
         return record;

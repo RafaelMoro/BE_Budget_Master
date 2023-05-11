@@ -40,31 +40,6 @@ export class RecordsController {
     return this.recordsService.findRecordsByAccount(accountId);
   }
 
-  @Post('/expenses/multiple')
-  createMultipleExpenses(@Body() payload: CreateExpenseDto[]) {
-    return this.recordsService.createMultipleRecords(payload);
-  }
-
-  @Post('/incomes/multiple')
-  createMultiple(@Body() payload: CreateIncomeDto[]) {
-    return this.recordsService.createMultipleRecords(payload, true);
-  }
-
-  @Delete('/multiple')
-  deleteMultiple(@Body() payload: DeleteRecordDto[]) {
-    return this.recordsService.deleteMultipleRecords(payload);
-  }
-
-  @Put('/expenses/multiple')
-  updateMultipleExpenses(@Body() payload: UpdateExpenseDto[]) {
-    return this.recordsService.updateMultipleRecords(payload);
-  }
-
-  @Put('/incomes/multiple')
-  updateMultipleIcomes(@Body() payload: UpdateIncomeDto[]) {
-    return this.recordsService.updateMultipleRecords(payload, true);
-  }
-
   @Put('/expenses')
   updateExpense(@Body() payload: UpdateExpenseDto) {
     return this.recordsService.updateRecord(payload);
@@ -83,5 +58,35 @@ export class RecordsController {
   @Delete('/incomes')
   removeIncome(@Body() payload: DeleteRecordDto) {
     return this.recordsService.removeRecord(payload, true);
+  }
+
+  @Post('/expenses/multiple')
+  createMultipleExpenses(@Body() payload: CreateExpenseDto[]) {
+    return this.recordsService.createMultipleRecords(payload);
+  }
+
+  @Post('/incomes/multiple')
+  createMultiple(@Body() payload: CreateIncomeDto[]) {
+    return this.recordsService.createMultipleRecords(payload, true);
+  }
+
+  @Delete('/expenses/multiple')
+  deleteMultipleExpenses(@Body() payload: DeleteRecordDto[]) {
+    return this.recordsService.deleteMultipleRecords(payload);
+  }
+
+  @Delete('/incomes/multiple')
+  deleteMultipleIncomes(@Body() payload: DeleteRecordDto[]) {
+    return this.recordsService.deleteMultipleRecords(payload, true);
+  }
+
+  @Put('/expenses/multiple')
+  updateMultipleExpenses(@Body() payload: UpdateExpenseDto[]) {
+    return this.recordsService.updateMultipleRecords(payload);
+  }
+
+  @Put('/incomes/multiple')
+  updateMultipleIcomes(@Body() payload: UpdateIncomeDto[]) {
+    return this.recordsService.updateMultipleRecords(payload, true);
   }
 }
