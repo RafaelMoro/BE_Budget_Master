@@ -94,15 +94,24 @@ export class RecordsService {
     }
   }
 
-  async updateMultipleRecords(changes: UpdateRecordDto[]) {
+  async updateMultipleRecords(
+    changes: UpdateIncomeDto[] | UpdateExpenseDto[],
+    isIncome = false,
+  ) {
     try {
       const updatedRecords = await Promise.all(
         changes.map((change) =>
-          this.recordModel.findByIdAndUpdate(
-            change.recordId,
-            { $set: change },
-            { new: true },
-          ),
+          !isIncome
+            ? this.expenseModel.findByIdAndUpdate(
+                change.recordId,
+                { $set: change },
+                { new: true },
+              )
+            : this.incomeModel.findByIdAndUpdate(
+                change.recordId,
+                { $set: change },
+                { new: true },
+              ),
         ),
       );
       const checkUpdatedRecords = updatedRecords.map((record, index) => {

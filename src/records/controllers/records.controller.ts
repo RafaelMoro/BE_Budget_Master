@@ -55,9 +55,14 @@ export class RecordsController {
     return this.recordsService.deleteMultipleRecords(payload);
   }
 
-  @Put('/multiple')
-  updateMultiple(@Body() payload: UpdateRecordDto[]) {
+  @Put('/expenses/multiple')
+  updateMultipleExpenses(@Body() payload: UpdateExpenseDto[]) {
     return this.recordsService.updateMultipleRecords(payload);
+  }
+
+  @Put('/incomes/multiple')
+  updateMultipleIcomes(@Body() payload: UpdateIncomeDto[]) {
+    return this.recordsService.updateMultipleRecords(payload, true);
   }
 
   @Put('/expenses')
