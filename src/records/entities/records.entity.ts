@@ -42,7 +42,7 @@ export class AccountRecord extends Document {
   account: Account | Types.ObjectId;
 
   @Prop()
-  budget: string[];
+  budgets: string[];
 }
 
 export const RecordsSchema = SchemaFactory.createForClass(AccountRecord);

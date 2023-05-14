@@ -61,7 +61,7 @@ export class CreateRecordDto {
   readonly account: string;
 
   @IsArray()
-  readonly budget: string[];
+  readonly budgets: string[];
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {
