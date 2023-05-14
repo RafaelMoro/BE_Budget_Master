@@ -4,7 +4,7 @@ import { PartialType } from '@nestjs/swagger';
 
 export class CreateExpenseDto extends CreateRecordDto {
   @IsBoolean()
-  readonly isPayed: boolean;
+  readonly isPaid: boolean;
 }
 
 export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {

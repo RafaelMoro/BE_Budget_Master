@@ -4,7 +4,7 @@ import { AccountRecord } from './records.entity';
 @Schema()
 export class Expense extends AccountRecord {
   @Prop({ required: true })
-  isPayed: boolean;
+  isPaid: boolean;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);
