@@ -31,8 +31,8 @@ export class AccountRecord extends Document {
       {
         name: { type: String },
         amount: { type: Number },
-        amountPayed: { type: Number },
-        isPayed: { type: Boolean },
+        amountPaid: { type: Number },
+        isPaid: { type: Boolean },
       },
     ],
   })

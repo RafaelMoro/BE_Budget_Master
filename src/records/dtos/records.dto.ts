@@ -18,10 +18,10 @@ export class IndebtedPeople {
   amount: number;
 
   @IsNotEmpty()
-  amountPayed: number;
+  amountPaid: number;
 
   @IsNotEmpty()
-  isPayed: boolean;
+  isPaid: boolean;
 }
 
 export class CreateRecordDto {
