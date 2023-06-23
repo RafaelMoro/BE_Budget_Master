@@ -12,10 +12,13 @@ export class AccountRecord extends Document {
   description: string;
 
   @Prop({ required: true })
-  amount: number;
+  amount: string;
 
-  @Prop({ type: Date })
-  date: Date;
+  @Prop({ required: true })
+  fullDate: string;
+
+  @Prop({ required: true })
+  formattedTime: string;
 
   @Prop({ required: true })
   category: string;

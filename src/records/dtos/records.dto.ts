@@ -32,14 +32,17 @@ export class CreateRecordDto {
   @IsString()
   readonly description: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly amount: number;
+  readonly amount: string;
 
-  @IsDate()
-  @Type(() => Date)
+  @IsString()
   @IsNotEmpty()
-  readonly date: Date;
+  readonly fullDate: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly formattedTime: Date;
 
   @IsString()
   @IsNotEmpty()
