@@ -1,10 +1,8 @@
 import {
   IsString,
-  IsNumber,
   IsNotEmpty,
   IsArray,
   IsMongoId,
-  IsDate,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';

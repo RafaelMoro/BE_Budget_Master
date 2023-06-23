@@ -34,19 +34,41 @@ export class RecordsService {
 
   async findRecordsByAccount(accountId: string, isIncome = false) {
     try {
-      const record = !isIncome
+      const records = !isIncome
         ? await this.expenseModel.find({ account: accountId }).exec()
         : await this.incomeModel
             .find({ account: accountId })
             .populate('expensesPaid')
             .exec();
-      if (record.length === 0) {
+
+      if (isIncome) {
+        // Check if the any record has any expenses paid linked.
+        const noExpensesPaid = records.some(
+          (record) => record.expensesPaid.length > 0,
+        );
+        if (noExpensesPaid) return records;
+
+        // Formatting expenses paid as the front end expect.
+        const newRecords = records.map((record) => {
+          if (record.expensesPaid.length < 1) return record.toJSON();
+
+          const expensesPaid = record.expensesPaid.map((expense) => {
+            const { _id, shortName, amount, fullDate, formattedTime } = expense;
+            return { _id, shortName, amount, fullDate, formattedTime };
+          });
+          return { ...record.toJSON(), expensesPaid };
+        });
+        return newRecords;
+      }
+
+      if (records.length === 0) {
         // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
         // it would break the service to delete an account with no records.
         const message = !isIncome ? EXPENSE_NOT_FOUND : INCOME_NOT_FOUND;
         return message;
       }
-      return record;
+
+      return records;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
