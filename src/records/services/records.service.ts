@@ -41,7 +41,7 @@ export class RecordsService {
             .populate('expensesPaid')
             .exec();
 
-      if (isIncome) {
+      if (isIncome && records.length > 0) {
         // Check if the any record has any expenses paid linked.
         const noExpensesPaid = records.some(
           (record) => record.expensesPaid.length > 0,
