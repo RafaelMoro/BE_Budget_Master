@@ -74,38 +74,75 @@ export class RecordsService {
   async findAllIncomesAndExpenses(accountId: string) {
     try {
       const expenses = await this.expenseModel
-        .find({ account: accountId })
+        .find({
+          account: accountId,
+        })
         .exec();
       const incomes = await this.incomeModel
-        .find({ account: accountId })
+        .find({
+          account: accountId,
+        })
         .populate('expensesPaid')
         .exec();
 
-      if (expenses.length === 0 && incomes.length === 0) {
-        return {
-          records: null,
-          message: 'No incomes or expenses found',
-        };
-      }
-
-      if (expenses.length === 0) {
-        const incomesOrdered = incomes.sort(compareDateAndTime);
-        return { records: incomesOrdered, message: 'No expenses found.' };
-      }
-
-      if (incomes.length === 0) {
-        const expensesOrdered = expenses.sort(compareDateAndTime);
-        return { records: expensesOrdered, message: 'No incomes found.' };
-      }
-
-      const formattedIncomes = this.formatIncome(incomes);
-      const records = [...expenses, ...formattedIncomes].sort(
-        compareDateAndTime,
-      );
-      return { records, message: null };
+      return this.joinIncomesAndExpenses(expenses, incomes);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async findAllIncomesAndExpensesByMonth(accountId: string, month: string) {
+    try {
+      const expenses = await this.expenseModel
+        .find({
+          account: accountId,
+          fullDate: { $regex: new RegExp(month, 'i') },
+        })
+        .exec();
+      const incomes = await this.incomeModel
+        .find({
+          account: accountId,
+          fullDate: { $regex: new RegExp(month, 'i') },
+        })
+        .populate('expensesPaid')
+        .exec();
+
+      return this.joinIncomesAndExpenses(expenses, incomes);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  joinIncomesAndExpenses(
+    expenses: (Expense & { _id: Types.ObjectId })[],
+    incomes: Omit<
+      Income & {
+        _id: Types.ObjectId;
+      },
+      never
+    >[],
+  ) {
+    if (expenses.length === 0 && incomes.length === 0) {
+      return {
+        records: null,
+        message: 'No incomes or expenses found',
+      };
+    }
+
+    if (expenses.length === 0) {
+      const incomesOrdered = incomes.sort(compareDateAndTime);
+      const incomesFormatted = this.formatIncome(incomesOrdered);
+      return { records: incomesFormatted, message: 'No expenses found.' };
+    }
+
+    if (incomes.length === 0) {
+      const expensesOrdered = expenses.sort(compareDateAndTime);
+      return { records: expensesOrdered, message: 'No incomes found.' };
+    }
+
+    const formattedIncomes = this.formatIncome(incomes);
+    const records = [...expenses, ...formattedIncomes].sort(compareDateAndTime);
+    return { records, message: null };
   }
 
   formatIncome(

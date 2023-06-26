@@ -44,6 +44,17 @@ export class RecordsController {
     return this.recordsService.findAllIncomesAndExpenses(accountId);
   }
 
+  @Get('/expenses-and-incomes/:accountId/:month')
+  findAllIncomesAndExpensesByAccountAndMonth(
+    @Param('accountId') accountId: string,
+    @Param('month') month: string,
+  ) {
+    return this.recordsService.findAllIncomesAndExpensesByMonth(
+      accountId,
+      month,
+    );
+  }
+
   @Put('/expenses')
   updateExpense(@Body() payload: UpdateExpenseDto) {
     return this.recordsService.updateRecord(payload);
