@@ -8,6 +8,7 @@ import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
+import { formatDateToString } from '../../utils/formatDateToString';
 
 @Injectable()
 export class RecordsService {
@@ -22,9 +23,11 @@ export class RecordsService {
     isIncome = false,
   ) {
     try {
+      const { fullDate, formattedTime } = formatDateToString(data.date);
+      const newData = { ...data, fullDate, formattedTime };
       const newModel = !isIncome
-        ? new this.expenseModel(data)
-        : new this.incomeModel(data);
+        ? new this.expenseModel(newData)
+        : new this.incomeModel(newData);
       const model = await newModel.save();
       return model;
     } catch (error) {

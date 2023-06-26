@@ -4,6 +4,7 @@ import {
   IsArray,
   IsMongoId,
   ValidateNested,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
@@ -34,13 +35,10 @@ export class CreateRecordDto {
   @IsNotEmpty()
   readonly amount: string;
 
-  @IsString()
+  @IsDate()
+  @Type(() => Date)
   @IsNotEmpty()
-  readonly fullDate: Date;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly formattedTime: Date;
+  readonly date: Date;
 
   @IsString()
   @IsNotEmpty()

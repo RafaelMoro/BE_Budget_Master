@@ -14,6 +14,9 @@ export class AccountRecord extends Document {
   @Prop({ required: true })
   amount: string;
 
+  @Prop({ type: Date })
+  date: Date;
+
   @Prop({ required: true })
   fullDate: string;
 
