@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import { AccountRecord } from '../entities/records.entity';
 import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
@@ -9,6 +10,7 @@ import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { formatDateToString } from '../../utils/formatDateToString';
+import { compareDateAndTime } from '../../utils/compareDates';
 
 @Injectable()
 export class RecordsService {
@@ -46,22 +48,14 @@ export class RecordsService {
 
       if (isIncome && records.length > 0) {
         // Check if the any record has any expenses paid linked.
-        const noExpensesPaid = records.some(
-          (record) => record.expensesPaid.length > 0,
+        return this.formatIncome(
+          records as Omit<
+            Income & {
+              _id: Types.ObjectId;
+            },
+            never
+          >[],
         );
-        if (noExpensesPaid) return records;
-
-        // Formatting expenses paid as the front end expect.
-        const newRecords = records.map((record) => {
-          if (record.expensesPaid.length < 1) return record.toJSON();
-
-          const expensesPaid = record.expensesPaid.map((expense) => {
-            const { _id, shortName, amount, fullDate, formattedTime } = expense;
-            return { _id, shortName, amount, fullDate, formattedTime };
-          });
-          return { ...record.toJSON(), expensesPaid };
-        });
-        return newRecords;
       }
 
       if (records.length === 0) {
@@ -75,6 +69,69 @@ export class RecordsService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async findAllIncomesAndExpenses(accountId: string) {
+    try {
+      const expenses = await this.expenseModel
+        .find({ account: accountId })
+        .exec();
+      const incomes = await this.incomeModel
+        .find({ account: accountId })
+        .populate('expensesPaid')
+        .exec();
+
+      if (expenses.length === 0 && incomes.length === 0) {
+        return {
+          records: null,
+          message: 'No incomes or expenses found',
+        };
+      }
+
+      if (expenses.length === 0) {
+        const incomesOrdered = incomes.sort(compareDateAndTime);
+        return { records: incomesOrdered, message: 'No expenses found.' };
+      }
+
+      if (incomes.length === 0) {
+        const expensesOrdered = expenses.sort(compareDateAndTime);
+        return { records: expensesOrdered, message: 'No incomes found.' };
+      }
+
+      const formattedIncomes = this.formatIncome(incomes);
+      const records = [...expenses, ...formattedIncomes].sort(
+        compareDateAndTime,
+      );
+      return { records, message: null };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  formatIncome(
+    incomes: Omit<
+      Income & {
+        _id: Types.ObjectId;
+      },
+      never
+    >[],
+  ) {
+    const noExpensesPaidFound = incomes.every(
+      (record) => record.expensesPaid.length === 0,
+    );
+    if (noExpensesPaidFound) return incomes;
+
+    // Formatting expenses paid as the front end expect.
+    const newRecords = incomes.map((record) => {
+      if (record.expensesPaid.length === 0) return record.toJSON();
+
+      const expensesPaid = record.expensesPaid.map((expense) => {
+        const { _id, shortName, amount, fullDate, formattedTime } = expense;
+        return { _id, shortName, amount, fullDate, formattedTime };
+      });
+      return { ...record.toJSON(), expensesPaid };
+    });
+    return newRecords;
   }
 
   async createMultipleRecords(
