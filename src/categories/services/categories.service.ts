@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '../entities/categories.entity';
 import { Model } from 'mongoose';
 import { CreateCategoriesDto } from '../dtos/categories.dto';
+// import {  }
 
 @Injectable()
 export class CategoriesService {
@@ -10,17 +11,19 @@ export class CategoriesService {
     @InjectModel(Category.name) private categoryModel: Model<Category>,
   ) {}
 
-  async findAll() {
+  async findbyUser(sub: string) {
     try {
-      return this.categoryModel.find().exec();
+      const categories = await this.categoryModel.find({ sub }).exec();
+      return categories;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async createOne(payload: CreateCategoriesDto) {
+  async createOne(payload: CreateCategoriesDto, userId: string) {
     try {
-      const newModel = new this.categoryModel(payload);
+      const completeData = { ...payload, sub: userId };
+      const newModel = new this.categoryModel(completeData);
       const model = await newModel.save();
       return model;
     } catch (error) {
