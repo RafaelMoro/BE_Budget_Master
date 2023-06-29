@@ -40,10 +40,14 @@ export class RecordsService {
   async findRecordsByAccount(accountId: string, isIncome = false) {
     try {
       const records = !isIncome
-        ? await this.expenseModel.find({ account: accountId }).exec()
+        ? await this.expenseModel
+            .find({ account: accountId })
+            .populate('category', 'categoryName')
+            .exec()
         : await this.incomeModel
             .find({ account: accountId })
             .populate('expensesPaid')
+            .populate('category', 'categoryName')
             .exec();
 
       if (isIncome && records.length > 0) {
@@ -77,12 +81,14 @@ export class RecordsService {
         .find({
           account: accountId,
         })
+        .populate('category', 'categoryName')
         .exec();
       const incomes = await this.incomeModel
         .find({
           account: accountId,
         })
         .populate('expensesPaid')
+        .populate('category', 'categoryName')
         .exec();
 
       return this.joinIncomesAndExpenses(expenses, incomes);
@@ -98,6 +104,7 @@ export class RecordsService {
           account: accountId,
           fullDate: { $regex: new RegExp(month, 'i') },
         })
+        .populate({ path: 'category', select: 'categoryName' })
         .exec();
       const incomes = await this.incomeModel
         .find({
@@ -105,6 +112,7 @@ export class RecordsService {
           fullDate: { $regex: new RegExp(month, 'i') },
         })
         .populate('expensesPaid')
+        .populate('category', 'categoryName')
         .exec();
 
       return this.joinIncomesAndExpenses(expenses, incomes);

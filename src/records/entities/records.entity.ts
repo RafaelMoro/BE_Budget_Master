@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Account } from '../../accounts/entities/accounts.entity';
+import { Category } from '../../categories/entities/categories.entity';
 
 @Schema()
 export class AccountRecord extends Document {
@@ -23,8 +24,8 @@ export class AccountRecord extends Document {
   @Prop({ required: true })
   formattedTime: string;
 
-  @Prop({ required: true })
-  category: string;
+  @Prop({ type: Types.ObjectId, ref: Category.name, required: true })
+  category: Category | Types.ObjectId;
 
   @Prop({ required: true })
   subCategory: string;
