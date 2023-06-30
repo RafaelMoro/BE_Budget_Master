@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, IsMongoId } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateCategoriesDto {
@@ -11,4 +11,14 @@ export class CreateCategoriesDto {
   readonly subCategories: string[];
 }
 
-export class UpdateCategoriesDto extends PartialType(CreateCategoriesDto) {}
+export class UpdateCategoriesDto extends PartialType(CreateCategoriesDto) {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly categoryId: string;
+}
+
+export class DeleteCategoryDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly categoryId: string;
+}

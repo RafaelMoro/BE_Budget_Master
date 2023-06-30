@@ -2,7 +2,11 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '../entities/categories.entity';
 import { Model } from 'mongoose';
-import { CreateCategoriesDto } from '../dtos/categories.dto';
+import {
+  CreateCategoriesDto,
+  DeleteCategoryDto,
+  UpdateCategoriesDto,
+} from '../dtos/categories.dto';
 // import {  }
 
 @Injectable()
@@ -26,6 +30,32 @@ export class CategoriesService {
       const newModel = new this.categoryModel(completeData);
       const model = await newModel.save();
       return model;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateCategory(changes: UpdateCategoriesDto) {
+    try {
+      const { categoryId } = changes;
+      const updateCategory = await this.categoryModel
+        .findByIdAndUpdate(categoryId, { $set: changes }, { new: true })
+        .exec();
+      if (!updateCategory) throw new BadRequestException('Category not found');
+      return updateCategory;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeCategory(payload: DeleteCategoryDto) {
+    try {
+      const { categoryId } = payload;
+      const categoryDeleted = await this.categoryModel.findByIdAndDelete(
+        categoryId,
+      );
+      if (!categoryDeleted) throw new BadRequestException('Category not found');
+      return categoryDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
