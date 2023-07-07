@@ -7,7 +7,6 @@ import {
   DeleteCategoryDto,
   UpdateCategoriesDto,
 } from '../dtos/categories.dto';
-// import {  }
 
 @Injectable()
 export class CategoriesService {
@@ -17,7 +16,9 @@ export class CategoriesService {
 
   async findbyUser(sub: string) {
     try {
-      const categories = await this.categoryModel.find({ sub }).exec();
+      const categories = await this.categoryModel
+        .find({ sub }, { sub: 0 })
+        .exec();
       return categories;
     } catch (error) {
       throw new BadRequestException(error.message);
