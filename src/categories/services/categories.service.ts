@@ -19,7 +19,10 @@ export class CategoriesService {
       const categories = await this.categoryModel
         .find({ sub }, { sub: 0 })
         .exec();
-      return categories;
+      return {
+        categories,
+        error: false,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }
