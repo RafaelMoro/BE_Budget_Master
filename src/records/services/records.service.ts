@@ -1,16 +1,23 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Types, isValidObjectId } from 'mongoose';
+
 import { AccountRecord } from '../entities/records.entity';
 import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
+import { CategoriesService } from '../../categories/services/categories.service';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
+import { createOrModifyCategoryForRecordResponse } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { formatDateToString } from '../../utils/formatDateToString';
 import { compareDateAndTime } from '../../utils/compareDates';
+import {
+  CreateCategoriesDto,
+  UpdateCategoriesDto,
+} from 'src/categories/dtos/categories.dto';
 
 @Injectable()
 export class RecordsService {
@@ -18,20 +25,110 @@ export class RecordsService {
     @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
     @InjectModel(Income.name) private incomeModel: Model<Income>,
+    private categoriesService: CategoriesService,
   ) {}
 
   async createOneRecord(
     data: CreateExpenseDto | CreateIncomeDto,
     isIncome = false,
+    userId: string,
   ) {
     try {
+      const { category, subCategory } = data;
+      const { categoryId } = await this.createOrModifyCategoryForRecord(
+        category,
+        subCategory,
+        userId,
+      );
       const { fullDate, formattedTime } = formatDateToString(data.date);
-      const newData = { ...data, fullDate, formattedTime };
+      const newData = {
+        ...data,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+      };
       const newModel = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
       const model = await newModel.save();
       return model;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /*
+   * This method will take the category by name or mongo id.
+   * If it's a name, it will search if the category has been created or not, if it has been created, it will update subcategories if needed.
+   * If the category is by mongo id, it will check if it exists and will update subcategories if needed.
+   * This method returns an object that contains "message: string | null" and "categoryId: string"
+   */
+  async createOrModifyCategoryForRecord(
+    // category could be a name or a mongo id
+    category: string,
+    subCategory: string,
+    userId: string,
+  ): Promise<createOrModifyCategoryForRecordResponse> {
+    try {
+      const categoryIsMongoId = isValidObjectId(category);
+
+      if (categoryIsMongoId) {
+        // Check the category exists
+        const categoryReturned = await this.categoriesService.findById(
+          category,
+        );
+
+        if (categoryReturned.length === 0) {
+          // This means that the mongo id passed does not belongs to a category
+          return {
+            message: 'Mongo Id does not belong to a category',
+            categoryId: category,
+          };
+        }
+
+        const { categoryId, message } =
+          await this.categoriesService.updateSubcategories(
+            categoryReturned[0],
+            subCategory,
+          );
+        return {
+          message,
+          categoryId,
+        };
+      }
+
+      // The category is a name and check it if it already exists
+      const searchedCategory = await this.categoriesService.findByName(
+        category,
+      );
+
+      // The category already exists with that name.
+      if (searchedCategory.length > 0) {
+        // Update subcategories if needed
+        const { categoryId, message } =
+          await this.categoriesService.updateSubcategories(
+            searchedCategory[0],
+            subCategory,
+          );
+        return {
+          message: 'Category already exists. ' + message,
+          categoryId: categoryId,
+        };
+      }
+
+      // The category is a name and does not exists, then create it.
+      const payload: CreateCategoriesDto = {
+        categoryName: category,
+        subCategories: [subCategory],
+      };
+      const newCategory = await this.categoriesService.createOne(
+        payload,
+        userId,
+      );
+      return {
+        message: 'New category created',
+        categoryId: newCategory._id,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

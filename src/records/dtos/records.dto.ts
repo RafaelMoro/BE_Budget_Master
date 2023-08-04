@@ -40,7 +40,7 @@ export class CreateRecordDto {
   @IsNotEmpty()
   readonly date: Date;
 
-  @IsMongoId()
+  @IsString()
   @IsNotEmpty()
   readonly category: string;
 

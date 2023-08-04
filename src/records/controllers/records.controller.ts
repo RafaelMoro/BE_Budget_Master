@@ -6,6 +6,7 @@ import {
   Put,
   UseGuards,
   Delete,
+  Request,
 } from '@nestjs/common';
 
 import { DeleteRecordDto } from '../dtos/records.dto';
@@ -20,13 +21,15 @@ export class RecordsController {
   constructor(private recordsService: RecordsService) {}
 
   @Post('/expenses')
-  createExpense(@Body() payload: CreateExpenseDto) {
-    return this.recordsService.createOneRecord(payload);
+  createExpense(@Body() payload: CreateExpenseDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.recordsService.createOneRecord(payload, false, userId);
   }
 
   @Post('/incomes')
-  createIncome(@Body() payload: CreateIncomeDto) {
-    return this.recordsService.createOneRecord(payload, true);
+  createIncome(@Body() payload: CreateIncomeDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.recordsService.createOneRecord(payload, true, userId);
   }
 
   @Get('/incomes/:accountId')
