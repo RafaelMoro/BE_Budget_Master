@@ -42,6 +42,14 @@ export class RecordsController {
     return this.recordsService.findRecordsByAccount(accountId);
   }
 
+  @Get('/expenses/:accountId/:month')
+  findExpensesByAccountAndMonth(
+    @Param('accountId') accountId: string,
+    @Param('month') month: string,
+  ) {
+    return this.recordsService.findAllNotPaidExpensesByMonth(accountId, month);
+  }
+
   @Get('/expenses-and-incomes/:accountId')
   findExpenseAndIncomesByAccount(@Param('accountId') accountId: string) {
     return this.recordsService.findAllIncomesAndExpenses(accountId);
