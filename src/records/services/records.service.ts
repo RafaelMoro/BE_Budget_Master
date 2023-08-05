@@ -197,12 +197,14 @@ export class RecordsService {
   async findAllNotPaidExpensesByMonth(
     accountId: string,
     month: string,
+    year: string,
   ): Promise<FindAllNotPaidExpensesByMonthResponse> {
     try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
       const expenses = await this.expenseModel
         .find({
           account: accountId,
-          fullDate: { $regex: new RegExp(month, 'i') },
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
           isPaid: false,
         })
         .populate({ path: 'category', select: 'categoryName' })
@@ -223,12 +225,17 @@ export class RecordsService {
     }
   }
 
-  async findAllIncomesAndExpensesByMonth(accountId: string, month: string) {
+  async findAllIncomesAndExpensesByMonthAndYear(
+    accountId: string,
+    month: string,
+    year: string,
+  ) {
     try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
       const expenses = await this.expenseModel
         .find({
           account: accountId,
-          fullDate: { $regex: new RegExp(month, 'i') },
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
         })
         .populate({ path: 'category', select: 'categoryName' })
         .exec();
