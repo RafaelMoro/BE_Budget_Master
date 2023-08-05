@@ -8,16 +8,16 @@ import { Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
-import { createOrModifyCategoryForRecordResponse } from '../interface';
+import {
+  CreateOrModifyCategoryForRecordResponse,
+  FindAllNotPaidExpensesByMonthResponse,
+} from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { formatDateToString } from '../../utils/formatDateToString';
 import { compareDateAndTime } from '../../utils/compareDates';
-import {
-  CreateCategoriesDto,
-  UpdateCategoriesDto,
-} from 'src/categories/dtos/categories.dto';
+import { CreateCategoriesDto } from 'src/categories/dtos/categories.dto';
 
 @Injectable()
 export class RecordsService {
@@ -68,7 +68,7 @@ export class RecordsService {
     category: string,
     subCategory: string,
     userId: string,
-  ): Promise<createOrModifyCategoryForRecordResponse> {
+  ): Promise<CreateOrModifyCategoryForRecordResponse> {
     try {
       const categoryIsMongoId = isValidObjectId(category);
 
@@ -194,12 +194,48 @@ export class RecordsService {
     }
   }
 
-  async findAllIncomesAndExpensesByMonth(accountId: string, month: string) {
+  async findAllNotPaidExpensesByMonth(
+    accountId: string,
+    month: string,
+    year: string,
+  ): Promise<FindAllNotPaidExpensesByMonthResponse> {
     try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
       const expenses = await this.expenseModel
         .find({
           account: accountId,
-          fullDate: { $regex: new RegExp(month, 'i') },
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
+          isPaid: false,
+        })
+        .populate({ path: 'category', select: 'categoryName' })
+        .exec();
+
+      if (expenses.length === 0) {
+        return {
+          message: 'Not expenses found on this month',
+          expenses,
+        };
+      }
+      return {
+        message: null,
+        expenses,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async findAllIncomesAndExpensesByMonthAndYear(
+    accountId: string,
+    month: string,
+    year: string,
+  ) {
+    try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
+      const expenses = await this.expenseModel
+        .find({
+          account: accountId,
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
         })
         .populate({ path: 'category', select: 'categoryName' })
         .exec();

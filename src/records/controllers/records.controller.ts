@@ -42,19 +42,34 @@ export class RecordsController {
     return this.recordsService.findRecordsByAccount(accountId);
   }
 
+  @Get('/expenses/:accountId/:month/:year')
+  findNotPaidExpensesByAccountMonthAndYear(
+    @Param('accountId') accountId: string,
+    @Param('month') month: string,
+    @Param('year') year: string,
+  ) {
+    return this.recordsService.findAllNotPaidExpensesByMonth(
+      accountId,
+      month,
+      year,
+    );
+  }
+
   @Get('/expenses-and-incomes/:accountId')
   findExpenseAndIncomesByAccount(@Param('accountId') accountId: string) {
     return this.recordsService.findAllIncomesAndExpenses(accountId);
   }
 
-  @Get('/expenses-and-incomes/:accountId/:month')
+  @Get('/expenses-and-incomes/:accountId/:month/:year')
   findAllIncomesAndExpensesByAccountAndMonth(
     @Param('accountId') accountId: string,
     @Param('month') month: string,
+    @Param('year') year: string,
   ) {
-    return this.recordsService.findAllIncomesAndExpensesByMonth(
+    return this.recordsService.findAllIncomesAndExpensesByMonthAndYear(
       accountId,
       month,
+      year,
     );
   }
 
