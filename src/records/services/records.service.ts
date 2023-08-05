@@ -51,6 +51,16 @@ export class RecordsService {
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
       const model = await newModel.save();
+
+      // Update the prop isPaid to true of the expenses related to this income
+      if (isIncome) {
+        const expensesIds: Expense[] = (data as CreateIncomeDto).expensesPaid;
+        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
+          recordId: id,
+          isPaid: true,
+        }));
+        await this.updateMultipleRecords(payload);
+      }
       return model;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -194,7 +204,7 @@ export class RecordsService {
     }
   }
 
-  async findAllNotPaidExpensesByMonth(
+  async findAllNotPaidExpensesByMonthAndYear(
     accountId: string,
     month: string,
     year: string,
@@ -387,6 +397,22 @@ export class RecordsService {
   async removeRecord(payload: DeleteRecordDto, isIncome = false) {
     try {
       const { recordId } = payload;
+
+      // Return expenses to not paid
+      if (isIncome) {
+        const income = await this.incomeModel.findById(recordId);
+
+        // Check if there are any expenses related to this income
+        if (income?.expensesPaid.length > 0) {
+          // set expenses as not paid
+          const payload: UpdateExpenseDto[] = income.expensesPaid.map((id) => ({
+            recordId: id,
+            isPaid: false,
+          }));
+          await this.updateMultipleRecords(payload);
+        }
+      }
+
       const recordDeleted = !isIncome
         ? await this.expenseModel.findByIdAndDelete(recordId)
         : await this.incomeModel.findByIdAndDelete(recordId);

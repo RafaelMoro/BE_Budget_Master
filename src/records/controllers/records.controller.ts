@@ -48,7 +48,7 @@ export class RecordsController {
     @Param('month') month: string,
     @Param('year') year: string,
   ) {
-    return this.recordsService.findAllNotPaidExpensesByMonth(
+    return this.recordsService.findAllNotPaidExpensesByMonthAndYear(
       accountId,
       month,
       year,
