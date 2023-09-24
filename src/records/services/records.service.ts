@@ -11,6 +11,7 @@ import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import {
   CreateOrModifyCategoryForRecordResponse,
   FindAllNotPaidExpensesByMonthResponse,
+  DeleteRecordResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -417,7 +418,12 @@ export class RecordsService {
         ? await this.expenseModel.findByIdAndDelete(recordId)
         : await this.incomeModel.findByIdAndDelete(recordId);
       if (!recordDeleted) throw new BadRequestException('Record not found');
-      return recordDeleted;
+      const response: DeleteRecordResponse = {
+        message: null,
+        error: null,
+        deleteRecordSuccess: true,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
