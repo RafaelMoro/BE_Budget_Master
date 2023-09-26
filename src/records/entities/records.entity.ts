@@ -13,7 +13,10 @@ export class AccountRecord extends Document {
   description: string;
 
   @Prop({ required: true })
-  amount: string;
+  amount: number;
+
+  @Prop({ required: true })
+  amountFormatted: string;
 
   @Prop({ type: Date })
   date: Date;

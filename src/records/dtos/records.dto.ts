@@ -1,5 +1,6 @@
 import {
   IsString,
+  IsNumber,
   IsNotEmpty,
   IsArray,
   IsMongoId,
@@ -31,9 +32,9 @@ export class CreateRecordDto {
   @IsString()
   readonly description: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  readonly amount: string;
+  readonly amount: number;
 
   @IsDate()
   @Type(() => Date)

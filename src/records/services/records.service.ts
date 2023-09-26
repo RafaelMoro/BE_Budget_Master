@@ -16,9 +16,12 @@ import {
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
-import { formatDateToString } from '../../utils/formatDateToString';
-import { compareDateAndTime } from '../../utils/compareDates';
-import { CreateCategoriesDto } from 'src/categories/dtos/categories.dto';
+import {
+  formatDateToString,
+  compareDateAndTime,
+  formatNumberToCurrency,
+} from '../../utils';
+import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 
 @Injectable()
 export class RecordsService {
@@ -35,18 +38,20 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, subCategory } = data;
+      const { category, subCategory, amount } = data;
       const { categoryId } = await this.createOrModifyCategoryForRecord(
         category,
         subCategory,
         userId,
       );
       const { fullDate, formattedTime } = formatDateToString(data.date);
+      const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
         fullDate,
         formattedTime,
         category: categoryId,
+        amountFormatted,
       };
       const newModel = !isIncome
         ? new this.expenseModel(newData)
