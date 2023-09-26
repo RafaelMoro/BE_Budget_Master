@@ -328,6 +328,7 @@ export class RecordsService {
     return newRecords;
   }
 
+  // Deprecated
   async createMultipleRecords(
     data: CreateExpenseDto[] | CreateIncomeDto[],
     isIncome = false,
