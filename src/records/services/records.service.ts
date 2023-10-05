@@ -356,18 +356,20 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { recordId, category, subCategory, date } = changes;
+      const { recordId, category, subCategory, date, amount } = changes;
       const { categoryId } = await this.createOrModifyCategoryForRecord(
         category,
         subCategory,
         userId,
       );
       const { fullDate, formattedTime } = formatDateToString(date);
+      const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
         ...changes,
         category: categoryId,
         fullDate,
         formattedTime,
+        amountFormatted,
       };
       const updatedRecord = !isIncome
         ? await this.expenseModel
