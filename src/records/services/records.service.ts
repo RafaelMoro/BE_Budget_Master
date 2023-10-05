@@ -353,15 +353,28 @@ export class RecordsService {
   async updateRecord(
     changes: UpdateIncomeDto | UpdateExpenseDto,
     isIncome = false,
+    userId: string,
   ) {
     try {
-      const { recordId } = changes;
+      const { recordId, category, subCategory, date } = changes;
+      const { categoryId } = await this.createOrModifyCategoryForRecord(
+        category,
+        subCategory,
+        userId,
+      );
+      const { fullDate, formattedTime } = formatDateToString(date);
+      const newChanges = {
+        ...changes,
+        category: categoryId,
+        fullDate,
+        formattedTime,
+      };
       const updatedRecord = !isIncome
         ? await this.expenseModel
-            .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
+            .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
             .exec()
         : await this.incomeModel
-            .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
+            .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
             .exec();
 
       if (!updatedRecord) throw new BadRequestException('Record not found');
