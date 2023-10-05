@@ -210,7 +210,8 @@ export class RecordsService {
     }
   }
 
-  async findAllNotPaidExpensesByMonthAndYear(
+  // This service is used to search for expenses to be related to an income.
+  async findAllExpensesByMonthAndYear(
     accountId: string,
     month: string,
     year: string,
@@ -221,7 +222,6 @@ export class RecordsService {
         .find({
           account: accountId,
           fullDate: { $regex: new RegExp(regexDate, 'i') },
-          isPaid: false,
         })
         .populate({ path: 'category', select: 'categoryName' })
         .exec();

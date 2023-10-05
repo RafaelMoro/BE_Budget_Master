@@ -42,13 +42,14 @@ export class RecordsController {
     return this.recordsService.findRecordsByAccount(accountId);
   }
 
+  // This endpoint is used to search for expenses to be related to an income.
   @Get('/expenses/:accountId/:month/:year')
-  findNotPaidExpensesByAccountMonthAndYear(
+  findExpensesByAccountMonthAndYear(
     @Param('accountId') accountId: string,
     @Param('month') month: string,
     @Param('year') year: string,
   ) {
-    return this.recordsService.findAllNotPaidExpensesByMonthAndYear(
+    return this.recordsService.findAllExpensesByMonthAndYear(
       accountId,
       month,
       year,
