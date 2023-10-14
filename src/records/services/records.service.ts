@@ -380,6 +380,17 @@ export class RecordsService {
             .exec();
 
       if (!updatedRecord) throw new BadRequestException('Record not found');
+
+      // Update the prop isPaid to true of the expenses related to this income
+      if (isIncome && (changes as CreateIncomeDto).expensesPaid.length > 0) {
+        const expensesIds: Expense[] = (changes as CreateIncomeDto)
+          .expensesPaid;
+        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
+          recordId: id,
+          isPaid: true,
+        }));
+        await this.updateMultipleRecords(payload);
+      }
       return updatedRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
