@@ -12,6 +12,7 @@ import {
   CreateOrModifyCategoryForRecordResponse,
   FindAllNotPaidExpensesByMonthResponse,
   DeleteRecordResponse,
+  FindRecordsByAccountProps,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -150,7 +151,10 @@ export class RecordsService {
     }
   }
 
-  async findRecordsByAccount(accountId: string, isIncome = false) {
+  async findRecordsByAccount({
+    accountId,
+    isIncome = false,
+  }: FindRecordsByAccountProps) {
     try {
       const records = !isIncome
         ? await this.expenseModel

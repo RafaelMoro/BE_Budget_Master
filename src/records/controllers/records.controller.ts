@@ -34,12 +34,15 @@ export class RecordsController {
 
   @Get('/incomes/:accountId')
   findIncomeByAccount(@Param('accountId') accountId: string) {
-    return this.recordsService.findRecordsByAccount(accountId, true);
+    return this.recordsService.findRecordsByAccount({
+      accountId,
+      isIncome: true,
+    });
   }
 
   @Get('/expenses/:accountId')
   findExpenseByAccount(@Param('accountId') accountId: string) {
-    return this.recordsService.findRecordsByAccount(accountId);
+    return this.recordsService.findRecordsByAccount({ accountId });
   }
 
   // This endpoint is used to search for expenses to be related to an income.
