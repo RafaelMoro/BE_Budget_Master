@@ -7,6 +7,9 @@ import { Category } from '../../categories/entities/categories.entity';
 @Schema()
 export class AccountRecord extends Document {
   @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
   shortName: string;
 
   @Prop()

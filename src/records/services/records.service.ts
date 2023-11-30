@@ -53,6 +53,7 @@ export class RecordsService {
         formattedTime,
         category: categoryId,
         amountFormatted,
+        userId,
       };
       const newModel = !isIncome
         ? new this.expenseModel(newData)
@@ -68,7 +69,8 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
-      return model;
+      const { userId: userIdModel, ...restProps } = model.toJSON();
+      return restProps;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
