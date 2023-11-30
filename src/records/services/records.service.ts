@@ -251,6 +251,7 @@ export class RecordsService {
     accountId: string,
     month: string,
     year: string,
+    userId: string,
   ) {
     try {
       const regexDate = `${month}.*${year}|${year}.*${month}`;
@@ -270,6 +271,14 @@ export class RecordsService {
         .populate('category', 'categoryName')
         .exec();
 
+      if (
+        (expenses.length > 0 && expenses[0]?.userId !== userId) ||
+        (incomes.length > 0 && incomes[0].userId !== userId)
+      ) {
+        throw new BadRequestException(
+          "You're unauthorized to see these records.",
+        );
+      }
       return this.joinIncomesAndExpenses(expenses, incomes);
     } catch (error) {
       throw new BadRequestException(error.message);
