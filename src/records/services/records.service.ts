@@ -195,6 +195,26 @@ export class RecordsService {
     }
   }
 
+  verifyExpensesBelongsToUser(expenses: Expense[], userId: string) {
+    if (expenses.length === 0) return expenses;
+    if (expenses[0]?.userId !== userId) {
+      throw new BadRequestException(
+        "You're unauthorized to see these expenses.",
+      );
+    }
+    return expenses;
+  }
+
+  verifyIncomesBelongsToUser(incomes: Income[], userId: string) {
+    if (incomes.length === 0) return incomes;
+    if (incomes[0]?.userId !== userId) {
+      throw new BadRequestException(
+        "You're unauthorized to see these incomes.",
+      );
+    }
+    return incomes;
+  }
+
   async findAllIncomesAndExpenses(accountId: string) {
     try {
       const expenses = await this.expenseModel
@@ -272,14 +292,9 @@ export class RecordsService {
         .populate('category', 'categoryName')
         .exec();
 
-      if (
-        (expenses.length > 0 && expenses[0]?.userId !== userId) ||
-        (incomes.length > 0 && incomes[0].userId !== userId)
-      ) {
-        throw new BadRequestException(
-          "You're unauthorized to see these records.",
-        );
-      }
+      this.verifyExpensesBelongsToUser(expenses, userId);
+      this.verifyIncomesBelongsToUser(incomes, userId);
+
       return this.joinIncomesAndExpenses(expenses, incomes);
     } catch (error) {
       throw new BadRequestException(error.message);
