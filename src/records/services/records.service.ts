@@ -5,7 +5,7 @@ import { Types, isValidObjectId } from 'mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
-import { Income } from '../entities/incomes.entity';
+import { CreateIncome } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import {
@@ -29,7 +29,7 @@ export class RecordsService {
   constructor(
     @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
-    @InjectModel(Income.name) private incomeModel: Model<Income>,
+    @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
   ) {}
 
@@ -174,7 +174,7 @@ export class RecordsService {
         // Check if the any record has any expenses paid linked.
         return this.formatIncome(
           records as Omit<
-            Income & {
+            CreateIncome & {
               _id: Types.ObjectId;
             },
             never
@@ -289,7 +289,7 @@ export class RecordsService {
   joinIncomesAndExpenses(
     expenses: Expense[],
     incomes: Omit<
-      Income & {
+      CreateIncome & {
         _id: Types.ObjectId;
       },
       never
@@ -320,7 +320,7 @@ export class RecordsService {
 
   formatIncome(
     incomes: Omit<
-      Income & {
+      CreateIncome & {
         _id: Types.ObjectId;
       },
       never

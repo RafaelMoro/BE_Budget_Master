@@ -4,7 +4,7 @@ import { AccountRecord } from './records.entity';
 import { CreateExpense } from './expenses.entity';
 
 @Schema()
-export class Income extends AccountRecord {
+export class CreateIncome extends AccountRecord {
   @Prop({
     type: [
       {
@@ -16,4 +16,4 @@ export class Income extends AccountRecord {
   expensesPaid: Types.Array<CreateExpense>;
 }
 
-export const IncomeSchema = SchemaFactory.createForClass(Income);
+export const IncomeSchema = SchemaFactory.createForClass(CreateIncome);
