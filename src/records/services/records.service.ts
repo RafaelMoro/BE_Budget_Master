@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Types, isValidObjectId } from 'mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
-import { CreateExpense } from '../entities/expenses.entity';
+import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
@@ -287,7 +287,7 @@ export class RecordsService {
   }
 
   joinIncomesAndExpenses(
-    expenses: (CreateExpense & { _id: Types.ObjectId })[],
+    expenses: Expense[],
     incomes: Omit<
       Income & {
         _id: Types.ObjectId;
