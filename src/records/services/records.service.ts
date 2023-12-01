@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Types, isValidObjectId } from 'mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
-import { Expense } from '../entities/expenses.entity';
+import { CreateExpense } from '../entities/expenses.entity';
 import { Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
@@ -28,7 +28,7 @@ import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 export class RecordsService {
   constructor(
     @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
-    @InjectModel(Expense.name) private expenseModel: Model<Expense>,
+    @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     @InjectModel(Income.name) private incomeModel: Model<Income>,
     private categoriesService: CategoriesService,
   ) {}
@@ -62,7 +62,8 @@ export class RecordsService {
 
       // Update the prop isPaid to true of the expenses related to this income
       if (isIncome) {
-        const expensesIds: Expense[] = (data as CreateIncomeDto).expensesPaid;
+        const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
+          .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
           recordId: id,
           isPaid: true,
@@ -286,7 +287,7 @@ export class RecordsService {
   }
 
   joinIncomesAndExpenses(
-    expenses: (Expense & { _id: Types.ObjectId })[],
+    expenses: (CreateExpense & { _id: Types.ObjectId })[],
     incomes: Omit<
       Income & {
         _id: Types.ObjectId;
@@ -398,7 +399,7 @@ export class RecordsService {
 
       // Update the prop isPaid to true of the expenses related to this income
       if (isIncome && (changes as CreateIncomeDto).expensesPaid.length > 0) {
-        const expensesIds: Expense[] = (changes as CreateIncomeDto)
+        const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
           recordId: id,

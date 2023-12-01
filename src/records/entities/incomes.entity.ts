@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { AccountRecord } from './records.entity';
-import { Expense } from './expenses.entity';
+import { CreateExpense } from './expenses.entity';
 
 @Schema()
 export class Income extends AccountRecord {
@@ -9,11 +9,11 @@ export class Income extends AccountRecord {
     type: [
       {
         type: Types.ObjectId,
-        ref: Expense.name,
+        ref: CreateExpense.name,
       },
     ],
   })
-  expensesPaid: Types.Array<Expense>;
+  expensesPaid: Types.Array<CreateExpense>;
 }
 
 export const IncomeSchema = SchemaFactory.createForClass(Income);

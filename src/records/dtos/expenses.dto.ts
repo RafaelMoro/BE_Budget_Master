@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty, IsBoolean } from 'class-validator';
 import { CreateRecordDto } from './records.dto';
 import { PartialType } from '@nestjs/swagger';
-import { Expense } from '../entities/expenses.entity';
+import { CreateExpense } from '../entities/expenses.entity';
 
 export class CreateExpenseDto extends CreateRecordDto {
   @IsBoolean()
@@ -11,5 +11,5 @@ export class CreateExpenseDto extends CreateRecordDto {
 export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {
   @IsMongoId()
   @IsNotEmpty()
-  readonly recordId: Expense;
+  readonly recordId: CreateExpense;
 }

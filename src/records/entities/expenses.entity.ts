@@ -2,9 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AccountRecord } from './records.entity';
 
 @Schema()
-export class Expense extends AccountRecord {
+export class CreateExpense extends AccountRecord {
   @Prop({ required: true })
   isPaid: boolean;
 }
 
-export const ExpenseSchema = SchemaFactory.createForClass(Expense);
+export const ExpenseSchema = SchemaFactory.createForClass(CreateExpense);

@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Expense } from './entities/expenses.entity';
+import { CreateExpense } from './entities/expenses.entity';
 
 export interface CreateOrModifyCategoryForRecordResponse {
   message: null | string;
@@ -15,7 +15,7 @@ export interface DeleteRecordResponse {
 export interface FindAllNotPaidExpensesByMonthResponse {
   message: null | string;
   expenses: Omit<
-    Expense & {
+    CreateExpense & {
       _id: Types.ObjectId;
     },
     never
