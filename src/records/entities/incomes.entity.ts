@@ -16,4 +16,10 @@ export class CreateIncome extends AccountRecord {
   expensesPaid: Types.Array<CreateExpense>;
 }
 
+export interface Income extends CreateIncome {
+  _id: Types.ObjectId;
+}
+
+export type IncomeWithoutUserId = Omit<Income, 'userId'>;
+
 export const IncomeSchema = SchemaFactory.createForClass(CreateIncome);
