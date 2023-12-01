@@ -12,6 +12,4 @@ export interface Expense extends CreateExpense {
   _id: Types.ObjectId;
 }
 
-export type ExpenseWithoutUserId = Omit<Expense, 'userId'>;
-
 export const ExpenseSchema = SchemaFactory.createForClass(CreateExpense);

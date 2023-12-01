@@ -51,11 +51,14 @@ export class RecordsController {
     @Param('accountId') accountId: string,
     @Param('month') month: string,
     @Param('year') year: string,
+    @Request() req,
   ) {
+    const userId = req.user.sub;
     return this.recordsService.findAllExpensesByMonthAndYear(
       accountId,
       month,
       year,
+      userId,
     );
   }
 

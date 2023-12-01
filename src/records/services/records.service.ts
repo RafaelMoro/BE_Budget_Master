@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types, isValidObjectId } from 'mongoose';
@@ -198,17 +202,18 @@ export class RecordsService {
   verifyExpensesBelongsToUser(expenses: Expense[], userId: string) {
     if (expenses.length === 0) return expenses;
     if (expenses[0]?.userId !== userId) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         "You're unauthorized to see these expenses.",
       );
     }
+
     return expenses;
   }
 
   verifyIncomesBelongsToUser(incomes: Income[], userId: string) {
     if (incomes.length === 0) return incomes;
     if (incomes[0]?.userId !== userId) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         "You're unauthorized to see these incomes.",
       );
     }
@@ -242,6 +247,7 @@ export class RecordsService {
     accountId: string,
     month: string,
     year: string,
+    userId: string,
   ): Promise<FindAllNotPaidExpensesByMonthResponse> {
     try {
       const regexDate = `${month}.*${year}|${year}.*${month}`;
@@ -253,6 +259,7 @@ export class RecordsService {
         .populate({ path: 'category', select: 'categoryName' })
         .exec();
 
+      this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
         return {
           message: 'Not expenses found on this month',

@@ -20,6 +20,4 @@ export interface Income extends CreateIncome {
   _id: Types.ObjectId;
 }
 
-export type IncomeWithoutUserId = Omit<Income, 'userId'>;
-
 export const IncomeSchema = SchemaFactory.createForClass(CreateIncome);
