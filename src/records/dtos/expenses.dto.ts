@@ -12,4 +12,7 @@ export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {
   @IsMongoId()
   @IsNotEmpty()
   readonly recordId: CreateExpense;
+
+  @IsMongoId()
+  readonly userId: string;
 }

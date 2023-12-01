@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { CreateExpense } from './entities/expenses.entity';
+import { DeleteRecordDto } from './dtos/records.dto';
 
 export interface CreateOrModifyCategoryForRecordResponse {
   message: null | string;
@@ -25,6 +26,12 @@ export interface FindAllNotPaidExpensesByMonthResponse {
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
+  userId: string;
+  isIncome?: boolean;
+}
+
+export interface RemoveRecordProps {
+  payload: DeleteRecordDto;
   userId: string;
   isIncome?: boolean;
 }

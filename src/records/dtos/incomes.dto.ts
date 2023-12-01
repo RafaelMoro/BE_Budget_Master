@@ -12,4 +12,7 @@ export class UpdateIncomeDto extends PartialType(CreateIncomeDto) {
   @IsMongoId()
   @IsNotEmpty()
   readonly recordId: string;
+
+  @IsMongoId()
+  readonly userId: string;
 }

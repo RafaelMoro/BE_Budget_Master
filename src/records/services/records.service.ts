@@ -17,6 +17,7 @@ import {
   FindAllNotPaidExpensesByMonthResponse,
   DeleteRecordResponse,
   FindRecordsByAccountProps,
+  RemoveRecordProps,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -71,6 +72,7 @@ export class RecordsService {
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
           recordId: id,
           isPaid: true,
+          userId,
         }));
         await this.updateMultipleRecords(payload);
       }
@@ -386,7 +388,21 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { recordId, category, subCategory, date, amount } = changes;
+      const {
+        recordId,
+        category,
+        subCategory,
+        date,
+        amount,
+        userId: userIdChanges,
+      } = changes;
+
+      // Verify that the record belongs to the user
+      if (userId !== userIdChanges) {
+        throw new UnauthorizedException(
+          'This record does not belongs to the user',
+        );
+      }
       const { categoryId } = await this.createOrModifyCategoryForRecord(
         category,
         subCategory,
@@ -418,6 +434,7 @@ export class RecordsService {
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
           recordId: id,
           isPaid: true,
+          userId,
         }));
         await this.updateMultipleRecords(payload);
       }
@@ -457,9 +474,30 @@ export class RecordsService {
     }
   }
 
-  async removeRecord(payload: DeleteRecordDto, isIncome = false) {
+  async verifyRecordBelongsUser(
+    recordId: string,
+    userId: string,
+    isIncome: boolean,
+  ) {
+    try {
+      const record = isIncome
+        ? await this.incomeModel.findById(recordId)
+        : await this.expenseModel.findById(recordId);
+      const { userId: recordUserId } = record;
+      if (userId !== recordUserId) {
+        throw new UnauthorizedException(
+          'This record does not belongs to the user',
+        );
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeRecord({ payload, userId, isIncome = false }: RemoveRecordProps) {
     try {
       const { recordId } = payload;
+      await this.verifyRecordBelongsUser(recordId, userId, isIncome);
 
       // Return expenses to not paid
       if (isIncome) {
@@ -471,6 +509,7 @@ export class RecordsService {
           const payload: UpdateExpenseDto[] = income.expensesPaid.map((id) => ({
             recordId: id,
             isPaid: false,
+            userId,
           }));
           await this.updateMultipleRecords(payload);
         }
