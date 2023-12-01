@@ -66,7 +66,7 @@ export class AccountsService {
     }
   }
 
-  async remove(payload: DeleteAccountDto) {
+  async remove(payload: DeleteAccountDto, userId: string) {
     try {
       let expenseRecords = null;
       let incomesRecords = null;
@@ -76,11 +76,13 @@ export class AccountsService {
       const expensesRelatedToAccount =
         await this.recordsService.findRecordsByAccount({
           accountId,
+          userId,
         });
       const incomesRelatedToAccount =
         await this.recordsService.findRecordsByAccount({
           accountId,
           isIncome: true,
+          userId,
         });
 
       // If the account has expenses, then delete expenses.

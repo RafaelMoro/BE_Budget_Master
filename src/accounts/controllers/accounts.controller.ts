@@ -45,7 +45,8 @@ export class AccountsController {
   }
 
   @Delete()
-  remove(@Body() payload: DeleteAccountDto) {
-    return this.accountsService.remove(payload);
+  remove(@Body() payload: DeleteAccountDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.accountsService.remove(payload, userId);
   }
 }

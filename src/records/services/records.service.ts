@@ -161,6 +161,7 @@ export class RecordsService {
   async findRecordsByAccount({
     accountId,
     isIncome = false,
+    userId,
   }: FindRecordsByAccountProps) {
     try {
       const records = !isIncome
@@ -174,16 +175,15 @@ export class RecordsService {
             .populate('category', 'categoryName')
             .exec();
 
+      if (isIncome) {
+        this.verifyIncomesBelongsToUser(records as Income[], userId);
+      } else {
+        this.verifyExpensesBelongsToUser(records as Expense[], userId);
+      }
+
       if (isIncome && records.length > 0) {
         // Check if the any record has any expenses paid linked.
-        return this.formatIncome(
-          records as Omit<
-            CreateIncome & {
-              _id: Types.ObjectId;
-            },
-            never
-          >[],
-        );
+        return this.formatIncome(records as Income[]);
       }
 
       if (records.length === 0) {

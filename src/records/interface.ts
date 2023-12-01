@@ -25,5 +25,6 @@ export interface FindAllNotPaidExpensesByMonthResponse {
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
+  userId: string;
   isIncome?: boolean;
 }
