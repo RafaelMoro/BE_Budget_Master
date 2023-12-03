@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.build.json",
     "build:local": "nest build",
     "gcp-build": "npm run build",
+    "deploy": "gcloud app deploy",
     "start": "node ./dist/main.js",
     "main": "node dist/main.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
