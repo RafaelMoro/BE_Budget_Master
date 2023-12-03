@@ -1,0 +1,31 @@
+runtime: nodejs16
+
+runtime: nodejs16
+service: budget-master-api
+
+handlers:
+  - url: /.*
+    script: auto
+
+env_variables:
+  CLUSTER: 'curso-basicomongo'
+  MONGO_USER: 'admin-rafa'
+  MONGO_PWD: 'yh9xCnyafjXEjlMG'
+  MONGO_DB_NAME: 'personal-finances'
+  MONGO_CONNECTION: 'mongodb+srv'
+  JWT_KEY: '*6fdgmE+@(MCx4ymq^3(q&)ZRh4NA%'
+  ONE_TIME_JWT_KEY: 'zdx#8nn5tf2SNpMJIg7Dq6*F'
+  PUBLIC_KEY: 'LAQ6IpFhh4CQGzUm4MnrN(Cu$s$mAj'
+  MAILER_MAIL: 'count.on.me.app.personal.finances@gmail.com'
+  MAILER_PWD: 'snhyngkfaygigwsg'
+  SMTP_HOST: 'smtp.gmail.com'
+  SMTP_PORT: '465'
+  FRONTEND_URI: 'http://localhost:3000'
+  FRONTEND_PORT: '3000'
+
+runtime_config:
+  commands:
+    - npm install
+    - npm run build
+
+entrypoint: npm run start
