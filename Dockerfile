@@ -1,8 +1,11 @@
 FROM node:16-buster
 RUN mkdir /app
-COPY package.json /app/
+COPY ["package.json" "/app/"]
 WORKDIR /app
-COPY . ./
+RUN npm install
+COPY ["." "./"]
+RUN npm run build
+EXPOSE 8080
 
 ENV CLUSTER=curso-basicomongo
 ENV MONGO_USER=admin-rafa
@@ -19,6 +22,4 @@ ENV SMTP_PORT=465
 ENV FRONTEND_URI=http://localhost:3000
 ENV FRONTEND_PORT=3000
 
-RUN npm install
-RUN npm run build
 CMD ["npm", "run","start:prod"]
