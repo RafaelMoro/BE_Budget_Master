@@ -18,4 +18,5 @@ export default registerAs('config', () => ({
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
   },
+  backendUri: process.env.BACKEND_URI,
 }));

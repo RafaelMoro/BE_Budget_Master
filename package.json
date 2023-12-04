@@ -7,8 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.build.json",
-    "build:local": "nest build",
+    "build": "nest build",
+    "build:gcp": "tsc -p tsconfig.build.json",
     "gcp-build": "npm run build",
     "deploy": "gcloud app deploy",
     "start": "node ./dist/main.js",
