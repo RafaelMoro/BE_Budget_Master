@@ -10,6 +10,7 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
+import { AccountResponse, GetAccountResponse } from '../interface';
 
 @Injectable()
 export class AccountsService {
@@ -46,12 +47,22 @@ export class AccountsService {
 
   async findByUser(sub: string) {
     try {
-      const accounts = await this.accountModel
+      const accounts: AccountResponse[] = await this.accountModel
         .find({ sub: sub }, { sub: 0 })
         .exec();
-      return accounts;
+
+      const response: GetAccountResponse = {
+        data: accounts,
+        error: null,
+      };
+      return response;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      const errorFormatted = new BadRequestException(error.message);
+      const errorResponse: GetAccountResponse = {
+        data: null,
+        error: errorFormatted,
+      };
+      return errorResponse;
     }
   }
 
