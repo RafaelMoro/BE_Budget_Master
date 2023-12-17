@@ -62,11 +62,11 @@ export class UsersService {
 
   async forgotPassword(payload: ForgotPasswordDto) {
     const { email, hostname } = payload;
-    const { frontendPort } = this.configService;
+    const { frontendPort, backendUri } = this.configService;
     const completeHostname =
       hostname === 'localhost'
         ? `http://${hostname}:${frontendPort}`
-        : `https://${hostname}`;
+        : `http://${backendUri}`;
 
     const user: User = await this.findByEmail(email);
     if (!user) throw new NotFoundException('User not found');
