@@ -45,11 +45,12 @@ export class RecordsService {
   ) {
     try {
       const { category, subCategory, amount } = data;
-      const { categoryId } = await this.createOrModifyCategoryForRecord(
-        category,
-        subCategory,
-        userId,
-      );
+      const { categoryId, categoryName } =
+        await this.createOrModifyCategoryForRecord(
+          category,
+          subCategory,
+          userId,
+        );
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
@@ -76,8 +77,11 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
-      const { userId: userIdModel, ...restProps } = model.toJSON();
-      return restProps;
+      const record = {
+        ...model.toJSON(),
+        category: { _id: categoryId, categoryName },
+      };
+      return record;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -109,6 +113,7 @@ export class RecordsService {
           return {
             message: 'Mongo Id does not belong to a category',
             categoryId: category,
+            categoryName: null,
           };
         }
 
@@ -120,6 +125,7 @@ export class RecordsService {
         return {
           message,
           categoryId,
+          categoryName: categoryReturned[0].categoryName,
         };
       }
 
@@ -139,6 +145,7 @@ export class RecordsService {
         return {
           message: 'Category already exists. ' + message,
           categoryId: categoryId,
+          categoryName: searchedCategory[0].categoryName,
         };
       }
 
@@ -154,6 +161,7 @@ export class RecordsService {
       return {
         message: 'New category created',
         categoryId: newCategory._id,
+        categoryName: newCategory.categoryName,
       };
     } catch (error) {
       throw new BadRequestException(error.message);
