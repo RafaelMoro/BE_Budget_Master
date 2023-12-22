@@ -28,7 +28,7 @@ export class UsersController {
   @Public()
   @Post()
   createUser(@Body() payload: CreateUserDto) {
-    return this.usersService.create(payload);
+    return this.usersService.createUser(payload);
   }
 
   @Delete()

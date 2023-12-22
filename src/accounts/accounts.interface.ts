@@ -1,7 +1,8 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
+import { Account } from './entities/accounts.entity';
 
-export interface AccountResponse {
+export interface AccountResponse extends Account {
   _id: Types.ObjectId;
 }
 

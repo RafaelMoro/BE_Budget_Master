@@ -17,6 +17,8 @@ import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
 import config from '../../config';
 import { ConfigType } from '@nestjs/config';
+import { CreateUserResponse, UserResponse } from '../users.interface';
+import { VERSION_RESPONSE } from '../../constants';
 
 @Injectable()
 export class UsersService {
@@ -31,19 +33,30 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async create(data: CreateUserDto) {
-    //Verify if the user exists with the same email.
-    const { email } = data;
-    const user = await this.findByEmail(email);
-    if (user) throw new BadRequestException('User with that email exists');
+  async createUser(data: CreateUserDto) {
+    try {
+      //Verify if the user exists with the same email.
+      const { email: emailData } = data;
+      const user = await this.findByEmail(emailData);
+      if (user) throw new BadRequestException('Try with other email.');
 
-    const userModel = new this.userModel(data);
-    const passwordHashed = await bcrypt.hash(userModel.password, 10);
-    userModel.password = passwordHashed;
-    const modelSaved = await userModel.save();
-    const { email: emailModel } = modelSaved.toJSON();
-    const rta = { emailModel, message: 'User created' };
-    return rta;
+      const userModel = new this.userModel(data);
+      const passwordHashed = await bcrypt.hash(userModel.password, 10);
+      userModel.password = passwordHashed;
+      const modelSaved: UserResponse = await userModel.save();
+      const { email } = modelSaved.toJSON();
+      // const rta = { emailModel, message: 'User created' };
+      const response: CreateUserResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'User created',
+        data: { email },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   // crear un metodo de update para cambiar firstname middlename o secondname

@@ -16,7 +16,7 @@ import {
   DeleteAccountResponse,
   GeneralAccountResponse,
   GetAccountResponse,
-} from '../interface';
+} from '../accounts.interface';
 
 @Injectable()
 export class AccountsService {
