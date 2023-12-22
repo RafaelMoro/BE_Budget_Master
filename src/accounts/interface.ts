@@ -10,7 +10,6 @@ export interface CreateAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: AccountResponse;
 }
 
-export interface GetAccountResponse {
+export interface GetAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: AccountResponse[];
-  error: BadRequestException | null;
 }

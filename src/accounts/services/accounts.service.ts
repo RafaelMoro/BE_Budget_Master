@@ -32,26 +32,11 @@ export class AccountsService {
       const response: CreateAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
+        message: 'Account created',
         data: model,
         error: null,
-        message: 'Account created',
       };
       return response;
-    } catch (error) {
-      throw new BadRequestException();
-    }
-  }
-
-  async createMultipleAccounts(data: CreateAccountDto[], userId: string) {
-    try {
-      const newModels = data.map((account) => {
-        const completeData = { ...account, sub: userId };
-        return new this.accountModel(completeData);
-      });
-      const savedModels = await Promise.all(
-        newModels.map((account) => account.save()),
-      );
-      return savedModels;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -60,21 +45,19 @@ export class AccountsService {
   async findByUser(sub: string) {
     try {
       const accounts: AccountResponse[] = await this.accountModel
-        .find({ sub: sub }, { sub: 0 })
+        .find({ sub: sub })
         .exec();
 
       const response: GetAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
         data: accounts,
         error: null,
       };
       return response;
     } catch (error) {
-      const errorFormatted = new BadRequestException(error.message);
-      const errorResponse: GetAccountResponse = {
-        data: null,
-        error: errorFormatted,
-      };
-      return errorResponse;
+      throw new BadRequestException(error.message);
     }
   }
 
