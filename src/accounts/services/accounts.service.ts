@@ -13,6 +13,7 @@ import {
 } from '../dtos/accounts.dto';
 import {
   AccountResponse,
+  DeleteAccountResponse,
   GeneralAccountResponse,
   GetAccountResponse,
 } from '../interface';
@@ -130,15 +131,22 @@ export class AccountsService {
       }
 
       // After deleting records related to this account if found, delete the account.
-      const accountDeleted = await this.accountModel.findByIdAndDelete(
-        accountId,
-      );
+      const accountDeleted: AccountResponse =
+        await this.accountModel.findByIdAndDelete(accountId);
       if (!accountDeleted) throw new BadRequestException('Account not found');
-      return {
-        ...accountDeleted.toJSON(),
-        deletedExpenses: expenseRecords,
-        deletedIncomes: incomesRecords,
+
+      const response: DeleteAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Account Deleted',
+        data: {
+          accountDeleted,
+          numberExpensesDeleted: expenseRecords?.length ?? 0,
+          numberIncomesDeleted: incomesRecords?.length ?? 0,
+        },
+        error: null,
       };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

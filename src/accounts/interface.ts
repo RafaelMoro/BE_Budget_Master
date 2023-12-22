@@ -12,3 +12,13 @@ export interface GeneralAccountResponse extends Omit<GeneralResponse, 'data'> {
 export interface GetAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: AccountResponse[];
 }
+
+interface DeleteAccountResponseData {
+  accountDeleted: AccountResponse;
+  numberExpensesDeleted: number;
+  numberIncomesDeleted: number;
+}
+
+export interface DeleteAccountResponse extends Omit<GeneralResponse, 'data'> {
+  data: DeleteAccountResponseData;
+}
