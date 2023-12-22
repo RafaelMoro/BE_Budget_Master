@@ -4,7 +4,10 @@ import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 
+import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
+import { USER_CREATED_MESSAGE } from '../constants';
 import {
   CreateUserDto,
   UpdateUserPasswordDto,
@@ -16,9 +19,7 @@ import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
 import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
 import config from '../../config';
-import { ConfigType } from '@nestjs/config';
 import { CreateUserResponse, UserResponse } from '../users.interface';
-import { VERSION_RESPONSE } from '../../constants';
 
 @Injectable()
 export class UsersService {
@@ -38,7 +39,7 @@ export class UsersService {
       //Verify if the user exists with the same email.
       const { email: emailData } = data;
       const user = await this.findByEmail(emailData);
-      if (user) throw new BadRequestException('Try with other email.');
+      if (user) throw new BadRequestException(USER_EXISTS_ERROR);
 
       const userModel = new this.userModel(data);
       const passwordHashed = await bcrypt.hash(userModel.password, 10);
@@ -49,7 +50,7 @@ export class UsersService {
       const response: CreateUserResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'User created',
+        message: USER_CREATED_MESSAGE,
         data: { email },
         error: null,
       };
