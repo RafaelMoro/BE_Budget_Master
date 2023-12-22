@@ -12,6 +12,7 @@ import {
   FORGOT_PASSWORD_MESSAGE,
   PASSWORD_DIRECT_CHANGE_ERROR,
   PROFILE_UPDATE,
+  RESET_PASSWORD_MESSAGE,
   USER_CREATED_MESSAGE,
 } from '../constants';
 import {
@@ -27,7 +28,7 @@ import { generateJWT } from '../../utils';
 import config from '../../config';
 import {
   CreateUserResponse,
-  ForgotPasswordResponse,
+  ForgotResetPasswordResponse,
   GeneralUserResponse,
   UserResponse,
 } from '../users.interface';
@@ -167,7 +168,7 @@ export class UsersService {
       };
       await this.mailService.sendUserForgotPasswordEmail(emailPayload);
 
-      const response: ForgotPasswordResponse = {
+      const response: ForgotResetPasswordResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: FORGOT_PASSWORD_MESSAGE,
@@ -190,31 +191,43 @@ export class UsersService {
       if (error?.message === 'jwt malformed') {
         throw new BadRequestException('Invalid JWT');
       }
+
+      throw new BadRequestException(error.message);
     }
   }
 
   async resetPassword(oneTimeToken: string, password: string) {
-    const tokenVerified = this.verifyToken(oneTimeToken);
-    if (!tokenVerified) throw new BadRequestException('Invalid JWT');
+    try {
+      const tokenVerified = this.verifyToken(oneTimeToken);
+      if (!tokenVerified) throw new BadRequestException('Invalid JWT');
 
-    const userId = tokenVerified.sub;
-    const user = await this.userModel.findOne({ _id: userId }).exec();
-    if (!user) throw new BadRequestException('The user does not exist');
-    const { _id } = user;
+      const userId = tokenVerified.sub;
+      const user = await this.userModel.findOne({ _id: userId }).exec();
+      if (!user) throw new BadRequestException('The user does not exist');
+      const { _id } = user;
 
-    const userOneTimeToken = user.oneTimeToken;
-    if (!userOneTimeToken) throw new BadRequestException('JWT not found');
+      const userOneTimeToken = user.oneTimeToken;
+      if (!userOneTimeToken) throw new BadRequestException('JWT not found');
 
-    if (oneTimeToken !== userOneTimeToken)
-      throw new BadRequestException('Wrong JWT');
+      if (oneTimeToken !== userOneTimeToken)
+        throw new BadRequestException('Wrong JWT');
 
-    await this.userModel.updateOne(
-      { _id: user.id },
-      { $unset: { oneTimeToken: '' } },
-    );
-    await this.updatePassword({ uid: _id, password });
-    const response = { response: 'password reset successfully' };
-    return response;
+      await this.userModel.updateOne(
+        { _id: user.id },
+        { $unset: { oneTimeToken: '' } },
+      );
+      await this.updatePassword({ uid: _id, password });
+      const response: ForgotResetPasswordResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: RESET_PASSWORD_MESSAGE,
+        data: null,
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async remove(email: string) {

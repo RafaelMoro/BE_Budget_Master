@@ -18,6 +18,7 @@ export interface GeneralUserResponse extends Omit<GeneralResponse, 'data'> {
   data: UserResponse;
 }
 
-export interface ForgotPasswordResponse extends Omit<GeneralResponse, 'data'> {
+export interface ForgotResetPasswordResponse
+  extends Omit<GeneralResponse, 'data'> {
   data: null;
 }
