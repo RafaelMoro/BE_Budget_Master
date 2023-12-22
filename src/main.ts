@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { ValidationPipe } from '@nestjs/common/pipes';
+import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.filter';
 dotenv.config();
 
 const frontendUri = process.env.FRONTEND_URI;
@@ -15,6 +16,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useGlobalFilters(new GeneralAppExceptionFilter());
   app.enableCors({
     origin: frontendUri,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

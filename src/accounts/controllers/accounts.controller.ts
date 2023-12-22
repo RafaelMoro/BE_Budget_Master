@@ -30,7 +30,7 @@ export class AccountsController {
   @Post()
   create(@Body() payload: CreateAccountDto, @Request() req) {
     const userId = req.user.sub;
-    return this.accountsService.createOne(payload, userId);
+    return this.accountsService.createOneAccount(payload, userId);
   }
 
   @Post('/multiple')

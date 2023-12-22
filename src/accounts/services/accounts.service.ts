@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account } from '../entities/accounts.entity';
+import { VERSION_RESPONSE } from '../../constants';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../../records/constants';
 import { RecordsService } from '../../records/services/records.service';
 import {
@@ -10,7 +11,11 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
-import { AccountResponse, GetAccountResponse } from '../interface';
+import {
+  AccountResponse,
+  CreateAccountResponse,
+  GetAccountResponse,
+} from '../interface';
 
 @Injectable()
 export class AccountsService {
@@ -19,14 +24,21 @@ export class AccountsService {
     private recordsService: RecordsService,
   ) {}
 
-  async createOne(data: CreateAccountDto, userId: string) {
+  async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
       const completeData = { ...data, sub: userId };
       const newModel = new this.accountModel(completeData);
-      const model = await newModel.save();
-      return model;
+      const model: AccountResponse = await newModel.save();
+      const response: CreateAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        data: model,
+        error: null,
+        message: 'Account created',
+      };
+      return response;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException();
     }
   }
 
