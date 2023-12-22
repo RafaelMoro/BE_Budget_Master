@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   UseGuards,
+  Put,
+  Request as RequestNest,
 } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -15,6 +17,7 @@ import {
   ResetPasswordDto,
   DeleteUserDto,
   ForgotPasswordBodyDto,
+  UpdateProfilerDto,
 } from '../dtos/users.dto';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -57,5 +60,11 @@ export class UsersController {
   ) {
     const { password } = changes;
     return this.usersService.resetPassword(oneTimeToken, password);
+  }
+
+  @Put()
+  modifyUser(@Body() changes: UpdateProfilerDto, @RequestNest() req) {
+    const userId = req.user.sub;
+    return this.usersService.updateUser(changes, userId);
   }
 }

@@ -24,6 +24,12 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateProfilerDto extends PartialType(CreateUserDto) {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email: string;
+}
 
 export class UpdateUserPasswordDto {
   @IsString()

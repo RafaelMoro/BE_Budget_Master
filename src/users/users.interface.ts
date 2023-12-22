@@ -13,3 +13,7 @@ interface CreateUserResponseData {
 export interface CreateUserResponse extends Omit<GeneralResponse, 'data'> {
   data: CreateUserResponseData;
 }
+
+export interface GeneralUserResponse extends Omit<GeneralResponse, 'data'> {
+  data: UserResponse;
+}

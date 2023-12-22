@@ -7,11 +7,17 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 
 import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
-import { USER_CREATED_MESSAGE } from '../constants';
+import {
+  EMAIL_CHANGE_ERROR,
+  PASSWORD_DIRECT_CHANGE_ERROR,
+  PROFILE_UPDATE,
+  USER_CREATED_MESSAGE,
+} from '../constants';
 import {
   CreateUserDto,
   UpdateUserPasswordDto,
   ForgotPasswordDto,
+  UpdateProfilerDto,
 } from '../dtos/users.dto';
 import { User } from '../entities/users.entity';
 import { MailService } from '../../mail/mail.service';
@@ -19,7 +25,11 @@ import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
 import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
 import config from '../../config';
-import { CreateUserResponse, UserResponse } from '../users.interface';
+import {
+  CreateUserResponse,
+  GeneralUserResponse,
+  UserResponse,
+} from '../users.interface';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +41,19 @@ export class UsersService {
   ) {}
 
   async findByEmail(email: string) {
-    return this.userModel.findOne({ email }).exec();
+    try {
+      return this.userModel.findOne({ email }).exec();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async findByUserId(userId: string) {
+    try {
+      return this.userModel.findOne({ uid: userId }).exec();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async createUser(data: CreateUserDto) {
@@ -60,7 +82,6 @@ export class UsersService {
     }
   }
 
-  // crear un metodo de update para cambiar firstname middlename o secondname
   async updatePassword(changes: UpdateUserPasswordDto) {
     const { uid, password } = changes;
     const passwordHashed = await bcrypt.hash(password, 10);
@@ -72,6 +93,36 @@ export class UsersService {
         { new: true },
       )
       .exec();
+  }
+
+  async updateUser(changes: UpdateProfilerDto, userId: string) {
+    try {
+      const user = await this.findByUserId(userId);
+      if (!user) throw new BadRequestException('User not found');
+
+      const {
+        email: emailFromChanges,
+        password: passwordFromChanges,
+        ...restProps
+      } = changes;
+      if (emailFromChanges) throw new BadRequestException(EMAIL_CHANGE_ERROR);
+      if (passwordFromChanges)
+        throw new BadRequestException(PASSWORD_DIRECT_CHANGE_ERROR);
+
+      const model: UserResponse = await this.userModel
+        .findByIdAndUpdate(userId, { $set: restProps }, { new: true })
+        .exec();
+      const response: GeneralUserResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: PROFILE_UPDATE,
+        data: model,
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async forgotPassword(payload: ForgotPasswordDto) {
