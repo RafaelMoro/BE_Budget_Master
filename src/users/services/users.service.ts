@@ -9,6 +9,7 @@ import { ConfigType } from '@nestjs/config';
 import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
 import {
   EMAIL_CHANGE_ERROR,
+  FORGOT_PASSWORD_MESSAGE,
   PASSWORD_DIRECT_CHANGE_ERROR,
   PROFILE_UPDATE,
   USER_CREATED_MESSAGE,
@@ -22,11 +23,11 @@ import {
 import { User } from '../entities/users.entity';
 import { MailService } from '../../mail/mail.service';
 import { MailForgotPasswordDto } from '../../mail/dtos/mail.dtos';
-import { IResponse } from '../../interfaces';
 import { generateJWT } from '../../utils';
 import config from '../../config';
 import {
   CreateUserResponse,
+  ForgotPasswordResponse,
   GeneralUserResponse,
   UserResponse,
 } from '../users.interface';
@@ -60,10 +61,10 @@ export class UsersService {
     try {
       //Verify if the user exists with the same email.
       const { email: emailData } = data;
-      const user = await this.findByEmail(emailData);
+      const user: UserResponse = await this.findByEmail(emailData);
       if (user) throw new BadRequestException(USER_EXISTS_ERROR);
 
-      const userModel = new this.userModel(data);
+      const userModel: UserResponse = new this.userModel(data);
       const passwordHashed = await bcrypt.hash(userModel.password, 10);
       userModel.password = passwordHashed;
       const modelSaved: UserResponse = await userModel.save();
@@ -83,16 +84,28 @@ export class UsersService {
   }
 
   async updatePassword(changes: UpdateUserPasswordDto) {
-    const { uid, password } = changes;
-    const passwordHashed = await bcrypt.hash(password, 10);
+    try {
+      const { uid, password } = changes;
+      const passwordHashed = await bcrypt.hash(password, 10);
 
-    return this.userModel
-      .findByIdAndUpdate(
-        uid,
-        { $set: { password: passwordHashed } },
-        { new: true },
-      )
-      .exec();
+      const model: UserResponse = await this.userModel
+        .findByIdAndUpdate(
+          uid,
+          { $set: { password: passwordHashed } },
+          { new: true },
+        )
+        .exec();
+      const response: GeneralUserResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: PROFILE_UPDATE,
+        data: model,
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async updateUser(changes: UpdateProfilerDto, userId: string) {
@@ -126,34 +139,45 @@ export class UsersService {
   }
 
   async forgotPassword(payload: ForgotPasswordDto) {
-    const { email, hostname } = payload;
-    const { frontendPort, backendUri } = this.configService;
-    const completeHostname =
-      hostname === 'localhost'
-        ? `http://${hostname}:${frontendPort}`
-        : `http://${backendUri}`;
+    try {
+      const { email, hostname } = payload;
+      const { frontendPort, backendUri } = this.configService;
+      const completeHostname =
+        hostname === 'localhost'
+          ? `http://${hostname}:${frontendPort}`
+          : `http://${backendUri}`;
 
-    const user: User = await this.findByEmail(email);
-    if (!user) throw new NotFoundException('User not found');
+      const user: User = await this.findByEmail(email);
+      if (!user) throw new NotFoundException('User not found');
 
-    const { firstName, lastName } = user;
-    const oneTimeToken = generateJWT(user, this.jwtService);
-    await this.userModel.updateOne(
-      { _id: user.id },
-      { oneTimeToken },
-      { multi: true },
-    );
+      const { firstName, lastName } = user;
+      const oneTimeToken = generateJWT(user, this.jwtService);
+      await this.userModel.updateOne(
+        { _id: user.id },
+        { oneTimeToken },
+        { multi: true },
+      );
 
-    const emailPayload: MailForgotPasswordDto = {
-      email,
-      hostname: completeHostname,
-      firstName,
-      lastName,
-      oneTimeToken,
-    };
-    await this.mailService.sendUserForgotPasswordEmail(emailPayload);
-    const response: IResponse = { response: 'email sent' };
-    return response;
+      const emailPayload: MailForgotPasswordDto = {
+        email,
+        hostname: completeHostname,
+        firstName,
+        lastName,
+        oneTimeToken,
+      };
+      await this.mailService.sendUserForgotPasswordEmail(emailPayload);
+
+      const response: ForgotPasswordResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: FORGOT_PASSWORD_MESSAGE,
+        data: null,
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   verifyToken(token: string) {
@@ -189,7 +213,7 @@ export class UsersService {
       { $unset: { oneTimeToken: '' } },
     );
     await this.updatePassword({ uid: _id, password });
-    const response: IResponse = { response: 'password reset successfully' };
+    const response = { response: 'password reset successfully' };
     return response;
   }
 
