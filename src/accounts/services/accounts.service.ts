@@ -13,7 +13,7 @@ import {
 } from '../dtos/accounts.dto';
 import {
   AccountResponse,
-  CreateAccountResponse,
+  GeneralAccountResponse,
   GetAccountResponse,
 } from '../interface';
 
@@ -29,7 +29,7 @@ export class AccountsService {
       const completeData = { ...data, sub: userId };
       const newModel = new this.accountModel(completeData);
       const model: AccountResponse = await newModel.save();
-      const response: CreateAccountResponse = {
+      const response: GeneralAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: 'Account created',
@@ -64,11 +64,18 @@ export class AccountsService {
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
-      const updatedAccount = await this.accountModel
+      const updatedAccount: AccountResponse = await this.accountModel
         .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();
       if (!updatedAccount) throw new BadRequestException('Account not found');
-      return updatedAccount;
+      const response: GeneralAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Account Updated',
+        data: updatedAccount,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

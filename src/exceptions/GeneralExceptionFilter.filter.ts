@@ -23,6 +23,6 @@ export class GeneralAppExceptionFilter implements ExceptionFilter {
       error,
     };
 
-    response.send(responseFormatted);
+    response.status(exception.getStatus()).send(responseFormatted);
   }
 }
