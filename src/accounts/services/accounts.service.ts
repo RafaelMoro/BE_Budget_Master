@@ -2,21 +2,26 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Account } from '../entities/accounts.entity';
+import {
+  ACCOUNT_CREATED_MESSAGE,
+  ACCOUNT_DELETED_MESSAGE,
+  ACCOUNT_UPDATED_MESSAGE,
+} from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
 import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../../records/constants';
-import { RecordsService } from '../../records/services/records.service';
-import {
-  CreateAccountDto,
-  UpdateAccountDto,
-  DeleteAccountDto,
-} from '../dtos/accounts.dto';
 import {
   AccountResponse,
   DeleteAccountResponse,
   GeneralAccountResponse,
   GetAccountResponse,
 } from '../accounts.interface';
+import { Account } from '../entities/accounts.entity';
+import { RecordsService } from '../../records/services/records.service';
+import {
+  CreateAccountDto,
+  UpdateAccountDto,
+  DeleteAccountDto,
+} from '../dtos/accounts.dto';
 
 @Injectable()
 export class AccountsService {
@@ -33,7 +38,7 @@ export class AccountsService {
       const response: GeneralAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Account created',
+        message: ACCOUNT_CREATED_MESSAGE,
         data: model,
         error: null,
       };
@@ -72,7 +77,7 @@ export class AccountsService {
       const response: GeneralAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Account Updated',
+        message: ACCOUNT_UPDATED_MESSAGE,
         data: updatedAccount,
         error: null,
       };
@@ -138,7 +143,7 @@ export class AccountsService {
       const response: DeleteAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Account Deleted',
+        message: ACCOUNT_DELETED_MESSAGE,
         data: {
           accountDeleted,
           numberExpensesDeleted: expenseRecords?.length ?? 0,
