@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
@@ -8,6 +8,8 @@ import { ConfigType } from '@nestjs/config';
 
 import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
 import {
+  DELETE_USER_ERROR,
+  DELETE_USER_MESSAGE,
   EMAIL_CHANGE_ERROR,
   FORGOT_PASSWORD_MESSAGE,
   PASSWORD_DIRECT_CHANGE_ERROR,
@@ -28,7 +30,7 @@ import { generateJWT } from '../../utils';
 import config from '../../config';
 import {
   CreateUserResponse,
-  ForgotResetPasswordResponse,
+  UserActionsResponse,
   GeneralUserResponse,
   UserResponse,
 } from '../users.interface';
@@ -168,7 +170,7 @@ export class UsersService {
       };
       await this.mailService.sendUserForgotPasswordEmail(emailPayload);
 
-      const response: ForgotResetPasswordResponse = {
+      const response: UserActionsResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: FORGOT_PASSWORD_MESSAGE,
@@ -217,7 +219,7 @@ export class UsersService {
         { $unset: { oneTimeToken: '' } },
       );
       await this.updatePassword({ uid: _id, password });
-      const response: ForgotResetPasswordResponse = {
+      const response: UserActionsResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: RESET_PASSWORD_MESSAGE,
@@ -230,11 +232,26 @@ export class UsersService {
     }
   }
 
-  async remove(email: string) {
+  async deleteUser(email: string, userId: string) {
     try {
-      const userId = await this.findByEmail(email);
-      const userDeleted = await this.userModel.findByIdAndDelete(userId);
-      return userDeleted;
+      const user = await this.findByUserId(userId);
+      const { email: emailModel } = user;
+      console.log('user', user);
+      console.log('email', email);
+      console.log('email model', emailModel);
+      console.log('condition', email !== emailModel);
+      if (email !== emailModel)
+        throw new UnauthorizedException(DELETE_USER_ERROR);
+
+      await this.userModel.findByIdAndDelete(userId);
+      const response: UserActionsResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: DELETE_USER_MESSAGE,
+        data: null,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

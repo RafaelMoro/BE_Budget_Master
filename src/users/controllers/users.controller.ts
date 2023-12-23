@@ -35,9 +35,10 @@ export class UsersController {
   }
 
   @Delete()
-  remove(@Body() changes: DeleteUserDto) {
+  remove(@Body() changes: DeleteUserDto, @RequestNest() req) {
+    const userId = req.user.sub;
     const { email } = changes;
-    return this.usersService.remove(email);
+    return this.usersService.deleteUser(email, userId);
   }
 
   @Public()
