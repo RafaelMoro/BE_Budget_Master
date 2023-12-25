@@ -19,3 +19,8 @@ export interface GeneralCategoriesResponse
 export interface SingleCategoryResponse extends Omit<GeneralResponse, 'data'> {
   data: CategoriesResponse;
 }
+
+export interface UpdateSubcategoriesResponse
+  extends Omit<GeneralResponse, 'data'> {
+  categoryId: Types.ObjectId | string;
+}

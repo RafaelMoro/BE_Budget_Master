@@ -152,10 +152,8 @@ export class RecordsService {
         categoryName: category,
         subCategories: [subCategory],
       };
-      const { data: newCategory } = await this.categoriesService.createOne(
-        payload,
-        userId,
-      );
+      const { data: newCategory } =
+        await this.categoriesService.createOneCategory(payload, userId);
       return {
         message: 'New category created',
         categoryId: newCategory._id,

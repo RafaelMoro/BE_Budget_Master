@@ -15,6 +15,7 @@ import {
   UpdateCategoriesDto,
 } from '../dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
+import { SUBCATEGORY_CREATED_SUCCESS, SUBCATEGORY_ERROR } from '../constants';
 
 @Injectable()
 export class CategoriesService {
@@ -76,7 +77,7 @@ export class CategoriesService {
     }
   }
 
-  async createOne(payload: CreateCategoriesDto, userId: string) {
+  async createOneCategory(payload: CreateCategoriesDto, userId: string) {
     try {
       const completeData = { ...payload, sub: userId };
       const newModel = new this.categoryModel(completeData);
@@ -115,9 +116,7 @@ export class CategoriesService {
   }
 
   async updateSubcategories(
-    category: Category & {
-      _id: Types.ObjectId;
-    },
+    category: CategoriesResponse,
     subCategory: string,
   ): Promise<UpdateSubcategoriesResponse> {
     try {
@@ -137,16 +136,24 @@ export class CategoriesService {
         const { data: categoryUpdated } = await this.updateCategory(
           modifyCategoryPayload,
         );
-        return {
-          message: 'Subcategory created',
+        const response: UpdateSubcategoriesResponse = {
+          version: VERSION_RESPONSE,
+          success: true,
+          message: SUBCATEGORY_CREATED_SUCCESS,
           categoryId: categoryUpdated._id,
+          error: null,
         };
+        return response;
       }
 
-      return {
-        message: 'Subcategory already exists',
+      const response: UpdateSubcategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: SUBCATEGORY_ERROR,
         categoryId: category._id,
+        error: null,
       };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

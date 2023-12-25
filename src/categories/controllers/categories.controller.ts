@@ -30,7 +30,7 @@ export class CategoriesController {
   @Post()
   createCategory(@Body() payload: CreateCategoriesDto, @Request() req) {
     const userId = req.user.sub;
-    return this.categoriesService.createOne(payload, userId);
+    return this.categoriesService.createOneCategory(payload, userId);
   }
 
   @Put()
