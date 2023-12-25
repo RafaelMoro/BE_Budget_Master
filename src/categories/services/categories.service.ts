@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { Category } from '../entities/categories.entity';
 import {
@@ -17,6 +17,7 @@ import {
 import { VERSION_RESPONSE } from '../../constants';
 import {
   CATEGORY_DELETED_MESSAGE,
+  CATEGORY_NOT_FOUND_ERROR,
   SUBCATEGORY_CREATED_SUCCESS,
   SUBCATEGORY_ERROR,
 } from '../constants';
@@ -105,7 +106,8 @@ export class CategoriesService {
       const updateCategory: CategoriesResponse = await this.categoryModel
         .findByIdAndUpdate(categoryId, { $set: changes }, { new: true })
         .exec();
-      if (!updateCategory) throw new BadRequestException('Category not found');
+      if (!updateCategory)
+        throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
       const response: SingleCategoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
@@ -168,7 +170,8 @@ export class CategoriesService {
       const { categoryId } = payload;
       const categoryDeleted: CategoriesResponse =
         await this.categoryModel.findByIdAndDelete(categoryId);
-      if (!categoryDeleted) throw new BadRequestException('Category not found');
+      if (!categoryDeleted)
+        throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
 
       const response: SingleCategoryResponse = {
         version: VERSION_RESPONSE,
