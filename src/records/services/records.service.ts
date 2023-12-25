@@ -104,9 +104,8 @@ export class RecordsService {
 
       if (categoryIsMongoId) {
         // Check the category exists
-        const categoryReturned = await this.categoriesService.findById(
-          category,
-        );
+        const { data: categoryReturned } =
+          await this.categoriesService.findById(category);
 
         if (categoryReturned.length === 0) {
           // This means that the mongo id passed does not belongs to a category
@@ -130,9 +129,8 @@ export class RecordsService {
       }
 
       // The category is a name and check it if it already exists
-      const searchedCategory = await this.categoriesService.findByName(
-        category,
-      );
+      const { data: searchedCategory } =
+        await this.categoriesService.findByName(category);
 
       // The category already exists with that name.
       if (searchedCategory.length > 0) {
@@ -154,7 +152,7 @@ export class RecordsService {
         categoryName: category,
         subCategories: [subCategory],
       };
-      const newCategory = await this.categoriesService.createOne(
+      const { data: newCategory } = await this.categoriesService.createOne(
         payload,
         userId,
       );

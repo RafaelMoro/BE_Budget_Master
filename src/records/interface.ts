@@ -4,7 +4,7 @@ import { DeleteRecordDto } from './dtos/records.dto';
 
 export interface CreateOrModifyCategoryForRecordResponse {
   message: null | string;
-  categoryId: string;
+  categoryId: Types.ObjectId | string;
   categoryName: string | null;
 }
 

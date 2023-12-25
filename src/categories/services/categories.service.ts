@@ -4,7 +4,9 @@ import { Model, Types } from 'mongoose';
 
 import { Category } from '../entities/categories.entity';
 import {
-  GetCategoriesResponse,
+  CategoriesResponse,
+  GeneralCategoriesResponse,
+  SingleCategoryResponse,
   UpdateSubcategoriesResponse,
 } from '../interface';
 import {
@@ -22,10 +24,10 @@ export class CategoriesService {
 
   async findbyUser(sub: string) {
     try {
-      const categories = await this.categoryModel
+      const categories: CategoriesResponse[] = await this.categoryModel
         .find({ sub }, { sub: 0 })
         .exec();
-      const response: GetCategoriesResponse = {
+      const response: GeneralCategoriesResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
@@ -40,8 +42,17 @@ export class CategoriesService {
 
   async findById(id: string) {
     try {
-      const category = await this.categoryModel.find({ _id: id }).exec();
-      return category;
+      const category: CategoriesResponse[] = await this.categoryModel
+        .find({ _id: id })
+        .exec();
+      const response: GeneralCategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: category,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -49,8 +60,17 @@ export class CategoriesService {
 
   async findByName(categoryName: string) {
     try {
-      const category = await this.categoryModel.find({ categoryName }).exec();
-      return category;
+      const category: CategoriesResponse[] = await this.categoryModel
+        .find({ categoryName })
+        .exec();
+      const response: GeneralCategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: category,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -60,8 +80,15 @@ export class CategoriesService {
     try {
       const completeData = { ...payload, sub: userId };
       const newModel = new this.categoryModel(completeData);
-      const model = await newModel.save();
-      return model;
+      const model: CategoriesResponse = await newModel.save();
+      const response: SingleCategoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: model,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -70,11 +97,18 @@ export class CategoriesService {
   async updateCategory(changes: UpdateCategoriesDto) {
     try {
       const { categoryId } = changes;
-      const updateCategory = await this.categoryModel
+      const updateCategory: CategoriesResponse = await this.categoryModel
         .findByIdAndUpdate(categoryId, { $set: changes }, { new: true })
         .exec();
       if (!updateCategory) throw new BadRequestException('Category not found');
-      return updateCategory;
+      const response: SingleCategoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: updateCategory,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -100,7 +134,7 @@ export class CategoriesService {
           categoryId: category._id,
           subCategories: newSubCategories,
         };
-        const categoryUpdated = await this.updateCategory(
+        const { data: categoryUpdated } = await this.updateCategory(
           modifyCategoryPayload,
         );
         return {

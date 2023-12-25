@@ -4,13 +4,18 @@ import { GeneralResponse } from '../response.interface';
 
 export interface UpdateSubcategoriesResponse {
   message: string | null;
-  categoryId: string;
+  categoryId: string | Types.ObjectId;
 }
 
 export interface CategoriesResponse extends Category {
   _id: Types.ObjectId;
 }
 
-export interface GetCategoriesResponse extends Omit<GeneralResponse, 'data'> {
+export interface GeneralCategoriesResponse
+  extends Omit<GeneralResponse, 'data'> {
   data: CategoriesResponse[];
+}
+
+export interface SingleCategoryResponse extends Omit<GeneralResponse, 'data'> {
+  data: CategoriesResponse;
 }
