@@ -15,7 +15,11 @@ import {
   UpdateCategoriesDto,
 } from '../dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
-import { SUBCATEGORY_CREATED_SUCCESS, SUBCATEGORY_ERROR } from '../constants';
+import {
+  CATEGORY_DELETED_MESSAGE,
+  SUBCATEGORY_CREATED_SUCCESS,
+  SUBCATEGORY_ERROR,
+} from '../constants';
 
 @Injectable()
 export class CategoriesService {
@@ -162,11 +166,18 @@ export class CategoriesService {
   async removeCategory(payload: DeleteCategoryDto) {
     try {
       const { categoryId } = payload;
-      const categoryDeleted = await this.categoryModel.findByIdAndDelete(
-        categoryId,
-      );
+      const categoryDeleted: CategoriesResponse =
+        await this.categoryModel.findByIdAndDelete(categoryId);
       if (!categoryDeleted) throw new BadRequestException('Category not found');
-      return categoryDeleted;
+
+      const response: SingleCategoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: CATEGORY_DELETED_MESSAGE,
+        data: categoryDeleted,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
