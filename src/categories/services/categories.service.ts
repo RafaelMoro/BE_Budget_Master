@@ -3,12 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
 import { Category } from '../entities/categories.entity';
-import { UpdateSubcategoriesResponse } from '../interface';
+import {
+  GetCategoriesResponse,
+  UpdateSubcategoriesResponse,
+} from '../interface';
 import {
   CreateCategoriesDto,
   DeleteCategoryDto,
   UpdateCategoriesDto,
 } from '../dtos/categories.dto';
+import { VERSION_RESPONSE } from '../../constants';
 
 @Injectable()
 export class CategoriesService {
@@ -21,10 +25,14 @@ export class CategoriesService {
       const categories = await this.categoryModel
         .find({ sub }, { sub: 0 })
         .exec();
-      return {
-        categories,
-        error: false,
+      const response: GetCategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: categories,
+        error: null,
       };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
