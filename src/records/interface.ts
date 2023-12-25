@@ -2,12 +2,6 @@ import { Types } from 'mongoose';
 import { CreateExpense } from './entities/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
 
-export interface CreateOrModifyCategoryForRecordResponse {
-  message: null | string;
-  categoryId: Types.ObjectId | string;
-  categoryName: string | null;
-}
-
 export interface DeleteRecordResponse {
   message: string | null;
   error: null | string;

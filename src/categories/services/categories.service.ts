@@ -7,7 +7,6 @@ import {
   CategoriesResponse,
   GeneralCategoriesResponse,
   SingleCategoryResponse,
-  UpdateSubcategoriesResponse,
 } from '../interface';
 import {
   CreateCategoriesDto,
@@ -16,6 +15,7 @@ import {
 } from '../dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import {
+  CATEGORY_CREATED_MESSAGE,
   CATEGORY_DELETED_MESSAGE,
   CATEGORY_NOT_FOUND_ERROR,
   SUBCATEGORY_CREATED_SUCCESS,
@@ -90,7 +90,7 @@ export class CategoriesService {
       const response: SingleCategoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: null,
+        message: CATEGORY_CREATED_MESSAGE,
         data: model,
         error: null,
       };
@@ -121,10 +121,7 @@ export class CategoriesService {
     }
   }
 
-  async updateSubcategories(
-    category: CategoriesResponse,
-    subCategory: string,
-  ): Promise<UpdateSubcategoriesResponse> {
+  async updateSubcategories(category: CategoriesResponse, subCategory: string) {
     try {
       // Verify that the sub category exists in the category fetched.
       const subCategoryExists = category?.subCategories.find(
@@ -142,21 +139,21 @@ export class CategoriesService {
         const { data: categoryUpdated } = await this.updateCategory(
           modifyCategoryPayload,
         );
-        const response: UpdateSubcategoriesResponse = {
+        const response: SingleCategoryResponse = {
           version: VERSION_RESPONSE,
           success: true,
           message: SUBCATEGORY_CREATED_SUCCESS,
-          categoryId: categoryUpdated._id,
+          data: categoryUpdated,
           error: null,
         };
         return response;
       }
 
-      const response: UpdateSubcategoriesResponse = {
+      const response: SingleCategoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: SUBCATEGORY_ERROR,
-        categoryId: category._id,
+        data: category,
         error: null,
       };
       return response;

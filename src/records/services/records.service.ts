@@ -11,9 +11,12 @@ import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../constants';
 import {
-  CreateOrModifyCategoryForRecordResponse,
+  CATEGORY_ID_ERROR,
+  EXPENSE_NOT_FOUND,
+  INCOME_NOT_FOUND,
+} from '../constants';
+import {
   FindAllNotPaidExpensesByMonthResponse,
   DeleteRecordResponse,
   FindRecordsByAccountProps,
@@ -28,6 +31,9 @@ import {
   formatNumberToCurrency,
 } from '../../utils';
 import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
+import { VERSION_RESPONSE } from '../../constants';
+import { SingleCategoryResponse } from '../../categories/interface';
+import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
 
 @Injectable()
 export class RecordsService {
@@ -45,12 +51,13 @@ export class RecordsService {
   ) {
     try {
       const { category, subCategory, amount } = data;
-      const { categoryId, categoryName } =
+      const { data: categoryCreatedModified } =
         await this.createOrModifyCategoryForRecord(
           category,
           subCategory,
           userId,
         );
+      const { _id: categoryId } = categoryCreatedModified;
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
@@ -79,7 +86,7 @@ export class RecordsService {
       }
       const record = {
         ...model.toJSON(),
-        category: { _id: categoryId, categoryName },
+        category: categoryCreatedModified,
       };
       return record;
     } catch (error) {
@@ -98,34 +105,34 @@ export class RecordsService {
     category: string,
     subCategory: string,
     userId: string,
-  ): Promise<CreateOrModifyCategoryForRecordResponse> {
+  ) {
     try {
       const categoryIsMongoId = isValidObjectId(category);
 
       if (categoryIsMongoId) {
         // Check the category exists
-        const { data: categoryReturned } =
-          await this.categoriesService.findById(category);
+        const { data: categoryFound } = await this.categoriesService.findById(
+          category,
+        );
 
-        if (categoryReturned.length === 0) {
+        if (categoryFound.length === 0) {
           // This means that the mongo id passed does not belongs to a category
-          return {
-            message: 'Mongo Id does not belong to a category',
-            categoryId: category,
-            categoryName: null,
-          };
+          throw new BadRequestException(CATEGORY_ID_ERROR);
         }
 
-        const { categoryId, message } =
+        const { data: categoryUpdated, message } =
           await this.categoriesService.updateSubcategories(
-            categoryReturned[0],
+            categoryFound[0],
             subCategory,
           );
-        return {
+        const response: SingleCategoryResponse = {
+          version: VERSION_RESPONSE,
+          success: true,
           message,
-          categoryId,
-          categoryName: categoryReturned[0].categoryName,
+          data: categoryUpdated,
+          error: null,
         };
+        return response;
       }
 
       // The category is a name and check it if it already exists
@@ -135,16 +142,19 @@ export class RecordsService {
       // The category already exists with that name.
       if (searchedCategory.length > 0) {
         // Update subcategories if needed
-        const { categoryId, message } =
+        const { data, message } =
           await this.categoriesService.updateSubcategories(
             searchedCategory[0],
             subCategory,
           );
-        return {
-          message: 'Category already exists. ' + message,
-          categoryId: categoryId,
-          categoryName: searchedCategory[0].categoryName,
+        const response: SingleCategoryResponse = {
+          version: VERSION_RESPONSE,
+          success: true,
+          message: CATEGORY_EXISTS_MESSAGE + message,
+          data,
+          error: null,
         };
+        return response;
       }
 
       // The category is a name and does not exists, then create it.
@@ -152,13 +162,11 @@ export class RecordsService {
         categoryName: category,
         subCategories: [subCategory],
       };
-      const { data: newCategory } =
-        await this.categoriesService.createOneCategory(payload, userId);
-      return {
-        message: 'New category created',
-        categoryId: newCategory._id,
-        categoryName: newCategory.categoryName,
-      };
+      const response = await this.categoriesService.createOneCategory(
+        payload,
+        userId,
+      );
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -407,7 +415,9 @@ export class RecordsService {
           'This record does not belongs to the user',
         );
       }
-      const { categoryId } = await this.createOrModifyCategoryForRecord(
+      const {
+        data: { _id: categoryId },
+      } = await this.createOrModifyCategoryForRecord(
         category,
         subCategory,
         userId,
