@@ -15,12 +15,16 @@ import {
   CATEGORY_ID_ERROR,
   EXPENSE_NOT_FOUND,
   INCOME_NOT_FOUND,
+  RECORD_CREATED_MESSAGE,
 } from '../constants';
 import {
   FindAllNotPaidExpensesByMonthResponse,
   DeleteRecordResponse,
   FindRecordsByAccountProps,
   RemoveRecordProps,
+  IncomeResponse,
+  ExpenseResponse,
+  RecordCreated,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -68,10 +72,10 @@ export class RecordsService {
         amountFormatted,
         userId,
       };
-      const newModel = !isIncome
+      const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
-      const model = await newModel.save();
+      const modelSaved: ExpenseResponse | IncomeResponse = await model.save();
 
       // Update the prop isPaid to true of the expenses related to this income
       if (isIncome) {
@@ -84,11 +88,20 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
+      // Change record categories for the categoryResponse
       const record = {
-        ...model.toJSON(),
+        ...modelSaved.toJSON(),
         category: categoryCreatedModified,
       };
-      return record;
+      // return record;
+      const response: RecordCreated = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: RECORD_CREATED_MESSAGE,
+        data: record,
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
