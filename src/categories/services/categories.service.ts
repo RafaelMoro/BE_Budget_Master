@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Category } from '../entities/categories.entity';
 import {
   CategoriesResponse,
+  FindByNameResponse,
   GeneralCategoriesResponse,
   SingleCategoryResponse,
 } from '../interface';
@@ -66,15 +67,29 @@ export class CategoriesService {
 
   async findByName(categoryName: string) {
     try {
-      const category: CategoriesResponse[] = await this.categoryModel
-        .find({ categoryName })
-        .exec();
-      const response: GeneralCategoriesResponse = {
+      const initialResponse: FindByNameResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
-        data: category,
+        data: null,
         error: null,
+      };
+      const category: CategoriesResponse[] = await this.categoryModel
+        .find({ categoryName })
+        .exec();
+
+      // If the category was not found, return that response
+      if (category.length === 0) {
+        const categoryNotFoundResponse: FindByNameResponse = {
+          ...initialResponse,
+          message: CATEGORY_NOT_FOUND_ERROR,
+        };
+        return categoryNotFoundResponse;
+      }
+
+      const response: FindByNameResponse = {
+        ...initialResponse,
+        data: category,
       };
       return response;
     } catch (error) {

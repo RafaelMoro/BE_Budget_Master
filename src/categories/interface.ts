@@ -11,6 +11,10 @@ export interface GeneralCategoriesResponse
   data: CategoriesResponse[];
 }
 
+export interface FindByNameResponse extends Omit<GeneralResponse, 'data'> {
+  data: null | CategoriesResponse[];
+}
+
 export interface SingleCategoryResponse extends Omit<GeneralResponse, 'data'> {
   data: CategoriesResponse;
 }

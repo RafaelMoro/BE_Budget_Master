@@ -5,14 +5,13 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types, isValidObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import {
-  CATEGORY_ID_ERROR,
   EXPENSE_NOT_FOUND,
   INCOME_NOT_FOUND,
   RECORD_CREATED_MESSAGE,
@@ -55,13 +54,9 @@ export class RecordsService {
   ) {
     try {
       const { category, subCategory, amount } = data;
-      const { data: categoryCreatedModified } =
-        await this.createOrModifyCategoryForRecord(
-          category,
-          subCategory,
-          userId,
-        );
-      const { _id: categoryId } = categoryCreatedModified;
+      const { data: categoryFoundOrCreated } =
+        await this.findOrCreateCategoryForRecord(category, subCategory, userId);
+      const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
@@ -91,9 +86,8 @@ export class RecordsService {
       // Change record categories for the categoryResponse
       const record = {
         ...modelSaved.toJSON(),
-        category: categoryCreatedModified,
+        category: categoryFoundOrCreated,
       };
-      // return record;
       const response: RecordCreated = {
         version: VERSION_RESPONSE,
         success: true,
@@ -113,58 +107,25 @@ export class RecordsService {
    * If the category is by mongo id, it will check if it exists and will update subcategories if needed.
    * This method returns an object that contains "message: string | null" and "categoryId: string"
    */
-  async createOrModifyCategoryForRecord(
-    // category could be a name or a mongo id
+  async findOrCreateCategoryForRecord(
+    // category it's only a name
     category: string,
     subCategory: string,
     userId: string,
   ) {
     try {
-      const categoryIsMongoId = isValidObjectId(category);
-
-      if (categoryIsMongoId) {
-        // Check the category exists
-        const { data: categoryFound } = await this.categoriesService.findById(
-          category,
-        );
-
-        if (categoryFound.length === 0) {
-          // This means that the mongo id passed does not belongs to a category
-          throw new BadRequestException(CATEGORY_ID_ERROR);
-        }
-
-        const { data: categoryUpdated, message } =
-          await this.categoriesService.updateSubcategories(
-            categoryFound[0],
-            subCategory,
-          );
-        const response: SingleCategoryResponse = {
-          version: VERSION_RESPONSE,
-          success: true,
-          message,
-          data: categoryUpdated,
-          error: null,
-        };
-        return response;
-      }
-
-      // The category is a name and check it if it already exists
+      // Check if category already exists.
       const { data: searchedCategory } =
         await this.categoriesService.findByName(category);
 
       // The category already exists with that name.
-      if (searchedCategory.length > 0) {
-        // Update subcategories if needed
-        const { data, message } =
-          await this.categoriesService.updateSubcategories(
-            searchedCategory[0],
-            subCategory,
-          );
+      if (searchedCategory) {
+        const [foundCategory] = searchedCategory;
         const response: SingleCategoryResponse = {
           version: VERSION_RESPONSE,
           success: true,
-          message: CATEGORY_EXISTS_MESSAGE + message,
-          data,
+          message: CATEGORY_EXISTS_MESSAGE,
+          data: foundCategory,
           error: null,
         };
         return response;
@@ -430,7 +391,7 @@ export class RecordsService {
       }
       const {
         data: { _id: categoryId },
-      } = await this.createOrModifyCategoryForRecord(
+      } = await this.findOrCreateCategoryForRecord(
         category,
         subCategory,
         userId,
