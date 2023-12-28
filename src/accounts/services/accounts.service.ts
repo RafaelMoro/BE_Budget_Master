@@ -108,11 +108,11 @@ export class AccountsService {
 
       // If the account has expenses, then delete expenses.
       if (
-        expensesRelatedToAccount !== EXPENSE_NOT_FOUND &&
-        expensesRelatedToAccount !== INCOME_NOT_FOUND
+        expensesRelatedToAccount.message !== EXPENSE_NOT_FOUND &&
+        expensesRelatedToAccount.message !== INCOME_NOT_FOUND
       ) {
         // Return each record id as object as expected to the service delete multiple records.
-        const expensesIds = expensesRelatedToAccount.map((record) => {
+        const expensesIds = expensesRelatedToAccount.data.map((record) => {
           return { recordId: record._id };
         });
         expenseRecords = await this.recordsService.deleteMultipleRecords(
@@ -122,11 +122,11 @@ export class AccountsService {
 
       // If the account has incomes, then delete incomes.
       if (
-        incomesRelatedToAccount !== EXPENSE_NOT_FOUND &&
-        incomesRelatedToAccount !== INCOME_NOT_FOUND
+        incomesRelatedToAccount.message !== EXPENSE_NOT_FOUND &&
+        incomesRelatedToAccount.message !== INCOME_NOT_FOUND
       ) {
         // Return records id as object each as expected to the service delete multiple records.
-        const incomesIds = incomesRelatedToAccount.map((record) => {
+        const incomesIds = incomesRelatedToAccount.data.map((record) => {
           return { recordId: record._id };
         });
         incomesRecords = await this.recordsService.deleteMultipleRecords(

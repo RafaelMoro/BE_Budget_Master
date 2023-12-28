@@ -4,12 +4,24 @@ import { DeleteRecordDto } from './dtos/records.dto';
 import { CreateIncome } from './entities/incomes.entity';
 import { GeneralResponse } from 'src/response.interface';
 
-export interface ExpenseResponse extends Omit<CreateExpense, 'category'> {
+export interface ExpenseResponse extends CreateExpense {
   _id: Types.ObjectId;
 }
 
-export interface IncomeResponse extends Omit<CreateIncome, 'category'> {
+export interface IncomeResponse extends CreateIncome {
   _id: Types.ObjectId;
+}
+
+export interface ExpensesPaidFormatted {
+  _id: string;
+  shortName: string;
+  amount: number;
+  fullDate: string;
+  formattedTime: string;
+}
+
+export interface FormattedIncomes extends Omit<IncomeResponse, 'expensesPaid'> {
+  expensesPaid: ExpensesPaidFormatted[];
 }
 
 export interface DeleteRecordResponse {
@@ -40,7 +52,11 @@ export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
   data: ExpenseResponse | IncomeResponse;
 }
 
+export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
+  data: ExpenseResponse[] | IncomeResponse[] | FormattedIncomes[] | null;
+}
+
 export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
-  // Returns record with all category information instead of returning just category id.
+  // Returns record with category information with id and category name.
   data: object;
 }

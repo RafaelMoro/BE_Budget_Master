@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
@@ -24,6 +23,9 @@ import {
   IncomeResponse,
   ExpenseResponse,
   RecordCreated,
+  MultipleRecordsResponse,
+  FormattedIncomes,
+  ExpensesPaidFormatted,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -37,6 +39,7 @@ import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import { SingleCategoryResponse } from '../../categories/interface';
 import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
+import { GeneralResponse } from '../../response.interface';
 
 @Injectable()
 export class RecordsService {
@@ -151,8 +154,16 @@ export class RecordsService {
     accountId,
     isIncome = false,
     userId,
-  }: FindRecordsByAccountProps) {
+  }: FindRecordsByAccountProps): Promise<MultipleRecordsResponse> {
     try {
+      const initialResponse: GeneralResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: null,
+        error: null,
+      };
+
       const records = !isIncome
         ? await this.expenseModel
             .find({ account: accountId })
@@ -172,17 +183,31 @@ export class RecordsService {
 
       if (isIncome && records.length > 0) {
         // Check if the any record has any expenses paid linked.
-        return this.formatIncome(records as Income[]);
+        const incomesFormatted = this.formatIncome(records as Income[]);
+        const response: MultipleRecordsResponse = {
+          ...initialResponse,
+          data: incomesFormatted,
+        };
+        return response;
       }
 
       if (records.length === 0) {
         // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
         // it would break the service to delete an account with no records.
         const message = !isIncome ? EXPENSE_NOT_FOUND : INCOME_NOT_FOUND;
-        return message;
+        const emptyRecordsResponse: MultipleRecordsResponse = {
+          ...initialResponse,
+          data: null,
+          message,
+        };
+        return emptyRecordsResponse;
       }
 
-      return records;
+      const response: MultipleRecordsResponse = {
+        ...initialResponse,
+        data: records,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -322,27 +347,24 @@ export class RecordsService {
   }
 
   formatIncome(
-    incomes: Omit<
-      CreateIncome & {
-        _id: Types.ObjectId;
-      },
-      never
-    >[],
-  ) {
+    incomes: IncomeResponse[],
+  ): FormattedIncomes[] | IncomeResponse[] {
     const noExpensesPaidFound = incomes.every(
       (record) => record.expensesPaid.length === 0,
     );
     if (noExpensesPaidFound) return incomes;
 
     // Formatting expenses paid as the front end expect.
-    const newRecords = incomes.map((record) => {
-      if (record.expensesPaid.length === 0) return record.toJSON();
+    const newRecords: FormattedIncomes[] = incomes.map((record) => {
+      if (record.expensesPaid.length === 0) return record.toObject();
 
-      const expensesPaid = record.expensesPaid.map((expense) => {
-        const { _id, shortName, amount, fullDate, formattedTime } = expense;
-        return { _id, shortName, amount, fullDate, formattedTime };
-      });
-      return { ...record.toJSON(), expensesPaid };
+      const expensesPaid: ExpensesPaidFormatted[] = record.expensesPaid.map(
+        (expense) => {
+          const { _id, shortName, amount, fullDate, formattedTime } = expense;
+          return { _id, shortName, amount, fullDate, formattedTime };
+        },
+      );
+      return { ...record.toObject(), expensesPaid };
     });
     return newRecords;
   }
