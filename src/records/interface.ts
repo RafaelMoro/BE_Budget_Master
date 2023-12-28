@@ -1,16 +1,7 @@
-import { Types } from 'mongoose';
-import { CreateExpense } from './entities/expenses.entity';
+import { Expense } from './entities/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
-import { CreateIncome } from './entities/incomes.entity';
 import { GeneralResponse } from 'src/response.interface';
-
-export interface ExpenseResponse extends CreateExpense {
-  _id: Types.ObjectId;
-}
-
-export interface IncomeResponse extends CreateIncome {
-  _id: Types.ObjectId;
-}
+import { Income } from './entities/incomes.entity';
 
 export interface ExpensesPaidFormatted {
   _id: string;
@@ -20,7 +11,7 @@ export interface ExpensesPaidFormatted {
   formattedTime: string;
 }
 
-export interface FormattedIncomes extends Omit<IncomeResponse, 'expensesPaid'> {
+export interface FormattedIncomes extends Omit<Income, 'expensesPaid'> {
   expensesPaid: ExpensesPaidFormatted[];
 }
 
@@ -32,7 +23,7 @@ export interface DeleteRecordResponse {
 
 export interface FindAllNotPaidExpensesByMonthResponse {
   message: null | string;
-  expenses: ExpenseResponse[];
+  expenses: Expense[];
 }
 
 /** Interfaces of services */
@@ -49,14 +40,18 @@ export interface RemoveRecordProps {
 }
 
 export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
-  data: ExpenseResponse | IncomeResponse;
+  data: Expense | Income;
 }
 
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
-  data: ExpenseResponse[] | IncomeResponse[] | FormattedIncomes[] | null;
+  data: Expense[] | Income[] | FormattedIncomes[] | null;
 }
 
 export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
   // Returns record with category information with id and category name.
   data: object;
+}
+
+export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
+  data: (Expense | Income | FormattedIncomes)[];
 }

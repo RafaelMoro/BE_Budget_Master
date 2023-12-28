@@ -13,6 +13,9 @@ import { CategoriesService } from '../../categories/services/categories.service'
 import {
   EXPENSE_NOT_FOUND,
   INCOME_NOT_FOUND,
+  NO_EXPENSES_FOUND,
+  NO_EXPENSES_INCOMES_FOUND,
+  NO_INCOMES_FOUND,
   RECORD_CREATED_MESSAGE,
 } from '../constants';
 import {
@@ -20,12 +23,11 @@ import {
   DeleteRecordResponse,
   FindRecordsByAccountProps,
   RemoveRecordProps,
-  IncomeResponse,
-  ExpenseResponse,
   RecordCreated,
   MultipleRecordsResponse,
   FormattedIncomes,
   ExpensesPaidFormatted,
+  JoinRecordsResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -73,7 +75,7 @@ export class RecordsService {
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
-      const modelSaved: ExpenseResponse | IncomeResponse = await model.save();
+      const modelSaved: Expense | Income = await model.save();
 
       // Update the prop isPaid to true of the expenses related to this income
       if (isIncome) {
@@ -323,32 +325,55 @@ export class RecordsService {
   }
 
   joinIncomesAndExpenses(expenses: Expense[], incomes: Income[]) {
+    const initialResponse: GeneralResponse = {
+      version: VERSION_RESPONSE,
+      success: true,
+      message: null,
+      data: null,
+      error: null,
+    };
     if (expenses.length === 0 && incomes.length === 0) {
-      return {
-        records: null,
-        message: 'No incomes or expenses found',
+      const noRecordsResponse: MultipleRecordsResponse = {
+        ...initialResponse,
+        data: null,
+        message: NO_EXPENSES_INCOMES_FOUND,
       };
+      return noRecordsResponse;
     }
 
     if (expenses.length === 0) {
+      // No expenses found, return the incomes found.
       const incomesOrdered = incomes.sort(compareDateAndTime);
       const incomesFormatted = this.formatIncome(incomesOrdered);
-      return { records: incomesFormatted, message: 'No expenses found.' };
+      const onlyIncomesFoundResponse: MultipleRecordsResponse = {
+        ...initialResponse,
+        data: incomesFormatted,
+        message: NO_EXPENSES_FOUND,
+      };
+      return onlyIncomesFoundResponse;
     }
 
     if (incomes.length === 0) {
+      // No incomes found, return the expenses found.
       const expensesOrdered = expenses.sort(compareDateAndTime);
-      return { records: expensesOrdered, message: 'No incomes found.' };
+      const onlyExpensesFoundResponse: MultipleRecordsResponse = {
+        ...initialResponse,
+        data: expensesOrdered,
+        message: NO_INCOMES_FOUND,
+      };
+      return onlyExpensesFoundResponse;
     }
 
     const formattedIncomes = this.formatIncome(incomes);
     const records = [...expenses, ...formattedIncomes].sort(compareDateAndTime);
-    return { records, message: null };
+    const response: JoinRecordsResponse = {
+      ...initialResponse,
+      data: records,
+    };
+    return response;
   }
 
-  formatIncome(
-    incomes: IncomeResponse[],
-  ): FormattedIncomes[] | IncomeResponse[] {
+  formatIncome(incomes: Income[]): FormattedIncomes[] | Income[] {
     const noExpensesPaidFound = incomes.every(
       (record) => record.expensesPaid.length === 0,
     );
