@@ -83,10 +83,11 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
+      const { _id, categoryName } = categoryFoundOrCreated;
       // Change record categories for the categoryResponse
       const record = {
         ...modelSaved.toJSON(),
-        category: categoryFoundOrCreated,
+        category: { _id, categoryName },
       };
       const response: RecordCreated = {
         version: VERSION_RESPONSE,
