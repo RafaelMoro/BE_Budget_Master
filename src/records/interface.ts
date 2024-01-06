@@ -21,11 +21,6 @@ export interface DeleteRecordResponse {
   deleteRecordSuccess: boolean;
 }
 
-export interface FindAllNotPaidExpensesByMonthResponse {
-  message: null | string;
-  expenses: Expense[];
-}
-
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;

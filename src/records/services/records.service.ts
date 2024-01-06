@@ -19,7 +19,6 @@ import {
   RECORD_CREATED_MESSAGE,
 } from '../constants';
 import {
-  FindAllNotPaidExpensesByMonthResponse,
   DeleteRecordResponse,
   FindRecordsByAccountProps,
   RemoveRecordProps,
@@ -264,10 +263,17 @@ export class RecordsService {
     month: string,
     year: string,
     userId: string,
-  ): Promise<FindAllNotPaidExpensesByMonthResponse> {
+  ): Promise<GeneralResponse> {
     try {
+      const initialResponse: GeneralResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: null,
+        error: null,
+      };
       const regexDate = `${month}.*${year}|${year}.*${month}`;
-      const expenses = await this.expenseModel
+      const expenses: Expense[] = await this.expenseModel
         .find({
           account: accountId,
           fullDate: { $regex: new RegExp(regexDate, 'i') },
@@ -277,15 +283,16 @@ export class RecordsService {
 
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
-        return {
-          message: 'Not expenses found on this month',
-          expenses,
+        const noExpensesResponse: GeneralResponse = {
+          ...initialResponse,
+          message: NO_EXPENSES_FOUND,
+          data: null,
         };
+        return noExpensesResponse;
       }
-      return {
-        message: null,
-        expenses,
-      };
+
+      const response: GeneralResponse = { ...initialResponse, data: expenses };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
