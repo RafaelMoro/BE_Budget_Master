@@ -165,14 +165,6 @@ export class RecordsService {
     userId,
   }: FindRecordsByAccountProps): Promise<MultipleRecordsResponse> {
     try {
-      const initialResponse: GeneralResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: null,
-        data: null,
-        error: null,
-      };
-
       const records = !isIncome
         ? await this.expenseModel
             .find({ account: accountId })
@@ -194,7 +186,7 @@ export class RecordsService {
         // Check if the any record has any expenses paid linked.
         const incomesFormatted = this.formatIncome(records as Income[]);
         const response: MultipleRecordsResponse = {
-          ...initialResponse,
+          ...INITIAL_RESPONSE,
           data: incomesFormatted,
         };
         return response;
@@ -205,7 +197,7 @@ export class RecordsService {
         // it would break the service to delete an account with no records.
         const message = !isIncome ? EXPENSE_NOT_FOUND : INCOME_NOT_FOUND;
         const emptyRecordsResponse: MultipleRecordsResponse = {
-          ...initialResponse,
+          ...INITIAL_RESPONSE,
           data: null,
           message,
         };
@@ -213,7 +205,7 @@ export class RecordsService {
       }
 
       const response: MultipleRecordsResponse = {
-        ...initialResponse,
+        ...INITIAL_RESPONSE,
         data: records,
       };
       return response;
@@ -329,16 +321,9 @@ export class RecordsService {
   }
 
   joinIncomesAndExpenses(expenses: Expense[], incomes: Income[]) {
-    const initialResponse: GeneralResponse = {
-      version: VERSION_RESPONSE,
-      success: true,
-      message: null,
-      data: null,
-      error: null,
-    };
     if (expenses.length === 0 && incomes.length === 0) {
       const noRecordsResponse: MultipleRecordsResponse = {
-        ...initialResponse,
+        ...INITIAL_RESPONSE,
         data: null,
         message: NO_EXPENSES_INCOMES_FOUND,
       };
@@ -350,7 +335,7 @@ export class RecordsService {
       const incomesOrdered = incomes.sort(compareDateAndTime);
       const incomesFormatted = this.formatIncome(incomesOrdered);
       const onlyIncomesFoundResponse: MultipleRecordsResponse = {
-        ...initialResponse,
+        ...INITIAL_RESPONSE,
         data: incomesFormatted,
         message: NO_EXPENSES_FOUND,
       };
@@ -361,7 +346,7 @@ export class RecordsService {
       // No incomes found, return the expenses found.
       const expensesOrdered = expenses.sort(compareDateAndTime);
       const onlyExpensesFoundResponse: MultipleRecordsResponse = {
-        ...initialResponse,
+        ...INITIAL_RESPONSE,
         data: expensesOrdered,
         message: NO_INCOMES_FOUND,
       };
@@ -371,7 +356,7 @@ export class RecordsService {
     const formattedIncomes = this.formatIncome(incomes);
     const records = [...expenses, ...formattedIncomes].sort(compareDateAndTime);
     const response: JoinRecordsResponse = {
-      ...initialResponse,
+      ...INITIAL_RESPONSE,
       data: records,
     };
     return response;
