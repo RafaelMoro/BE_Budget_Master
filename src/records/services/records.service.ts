@@ -11,12 +11,20 @@ import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import {
+  INITIAL_RESPONSE,
   EXPENSE_NOT_FOUND,
   INCOME_NOT_FOUND,
   NO_EXPENSES_FOUND,
   NO_EXPENSES_INCOMES_FOUND,
   NO_INCOMES_FOUND,
   RECORD_CREATED_MESSAGE,
+  RECORD_NOT_FOUND,
+  RECORD_UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_EXPENSES_ERROR,
+  UNAUTHORIZED_INCOMES_ERROR,
+  MISSING_DATE,
+  MISSING_CATEGORY,
+  MISSING_AMOUNT,
 } from '../constants';
 import {
   DeleteRecordResponse,
@@ -217,9 +225,7 @@ export class RecordsService {
   verifyExpensesBelongsToUser(expenses: Expense[], userId: string) {
     if (expenses.length === 0) return expenses;
     if (expenses[0]?.userId !== userId) {
-      throw new UnauthorizedException(
-        "You're unauthorized to see these expenses.",
-      );
+      throw new UnauthorizedException(UNAUTHORIZED_EXPENSES_ERROR);
     }
 
     return expenses;
@@ -228,9 +234,7 @@ export class RecordsService {
   verifyIncomesBelongsToUser(incomes: Income[], userId: string) {
     if (incomes.length === 0) return incomes;
     if (incomes[0]?.userId !== userId) {
-      throw new UnauthorizedException(
-        "You're unauthorized to see these incomes.",
-      );
+      throw new UnauthorizedException(UNAUTHORIZED_INCOMES_ERROR);
     }
     return incomes;
   }
@@ -265,13 +269,6 @@ export class RecordsService {
     userId: string,
   ): Promise<GeneralResponse> {
     try {
-      const initialResponse: GeneralResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: null,
-        data: null,
-        error: null,
-      };
       const regexDate = `${month}.*${year}|${year}.*${month}`;
       const expenses: Expense[] = await this.expenseModel
         .find({
@@ -284,14 +281,14 @@ export class RecordsService {
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
         const noExpensesResponse: GeneralResponse = {
-          ...initialResponse,
+          ...INITIAL_RESPONSE,
           message: NO_EXPENSES_FOUND,
           data: null,
         };
         return noExpensesResponse;
       }
 
-      const response: GeneralResponse = { ...initialResponse, data: expenses };
+      const response: GeneralResponse = { ...INITIAL_RESPONSE, data: expenses };
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -440,10 +437,12 @@ export class RecordsService {
 
       // Verify that the record belongs to the user
       if (userId !== userIdChanges) {
-        throw new UnauthorizedException(
-          'This record does not belongs to the user',
-        );
+        throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
       }
+      if (!date) throw new UnauthorizedException(MISSING_DATE);
+      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
+      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
+
       const {
         data: { _id: categoryId },
       } = await this.findOrCreateCategoryForRecord(
@@ -468,10 +467,10 @@ export class RecordsService {
             .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
             .exec();
 
-      if (!updatedRecord) throw new BadRequestException('Record not found');
+      if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
 
       // Update the prop isPaid to true of the expenses related to this income
-      if (isIncome && (changes as CreateIncomeDto).expensesPaid.length > 0) {
+      if (isIncome && (changes as CreateIncomeDto).expensesPaid?.length > 0) {
         const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
@@ -481,7 +480,11 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
-      return updatedRecord;
+      const response: GeneralResponse = {
+        ...INITIAL_RESPONSE,
+        data: updatedRecord,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
