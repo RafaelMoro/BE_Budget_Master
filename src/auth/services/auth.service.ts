@@ -6,7 +6,9 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/entities/users.entity';
 import { generateJWT } from '../../utils';
+import { INITIAL_RESPONSE } from '../../records/constants';
 import config from '../../config';
+import { LoginData, LoginResponse } from '../interface';
 
 @Injectable()
 export class AuthService {
@@ -30,9 +32,11 @@ export class AuthService {
 
   generateJWTAuth(user: User) {
     const accessToken = generateJWT(user, this.jwtService);
-    return {
+    const loginData: LoginData = {
       accessToken,
       user,
     };
+    const response: LoginResponse = { ...INITIAL_RESPONSE, data: loginData };
+    return response;
   }
 }
