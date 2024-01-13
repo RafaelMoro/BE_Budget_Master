@@ -115,9 +115,10 @@ export class AccountsService {
         const expensesIds = expensesRelatedToAccount.data.map((record) => {
           return { recordId: record._id };
         });
-        expenseRecords = await this.recordsService.deleteMultipleRecords(
+        const { data } = await this.recordsService.deleteMultipleRecords(
           expensesIds,
         );
+        expenseRecords = data;
       }
 
       // If the account has incomes, then delete incomes.
@@ -129,10 +130,11 @@ export class AccountsService {
         const incomesIds = incomesRelatedToAccount.data.map((record) => {
           return { recordId: record._id };
         });
-        incomesRecords = await this.recordsService.deleteMultipleRecords(
+        const { data } = await this.recordsService.deleteMultipleRecords(
           incomesIds,
           true,
         );
+        incomesRecords = data;
       }
 
       // After deleting records related to this account if found, delete the account.

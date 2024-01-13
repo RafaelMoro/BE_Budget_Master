@@ -35,6 +35,7 @@ import {
   FormattedIncomes,
   ExpensesPaidFormatted,
   JoinRecordsResponse,
+  DeleteMultipleRecordsResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -565,18 +566,25 @@ export class RecordsService {
   async deleteMultipleRecords(records: DeleteRecordDto[], isIncome = false) {
     try {
       const recordsIds = records.map((record) => record.recordId);
-      const deletedRecords = !isIncome
+      const deletedRecords: Expense[] | Income[] = !isIncome
         ? await Promise.all(
             recordsIds.map((id) => this.expenseModel.findByIdAndDelete(id)),
           )
         : await Promise.all(
             recordsIds.map((id) => this.incomeModel.findByIdAndDelete(id)),
           );
-      const checkDeletedRecords = deletedRecords.map((record, index) => {
-        if (!record) return `record id ${records[index].recordId} not found`;
-        return record;
-      });
-      return checkDeletedRecords;
+      const checkDeletedRecords = deletedRecords.map(
+        (record: Expense | Income, index: number) => {
+          if (!record) return `record id ${records[index].recordId} not found`;
+          return record;
+        },
+      );
+
+      const response: DeleteMultipleRecordsResponse = {
+        ...INITIAL_RESPONSE,
+        data: checkDeletedRecords,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

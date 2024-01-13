@@ -44,3 +44,8 @@ export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
 export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | Income | FormattedIncomes)[];
 }
+
+export interface DeleteMultipleRecordsResponse
+  extends Omit<GeneralResponse, 'data'> {
+  data: (Expense | Income | string)[];
+}
