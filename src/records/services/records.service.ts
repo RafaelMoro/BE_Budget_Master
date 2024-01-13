@@ -25,9 +25,9 @@ import {
   MISSING_DATE,
   MISSING_CATEGORY,
   MISSING_AMOUNT,
+  RECORD_DELETED,
 } from '../constants';
 import {
-  DeleteRecordResponse,
   FindRecordsByAccountProps,
   RemoveRecordProps,
   RecordCreated,
@@ -514,11 +514,11 @@ export class RecordsService {
       const record = isIncome
         ? await this.incomeModel.findById(recordId)
         : await this.expenseModel.findById(recordId);
+      if (!record) throw new UnauthorizedException(RECORD_NOT_FOUND);
+
       const { userId: recordUserId } = record;
       if (userId !== recordUserId) {
-        throw new UnauthorizedException(
-          'This record does not belongs to the user',
-        );
+        throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
       }
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -535,7 +535,7 @@ export class RecordsService {
         const income = await this.incomeModel.findById(recordId);
 
         // Check if there are any expenses related to this income
-        if (income?.expensesPaid.length > 0) {
+        if (income?.expensesPaid?.length > 0) {
           // set expenses as not paid
           const payload: UpdateExpenseDto[] = income.expensesPaid.map((id) => ({
             recordId: id,
@@ -546,14 +546,15 @@ export class RecordsService {
         }
       }
 
-      const recordDeleted = !isIncome
+      const recordDeleted: Expense | Income = !isIncome
         ? await this.expenseModel.findByIdAndDelete(recordId)
         : await this.incomeModel.findByIdAndDelete(recordId);
-      if (!recordDeleted) throw new BadRequestException('Record not found');
-      const response: DeleteRecordResponse = {
-        message: null,
-        error: null,
-        deleteRecordSuccess: true,
+      if (!recordDeleted) throw new BadRequestException(RECORD_NOT_FOUND);
+
+      const response: GeneralResponse = {
+        ...INITIAL_RESPONSE,
+        message: RECORD_DELETED,
+        data: recordDeleted,
       };
       return response;
     } catch (error) {

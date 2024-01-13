@@ -15,12 +15,6 @@ export interface FormattedIncomes extends Omit<Income, 'expensesPaid'> {
   expensesPaid: ExpensesPaidFormatted[];
 }
 
-export interface DeleteRecordResponse {
-  message: string | null;
-  error: null | string;
-  deleteRecordSuccess: boolean;
-}
-
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
