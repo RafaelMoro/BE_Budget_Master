@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../users/services/users.service';
 import { User } from '../../users/entities/users.entity';
 import { generateJWT } from '../../utils';
-import { INITIAL_RESPONSE } from '../../records/constants';
+import { INITIAL_RESPONSE } from '../../constants';
 import config from '../../config';
 import { LoginData, LoginResponse } from '../interface';
 

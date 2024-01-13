@@ -1,6 +1,3 @@
-import { VERSION_RESPONSE } from '../../constants';
-import { GeneralResponse } from '../../response.interface';
-
 export const EXPENSE_NOT_FOUND = 'No expense found with that account id';
 export const INCOME_NOT_FOUND = 'No income found with that account id';
 export const CATEGORY_ID_ERROR = 'Mongo Id does not belong to a category';
@@ -19,11 +16,3 @@ export const UNAUTHORIZED_INCOMES_ERROR =
   "You're unauthorized to see these incomes.";
 export const RECORD_UNAUTHORIZED_ERROR =
   'This record does not belongs to the user';
-
-export const INITIAL_RESPONSE: GeneralResponse = {
-  version: VERSION_RESPONSE,
-  success: true,
-  message: null,
-  data: null,
-  error: null,
-};

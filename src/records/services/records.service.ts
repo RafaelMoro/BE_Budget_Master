@@ -10,8 +10,8 @@ import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
+import { INITIAL_RESPONSE } from '../../constants';
 import {
-  INITIAL_RESPONSE,
   EXPENSE_NOT_FOUND,
   INCOME_NOT_FOUND,
   NO_EXPENSES_FOUND,
