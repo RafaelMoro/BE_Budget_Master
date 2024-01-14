@@ -31,11 +31,11 @@ import {
   FindRecordsByAccountProps,
   RemoveRecordProps,
   RecordCreated,
-  MultipleRecordsResponse,
   FormattedIncomes,
   ExpensesPaidFormatted,
   JoinRecordsResponse,
-  DeleteMultipleRecordsResponse,
+  MultipleRecordsResponse,
+  BatchRecordsResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -500,7 +500,11 @@ export class RecordsService {
         if (!record) return `record id ${changes[index].recordId} not found`;
         return record;
       });
-      return checkUpdatedRecords;
+      const response: BatchRecordsResponse = {
+        ...INITIAL_RESPONSE,
+        data: checkUpdatedRecords,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -580,7 +584,7 @@ export class RecordsService {
         },
       );
 
-      const response: DeleteMultipleRecordsResponse = {
+      const response: BatchRecordsResponse = {
         ...INITIAL_RESPONSE,
         data: checkDeletedRecords,
       };

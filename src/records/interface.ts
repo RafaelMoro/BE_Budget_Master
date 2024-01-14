@@ -45,7 +45,6 @@ export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | Income | FormattedIncomes)[];
 }
 
-export interface DeleteMultipleRecordsResponse
-  extends Omit<GeneralResponse, 'data'> {
+export interface BatchRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | Income | string)[];
 }
