@@ -84,7 +84,7 @@ export class UsersService {
         version: VERSION_RESPONSE,
         success: true,
         message: USER_CREATED_MESSAGE,
-        data: { email },
+        data: { userCreated: { email } },
         error: null,
       };
       return response;

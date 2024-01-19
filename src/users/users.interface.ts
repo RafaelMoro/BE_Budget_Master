@@ -7,7 +7,7 @@ export interface UserResponse extends User {
 }
 
 interface CreateUserResponseData {
-  email: string;
+  userCreated: { email: string };
 }
 
 export interface CreateUserResponse extends Omit<GeneralResponse, 'data'> {
