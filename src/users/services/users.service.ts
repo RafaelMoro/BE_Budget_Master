@@ -11,11 +11,17 @@ import {
   DELETE_USER_MESSAGE,
   EMAIL_CHANGE_ERROR,
   FORGOT_PASSWORD_MESSAGE,
+  JWT_EXPIRED_ERROR,
+  JWT_INVALID_ERROR,
+  JWT_MALFORMED_ERROR,
+  JWT_NOT_FOUND,
+  LOCALHOST,
   PASSWORD_DIRECT_CHANGE_ERROR,
   PROFILE_UPDATE,
   RESET_PASSWORD_MESSAGE,
   USER_CREATED_MESSAGE,
   USER_NOT_FOUND_ERROR,
+  WRONG_JWT_ERROR,
 } from '../constants';
 import {
   CreateUserDto,
@@ -74,7 +80,6 @@ export class UsersService {
       userModel.password = passwordHashed;
       const modelSaved: UserResponse = await userModel.save();
       const { email } = modelSaved.toJSON();
-      // const rta = { emailModel, message: 'User created' };
       const response: CreateUserResponse = {
         version: VERSION_RESPONSE,
         success: true,
@@ -116,7 +121,7 @@ export class UsersService {
   async updateUser(changes: UpdateProfilerDto, userId: string) {
     try {
       const user = await this.findByUserId(userId);
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) throw new BadRequestException(USER_NOT_FOUND_ERROR);
 
       const {
         email: emailFromChanges,
@@ -148,7 +153,7 @@ export class UsersService {
       const { email, hostname } = payload;
       const { frontendPort, backendUri } = this.configService;
       const completeHostname =
-        hostname === 'localhost'
+        hostname === LOCALHOST
           ? `http://${hostname}:${frontendPort}`
           : `http://${backendUri}`;
 
@@ -189,11 +194,11 @@ export class UsersService {
     try {
       return this.jwtService.verify(token);
     } catch (error) {
-      if (error?.message === 'jwt expired') {
-        throw new BadRequestException('JWT Expired');
+      if (error?.message === JWT_EXPIRED_ERROR) {
+        throw new BadRequestException(JWT_EXPIRED_ERROR);
       }
-      if (error?.message === 'jwt malformed') {
-        throw new BadRequestException('Invalid JWT');
+      if (error?.message === JWT_MALFORMED_ERROR) {
+        throw new BadRequestException(JWT_MALFORMED_ERROR);
       }
 
       throw new BadRequestException(error.message);
@@ -203,18 +208,18 @@ export class UsersService {
   async resetPassword(oneTimeToken: string, password: string) {
     try {
       const tokenVerified = this.verifyToken(oneTimeToken);
-      if (!tokenVerified) throw new BadRequestException('Invalid JWT');
+      if (!tokenVerified) throw new BadRequestException(JWT_INVALID_ERROR);
 
       const userId = tokenVerified.sub;
       const user = await this.userModel.findOne({ _id: userId }).exec();
-      if (!user) throw new BadRequestException('The user does not exist');
+      if (!user) throw new BadRequestException(USER_NOT_FOUND_ERROR);
       const { _id } = user;
 
       const userOneTimeToken = user.oneTimeToken;
-      if (!userOneTimeToken) throw new BadRequestException('JWT not found');
+      if (!userOneTimeToken) throw new BadRequestException(JWT_NOT_FOUND);
 
       if (oneTimeToken !== userOneTimeToken)
-        throw new BadRequestException('Wrong JWT');
+        throw new BadRequestException(WRONG_JWT_ERROR);
 
       await this.userModel.updateOne(
         { _id: user.id },
