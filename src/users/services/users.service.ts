@@ -8,12 +8,14 @@ import { ConfigType } from '@nestjs/config';
 
 import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
 import {
+  DELETE_USER_MESSAGE,
   EMAIL_CHANGE_ERROR,
   FORGOT_PASSWORD_MESSAGE,
   PASSWORD_DIRECT_CHANGE_ERROR,
   PROFILE_UPDATE,
   RESET_PASSWORD_MESSAGE,
   USER_CREATED_MESSAGE,
+  USER_NOT_FOUND_ERROR,
 } from '../constants';
 import {
   CreateUserDto,
@@ -32,6 +34,8 @@ import {
   GeneralUserResponse,
   UserResponse,
 } from '../users.interface';
+import { INITIAL_RESPONSE } from '../../constants';
+import { GeneralResponse } from '../../response.interface';
 
 @Injectable()
 export class UsersService {
@@ -149,7 +153,7 @@ export class UsersService {
           : `http://${backendUri}`;
 
       const user: User = await this.findByEmail(email);
-      if (!user) throw new NotFoundException('User not found');
+      if (!user) throw new NotFoundException(USER_NOT_FOUND_ERROR);
 
       const { firstName, lastName } = user;
       const oneTimeToken = generateJWT(user, this.jwtService);
@@ -230,11 +234,19 @@ export class UsersService {
     }
   }
 
-  async remove(email: string) {
+  async deleteUser(userId: string) {
     try {
-      const userId = await this.findByEmail(email);
-      const userDeleted = await this.userModel.findByIdAndDelete(userId);
-      return userDeleted;
+      const userDeletedModel = await this.userModel.findByIdAndDelete(userId);
+      if (!userDeletedModel)
+        throw new BadRequestException(USER_NOT_FOUND_ERROR);
+
+      const { email, firstName, lastName } = userDeletedModel;
+      const response: GeneralResponse = {
+        ...INITIAL_RESPONSE,
+        data: { userDeleted: { email, firstName, lastName } },
+        message: DELETE_USER_MESSAGE,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

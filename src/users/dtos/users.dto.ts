@@ -64,10 +64,3 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   readonly password: string;
 }
-
-export class DeleteUserDto {
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  readonly email: string;
-}

@@ -15,7 +15,6 @@ import {
   CreateUserDto,
   ForgotPasswordDto,
   ResetPasswordDto,
-  DeleteUserDto,
   ForgotPasswordBodyDto,
   UpdateProfilerDto,
 } from '../dtos/users.dto';
@@ -35,9 +34,9 @@ export class UsersController {
   }
 
   @Delete()
-  remove(@Body() changes: DeleteUserDto) {
-    const { email } = changes;
-    return this.usersService.remove(email);
+  deleteUser(@RequestNest() request) {
+    const userId = request.user.sub;
+    return this.usersService.deleteUser(userId);
   }
 
   @Public()
