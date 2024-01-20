@@ -33,7 +33,9 @@ export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
 }
 
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
-  data: Expense[] | Income[] | FormattedIncomes[] | null;
+  data: {
+    records: Expense[] | Income[] | FormattedIncomes[] | null;
+  };
 }
 
 export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
@@ -44,7 +46,9 @@ export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
 }
 
 export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
-  data: (Expense | Income | FormattedIncomes)[];
+  data: {
+    records: (Expense | Income | FormattedIncomes)[];
+  };
 }
 
 export interface BatchRecordsResponse extends Omit<GeneralResponse, 'data'> {

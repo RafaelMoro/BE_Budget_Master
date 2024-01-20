@@ -190,7 +190,9 @@ export class RecordsService {
         const incomesFormatted = this.formatIncome(records as Income[]);
         const response: MultipleRecordsResponse = {
           ...INITIAL_RESPONSE,
-          data: incomesFormatted,
+          data: {
+            records: incomesFormatted,
+          },
         };
         return response;
       }
@@ -209,7 +211,9 @@ export class RecordsService {
 
       const response: MultipleRecordsResponse = {
         ...INITIAL_RESPONSE,
-        data: records,
+        data: {
+          records,
+        },
       };
       return response;
     } catch (error) {
@@ -283,7 +287,10 @@ export class RecordsService {
         return noExpensesResponse;
       }
 
-      const response: GeneralResponse = { ...INITIAL_RESPONSE, data: expenses };
+      const response: MultipleRecordsResponse = {
+        ...INITIAL_RESPONSE,
+        data: { records: expenses },
+      };
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -339,7 +346,9 @@ export class RecordsService {
       const incomesFormatted = this.formatIncome(incomesOrdered);
       const onlyIncomesFoundResponse: MultipleRecordsResponse = {
         ...INITIAL_RESPONSE,
-        data: incomesFormatted,
+        data: {
+          records: incomesFormatted,
+        },
         message: NO_EXPENSES_FOUND,
       };
       return onlyIncomesFoundResponse;
@@ -350,7 +359,9 @@ export class RecordsService {
       const expensesOrdered = expenses.sort(compareDateAndTime);
       const onlyExpensesFoundResponse: MultipleRecordsResponse = {
         ...INITIAL_RESPONSE,
-        data: expensesOrdered,
+        data: {
+          records: expensesOrdered,
+        },
         message: NO_INCOMES_FOUND,
       };
       return onlyExpensesFoundResponse;
@@ -360,7 +371,9 @@ export class RecordsService {
     const records = [...expenses, ...formattedIncomes].sort(compareDateAndTime);
     const response: JoinRecordsResponse = {
       ...INITIAL_RESPONSE,
-      data: records,
+      data: {
+        records,
+      },
     };
     return response;
   }
