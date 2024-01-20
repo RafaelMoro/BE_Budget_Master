@@ -38,6 +38,8 @@ import {
   CreateUserResponse,
   ForgotResetPasswordResponse,
   GeneralUserResponse,
+  UpdateProfileData,
+  UpdateProfileResponse,
   UserResponse,
 } from '../users.interface';
 import { INITIAL_RESPONSE } from '../../constants';
@@ -109,7 +111,7 @@ export class UsersService {
         version: VERSION_RESPONSE,
         success: true,
         message: PROFILE_UPDATE,
-        data: model,
+        data: { user: model },
         error: null,
       };
       return response;
@@ -135,11 +137,20 @@ export class UsersService {
       const model: UserResponse = await this.userModel
         .findByIdAndUpdate(userId, { $set: restProps }, { new: true })
         .exec();
-      const response: GeneralUserResponse = {
+      const { email, firstName, middleName, lastName } = model.toObject();
+
+      const updateProfileData: UpdateProfileData = {
+        email,
+        firstName,
+        middleName,
+        lastName,
+      };
+
+      const response: UpdateProfileResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: PROFILE_UPDATE,
-        data: model,
+        data: { userUpdated: updateProfileData },
         error: null,
       };
       return response;

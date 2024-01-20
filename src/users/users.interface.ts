@@ -15,7 +15,22 @@ export interface CreateUserResponse extends Omit<GeneralResponse, 'data'> {
 }
 
 export interface GeneralUserResponse extends Omit<GeneralResponse, 'data'> {
-  data: UserResponse;
+  data: {
+    user: UserResponse;
+  };
+}
+
+export interface UpdateProfileData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
+}
+
+export interface UpdateProfileResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    userUpdated: UpdateProfileData;
+  };
 }
 
 export interface ForgotResetPasswordResponse
