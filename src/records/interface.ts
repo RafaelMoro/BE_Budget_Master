@@ -29,7 +29,9 @@ export interface RemoveRecordProps {
 }
 
 export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
-  data: Expense | Income;
+  data: {
+    record: Expense | Income;
+  };
 }
 
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {

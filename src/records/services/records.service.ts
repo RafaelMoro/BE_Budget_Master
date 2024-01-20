@@ -454,7 +454,7 @@ export class RecordsService {
 
       const {
         data: {
-          category: { _id: categoryId },
+          category: { _id: categoryId, categoryName },
         },
       } = await this.findOrCreateCategoryForRecord(
         category,
@@ -491,9 +491,17 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
       }
+
+      const { categoryFromRecord, ...restProps } = updatedRecord.toObject();
+      const recordWithCategory = {
+        ...restProps,
+        category: { _id: categoryId, categoryName },
+      };
       const response: GeneralResponse = {
         ...INITIAL_RESPONSE,
-        data: updatedRecord,
+        data: {
+          record: recordWithCategory,
+        },
       };
       return response;
     } catch (error) {
