@@ -106,7 +106,9 @@ export class RecordsService {
         version: VERSION_RESPONSE,
         success: true,
         message: RECORD_CREATED_MESSAGE,
-        data: record,
+        data: {
+          record,
+        },
         error: null,
       };
       return response;
