@@ -38,7 +38,9 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
-        data: categories,
+        data: {
+          categories,
+        },
         error: null,
       };
       return response;
@@ -56,7 +58,7 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
-        data: category,
+        data: { categories: category },
         error: null,
       };
       return response;
@@ -89,7 +91,9 @@ export class CategoriesService {
 
       const response: FindByNameResponse = {
         ...initialResponse,
-        data: category,
+        data: {
+          categories: category,
+        },
       };
       return response;
     } catch (error) {
@@ -106,7 +110,9 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: CATEGORY_CREATED_MESSAGE,
-        data: model,
+        data: {
+          category: model,
+        },
         error: null,
       };
       return response;
@@ -127,7 +133,9 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
-        data: updateCategory,
+        data: {
+          category: updateCategory,
+        },
         error: null,
       };
       return response;
@@ -168,7 +176,9 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: SUBCATEGORY_ERROR,
-        data: category,
+        data: {
+          category,
+        },
         error: null,
       };
       return response;
@@ -189,7 +199,9 @@ export class CategoriesService {
         version: VERSION_RESPONSE,
         success: true,
         message: CATEGORY_DELETED_MESSAGE,
-        data: categoryDeleted,
+        data: {
+          category: categoryDeleted,
+        },
         error: null,
       };
       return response;

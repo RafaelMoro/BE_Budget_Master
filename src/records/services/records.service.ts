@@ -67,8 +67,13 @@ export class RecordsService {
   ) {
     try {
       const { category, subCategory, amount } = data;
-      const { data: categoryFoundOrCreated } =
-        await this.findOrCreateCategoryForRecord(category, subCategory, userId);
+      const {
+        data: { category: categoryFoundOrCreated },
+      } = await this.findOrCreateCategoryForRecord(
+        category,
+        subCategory,
+        userId,
+      );
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
@@ -131,8 +136,9 @@ export class RecordsService {
   ) {
     try {
       // Check if category already exists.
-      const { data: searchedCategory } =
-        await this.categoriesService.findByName(category);
+      const {
+        data: { categories: searchedCategory },
+      } = await this.categoriesService.findByName(category);
 
       // The category already exists with that name.
       if (searchedCategory) {
@@ -141,7 +147,9 @@ export class RecordsService {
           version: VERSION_RESPONSE,
           success: true,
           message: CATEGORY_EXISTS_MESSAGE,
-          data: foundCategory,
+          data: {
+            category: foundCategory,
+          },
           error: null,
         };
         return response;
@@ -445,7 +453,9 @@ export class RecordsService {
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
       const {
-        data: { _id: categoryId },
+        data: {
+          category: { _id: categoryId },
+        },
       } = await this.findOrCreateCategoryForRecord(
         category,
         subCategory,

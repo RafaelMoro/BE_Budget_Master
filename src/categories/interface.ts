@@ -8,15 +8,21 @@ export interface CategoriesResponse extends Category {
 
 export interface GeneralCategoriesResponse
   extends Omit<GeneralResponse, 'data'> {
-  data: CategoriesResponse[];
+  data: {
+    categories: CategoriesResponse[];
+  };
 }
 
 export interface FindByNameResponse extends Omit<GeneralResponse, 'data'> {
-  data: null | CategoriesResponse[];
+  data: {
+    categories: null | CategoriesResponse[];
+  };
 }
 
 export interface SingleCategoryResponse extends Omit<GeneralResponse, 'data'> {
-  data: CategoriesResponse;
+  data: {
+    category: CategoriesResponse;
+  };
 }
 
 export interface UpdateSubcategoriesResponse
