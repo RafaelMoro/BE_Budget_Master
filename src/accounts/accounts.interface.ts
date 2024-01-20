@@ -7,11 +7,15 @@ export interface AccountResponse extends Account {
 }
 
 export interface GeneralAccountResponse extends Omit<GeneralResponse, 'data'> {
-  data: AccountResponse;
+  data: {
+    account: AccountResponse;
+  };
 }
 
 export interface GetAccountResponse extends Omit<GeneralResponse, 'data'> {
-  data: AccountResponse[];
+  data: {
+    accounts: AccountResponse[];
+  };
 }
 
 interface DeleteAccountResponseData {

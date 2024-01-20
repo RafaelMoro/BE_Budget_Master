@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   ACCOUNT_CREATED_MESSAGE,
   ACCOUNT_DELETED_MESSAGE,
+  ACCOUNT_NOT_FOUND,
   ACCOUNT_UPDATED_MESSAGE,
 } from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
@@ -39,7 +40,9 @@ export class AccountsService {
         version: VERSION_RESPONSE,
         success: true,
         message: ACCOUNT_CREATED_MESSAGE,
-        data: model,
+        data: {
+          account: model,
+        },
         error: null,
       };
       return response;
@@ -58,7 +61,9 @@ export class AccountsService {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
-        data: accounts,
+        data: {
+          accounts,
+        },
         error: null,
       };
       return response;
@@ -78,7 +83,9 @@ export class AccountsService {
         version: VERSION_RESPONSE,
         success: true,
         message: ACCOUNT_UPDATED_MESSAGE,
-        data: updatedAccount,
+        data: {
+          account: updatedAccount,
+        },
         error: null,
       };
       return response;
@@ -140,7 +147,7 @@ export class AccountsService {
       // After deleting records related to this account if found, delete the account.
       const accountDeleted: AccountResponse =
         await this.accountModel.findByIdAndDelete(accountId);
-      if (!accountDeleted) throw new BadRequestException('Account not found');
+      if (!accountDeleted) throw new BadRequestException(ACCOUNT_NOT_FOUND);
 
       const response: DeleteAccountResponse = {
         version: VERSION_RESPONSE,
