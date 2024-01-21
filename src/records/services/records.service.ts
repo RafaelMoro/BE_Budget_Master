@@ -477,6 +477,7 @@ export class RecordsService {
             .exec()
         : await this.incomeModel
             .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+            .populate('expensesPaid')
             .exec();
 
       if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
