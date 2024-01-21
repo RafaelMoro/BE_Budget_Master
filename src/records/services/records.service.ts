@@ -136,9 +136,10 @@ export class RecordsService {
   ) {
     try {
       // Check if category already exists.
-      const {
-        data: { categories: searchedCategory },
-      } = await this.categoriesService.findByName(category);
+      const categoryResponse = await this.categoriesService.findByName(
+        category,
+      );
+      const searchedCategory = categoryResponse.data?.categories;
 
       // The category already exists with that name.
       if (searchedCategory) {
