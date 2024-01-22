@@ -89,6 +89,7 @@ export class RecordsService {
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
       const modelSaved: Expense | Income = await model.save();
+      let modelPopulated: Expense | Income;
 
       // Update the prop isPaid to true of the expenses related to this income
       if (isIncome) {
@@ -100,19 +101,28 @@ export class RecordsService {
           userId,
         }));
         await this.updateMultipleRecords(payload);
+
+        modelPopulated = await this.incomeModel.populate(
+          modelSaved,
+          'expensesPaid',
+        );
+        modelPopulated = await this.incomeModel.populate(
+          modelPopulated,
+          'category',
+        );
+      } else {
+        modelPopulated = await this.expenseModel.populate(
+          modelSaved,
+          'category',
+        );
       }
-      const { _id, categoryName } = categoryFoundOrCreated;
-      // Change record categories for the categoryResponse
-      const record = {
-        ...modelSaved.toJSON(),
-        category: { _id, categoryName },
-      };
+
       const response: RecordCreated = {
         version: VERSION_RESPONSE,
         success: true,
         message: RECORD_CREATED_MESSAGE,
         data: {
-          record,
+          record: modelPopulated,
         },
         error: null,
       };
