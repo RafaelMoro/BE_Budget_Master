@@ -41,9 +41,8 @@ export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
 }
 
 export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
-  // Returns record with category information with id and category name.
   data: {
-    record: object;
+    record: Expense | Income;
   };
 }
 
