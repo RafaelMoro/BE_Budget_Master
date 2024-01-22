@@ -102,19 +102,19 @@ export class RecordsService {
         }));
         await this.updateMultipleRecords(payload);
 
-        modelPopulated = await this.incomeModel.populate(
-          modelSaved,
-          'expensesPaid',
-        );
-        modelPopulated = await this.incomeModel.populate(
-          modelPopulated,
-          'category',
-        );
+        modelPopulated = await this.incomeModel.populate(modelSaved, {
+          path: 'expensesPaid',
+          select: '_id shortName amount fullDate isPaid',
+        });
+        modelPopulated = await this.incomeModel.populate(modelPopulated, {
+          path: 'category',
+          select: '_id categoryName',
+        });
       } else {
-        modelPopulated = await this.expenseModel.populate(
-          modelSaved,
-          'category',
-        );
+        modelPopulated = await this.expenseModel.populate(modelSaved, {
+          path: 'category',
+          select: '_id categoryName',
+        });
       }
 
       const response: RecordCreated = {
