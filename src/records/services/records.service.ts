@@ -31,8 +31,6 @@ import {
   FindRecordsByAccountProps,
   RemoveRecordProps,
   RecordCreated,
-  FormattedIncomes,
-  ExpensesPaidFormatted,
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
@@ -104,7 +102,7 @@ export class RecordsService {
 
         modelPopulated = await this.incomeModel.populate(modelSaved, {
           path: 'expensesPaid',
-          select: '_id shortName amount fullDate isPaid',
+          select: '_id shortName amount fullDate formattedTime',
         });
         modelPopulated = await this.incomeModel.populate(modelPopulated, {
           path: 'category',
@@ -197,7 +195,7 @@ export class RecordsService {
             .find({ account: accountId })
             .populate({
               path: 'expensesPaid',
-              select: '_id shortName amount fullDate isPaid',
+              select: '_id shortName amount fullDate formattedTime',
             })
             .populate('category', 'categoryName')
             .exec();
@@ -273,7 +271,7 @@ export class RecordsService {
         })
         .populate({
           path: 'expensesPaid',
-          select: '_id shortName amount fullDate isPaid',
+          select: '_id shortName amount fullDate formattedTime',
         })
         .populate('category', 'categoryName')
         .exec();
@@ -341,7 +339,10 @@ export class RecordsService {
           account: accountId,
           fullDate: { $regex: new RegExp(month, 'i') },
         })
-        .populate('expensesPaid')
+        .populate({
+          path: 'expensesPaid',
+          select: '_id shortName amount fullDate formattedTime',
+        })
         .populate('category', 'categoryName')
         .exec();
 
@@ -398,27 +399,6 @@ export class RecordsService {
       },
     };
     return response;
-  }
-
-  formatIncome(incomes: Income[]): FormattedIncomes[] | Income[] {
-    const noExpensesPaidFound = incomes.every(
-      (record) => record.expensesPaid.length === 0,
-    );
-    if (noExpensesPaidFound) return incomes;
-
-    // Formatting expenses paid as the front end expect.
-    const newRecords: FormattedIncomes[] = incomes.map((record) => {
-      if (record.expensesPaid.length === 0) return record.toObject();
-
-      const expensesPaid: ExpensesPaidFormatted[] = record.expensesPaid.map(
-        (expense) => {
-          const { _id, shortName, amount, fullDate, formattedTime } = expense;
-          return { _id, shortName, amount, fullDate, formattedTime };
-        },
-      );
-      return { ...record.toObject(), expensesPaid };
-    });
-    return newRecords;
   }
 
   // Deprecated

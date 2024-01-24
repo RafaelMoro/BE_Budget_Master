@@ -3,18 +3,6 @@ import { DeleteRecordDto } from './dtos/records.dto';
 import { GeneralResponse } from 'src/response.interface';
 import { Income } from './entities/incomes.entity';
 
-export interface ExpensesPaidFormatted {
-  _id: string;
-  shortName: string;
-  amount: number;
-  fullDate: string;
-  formattedTime: string;
-}
-
-export interface FormattedIncomes extends Omit<Income, 'expensesPaid'> {
-  expensesPaid: ExpensesPaidFormatted[];
-}
-
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
@@ -36,7 +24,7 @@ export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
 
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
-    records: Expense[] | Income[] | FormattedIncomes[] | null;
+    records: Expense[] | Income[] | null;
   };
 }
 
@@ -48,7 +36,7 @@ export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
 
 export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
-    records: (Expense | Income | FormattedIncomes)[];
+    records: (Expense | Income)[];
   };
 }
 
