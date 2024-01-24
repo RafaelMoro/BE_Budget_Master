@@ -131,10 +131,9 @@ export class RecordsService {
   }
 
   /*
-   * This method will take the category by name or mongo id.
-   * If it's a name, it will search if the category has been created or not, if it has been created, it will update subcategories if needed.
-   * If the category is by mongo id, it will check if it exists and will update subcategories if needed.
-   * This method returns an object that contains "message: string | null" and "categoryId: string"
+   * This method will take the category only by name.
+   * It will search if the category has been created or not, if it has been created, it will update subcategories if needed.
+   * This method returns the standarized response with the category.
    */
   async findOrCreateCategoryForRecord(
     // category it's only a name
