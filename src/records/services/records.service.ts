@@ -181,6 +181,7 @@ export class RecordsService {
     }
   }
 
+  /** Service used for searching incomes or expenses by account. */
   async findRecordsByAccount({
     accountId,
     isIncome = false,
@@ -194,7 +195,10 @@ export class RecordsService {
             .exec()
         : await this.incomeModel
             .find({ account: accountId })
-            .populate('expensesPaid')
+            .populate({
+              path: 'expensesPaid',
+              select: '_id shortName amount fullDate isPaid',
+            })
             .populate('category', 'categoryName')
             .exec();
 
@@ -205,12 +209,10 @@ export class RecordsService {
       }
 
       if (isIncome && records.length > 0) {
-        // Check if the any record has any expenses paid linked.
-        const incomesFormatted = this.formatIncome(records as Income[]);
         const response: MultipleRecordsResponse = {
           ...INITIAL_RESPONSE,
           data: {
-            records: incomesFormatted,
+            records,
           },
         };
         return response;
