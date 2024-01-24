@@ -206,16 +206,6 @@ export class RecordsService {
         this.verifyExpensesBelongsToUser(records as Expense[], userId);
       }
 
-      if (isIncome && records.length > 0) {
-        const response: MultipleRecordsResponse = {
-          ...INITIAL_RESPONSE,
-          data: {
-            records,
-          },
-        };
-        return response;
-      }
-
       if (records.length === 0) {
         // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
         // it would break the service to delete an account with no records.
