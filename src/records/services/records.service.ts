@@ -271,7 +271,10 @@ export class RecordsService {
         .find({
           account: accountId,
         })
-        .populate('expensesPaid')
+        .populate({
+          path: 'expensesPaid',
+          select: '_id shortName amount fullDate isPaid',
+        })
         .populate('category', 'categoryName')
         .exec();
 
@@ -364,11 +367,10 @@ export class RecordsService {
     if (expenses.length === 0) {
       // No expenses found, return the incomes found.
       const incomesOrdered = incomes.sort(compareDateAndTime);
-      const incomesFormatted = this.formatIncome(incomesOrdered);
       const onlyIncomesFoundResponse: MultipleRecordsResponse = {
         ...INITIAL_RESPONSE,
         data: {
-          records: incomesFormatted,
+          records: incomesOrdered,
         },
         message: NO_EXPENSES_FOUND,
       };
@@ -388,8 +390,7 @@ export class RecordsService {
       return onlyExpensesFoundResponse;
     }
 
-    const formattedIncomes = this.formatIncome(incomes);
-    const records = [...expenses, ...formattedIncomes].sort(compareDateAndTime);
+    const records = [...expenses, ...incomes].sort(compareDateAndTime);
     const response: JoinRecordsResponse = {
       ...INITIAL_RESPONSE,
       data: {
