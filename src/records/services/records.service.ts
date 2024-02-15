@@ -102,7 +102,7 @@ export class RecordsService {
 
         modelPopulated = await this.incomeModel.populate(modelSaved, {
           path: 'expensesPaid',
-          select: '_id shortName amount fullDate formattedTime',
+          select: '_id shortName amountFormatted fullDate formattedTime',
         });
         modelPopulated = await this.incomeModel.populate(modelPopulated, {
           path: 'category',
@@ -194,7 +194,7 @@ export class RecordsService {
             .find({ account: accountId })
             .populate({
               path: 'expensesPaid',
-              select: '_id shortName amount fullDate formattedTime',
+              select: '_id shortName amountFormatted fullDate formattedTime',
             })
             .populate('category', 'categoryName')
             .exec();
@@ -260,7 +260,7 @@ export class RecordsService {
         })
         .populate({
           path: 'expensesPaid',
-          select: '_id shortName amount fullDate formattedTime',
+          select: '_id shortName amountFormatted fullDate formattedTime',
         })
         .populate('category', 'categoryName')
         .exec();
@@ -330,7 +330,7 @@ export class RecordsService {
         })
         .populate({
           path: 'expensesPaid',
-          select: '_id shortName amount fullDate formattedTime',
+          select: '_id shortName amountFormatted fullDate formattedTime',
         })
         .populate('category', 'categoryName')
         .exec();
@@ -459,7 +459,10 @@ export class RecordsService {
             .exec()
         : await this.incomeModel
             .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
-            .populate('expensesPaid')
+            .populate({
+              path: 'expensesPaid',
+              select: '_id shortName amountFormatted fullDate formattedTime',
+            })
             .exec();
 
       if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
