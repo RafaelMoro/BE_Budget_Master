@@ -1,0 +1,27 @@
+service: budget-master-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  architecture: arm64
+  stage: production
+  region: us-east-1
+  memorySize: 2048
+  logRetentionInDays: 1
+  timeout: 15
+  stackName: budget-master-api
+  apiName: budget-master-api
+
+functions:
+  api:
+    handler: dist/lambda.handler
+    events:
+      - httpApi:
+          method: ANY
+          path: /{proxy+}
+
+plugins:
+  - serverless-jetpack
+  - serverless-offline
