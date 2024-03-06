@@ -1,6 +1,6 @@
 {
   "name": "be_personal_finances",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "author": "",
   "private": true,
@@ -8,10 +8,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "build:gcp": "tsc -p tsconfig.build.json",
-    "gcp-build": "npm run build",
     "deploy": "bun run build && sls deploy",
-    "deploy:dev": "bun run build && sls deploy --stage dev",
     "start": "node ./dist/main.js",
     "main": "node dist/main.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
