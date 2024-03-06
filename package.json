@@ -1,6 +1,6 @@
 {
   "name": "be_personal_finances",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "author": "",
   "private": true,
@@ -10,7 +10,8 @@
     "build": "nest build",
     "build:gcp": "tsc -p tsconfig.build.json",
     "gcp-build": "npm run build",
-    "deploy": "gcloud app deploy",
+    "deploy": "bun run build && sls deploy",
+    "deploy:dev": "bun run build && sls deploy --stage dev",
     "start": "node ./dist/main.js",
     "main": "node dist/main.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
