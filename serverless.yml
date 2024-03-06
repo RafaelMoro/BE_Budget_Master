@@ -1,0 +1,28 @@
+service: budget-master-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: production
+  region: us-east-1
+  logRetentionInDays: 1
+  timeout: 15
+  stackName: budget-master-api
+  apiName: budget-master-api
+
+functions:
+  api:
+    handler: dist/lambda.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
+
+plugins:
+  - serverless-jetpack
+  - serverless-offline
