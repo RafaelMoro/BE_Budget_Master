@@ -34,7 +34,6 @@
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.0",
-    "@vendia/serverless-express": "^4.12.6",
     "aws-lambda": "^1.0.7",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
@@ -50,10 +49,10 @@
     "reflect-metadata": "^0.1.14",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "swagger-ui-express": "^4.5.0"
+    "swagger-ui-express": "^4.5.0",
+    "@codegenie/serverless-express": "^4.13.0"
   },
   "devDependencies": {
-    "@codegenie/serverless-express": "^4.13.0",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",

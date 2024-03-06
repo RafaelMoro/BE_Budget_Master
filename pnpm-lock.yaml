@@ -32,9 +32,6 @@ dependencies:
   '@nestjs/swagger':
     specifier: ^6.1.0
     version: 6.3.0(@nestjs/common@9.4.3)(@nestjs/core@9.4.3)(class-transformer@0.5.1)(class-validator@0.13.2)(reflect-metadata@0.1.14)
-  '@vendia/serverless-express':
-    specifier: ^4.12.6
-    version: 4.12.6
   aws-lambda:
     specifier: ^1.0.7
     version: 1.0.7
@@ -1201,6 +1198,7 @@ packages:
   /@codegenie/serverless-express@4.13.0:
     resolution: {integrity: sha512-xjTotGExm+2j45T6XTvDuTJO1105jKLf152j9nXXeJboYH3dwd8Ted6guv+jDFNouf0uKOO7AhGRQdCTpLVIiw==}
     engines: {node: '>=12'}
+    dev: true
 
   /@colors/colors@1.5.0:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -3197,13 +3195,6 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
-
-  /@vendia/serverless-express@4.12.6:
-    resolution: {integrity: sha512-ePsIPk3VQwgm5nh/JGBtTKQs5ZOF7REjHxC+PKk/CHvhlKQkJuUU365uPOlxuLJhC+BAefDznDRReWxpnKjmYg==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@codegenie/serverless-express': 4.13.0
-    dev: false
 
   /@webassemblyjs/ast@1.11.6:
     resolution: {integrity: sha512-IN1xI7PwOvLPgjcf180gC1bqn3q/QaOCwYUahIOhbYUu8KA/3tw2RT/T0Gidi1l7Hhj5D/INhJxiICObqpMu4Q==}
