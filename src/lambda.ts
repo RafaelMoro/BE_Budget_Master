@@ -1,11 +1,12 @@
 import 'reflect-metadata';
-import { configure as serverlessExpress } from '@vendia/serverless-express';
-import { ValidationPipe } from '@nestjs/common/pipes';
+import { configure as serverlessExpress } from '@codegenie/serverless-express';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Callback, Context, Handler } from 'aws-lambda';
 import { AppModule } from './app.module';
 import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.filter';
 
-let cachedServer: any;
+let cachedServer: Handler;
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,7 +23,11 @@ export async function bootstrap() {
   return serverlessExpress({ app: expressApp });
 }
 
-export const handler = async (event, context) => {
+export const handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
   cachedServer = cachedServer ?? (await bootstrap());
-  return cachedServer(event, context);
+  return cachedServer(event, context, callback);
 };
