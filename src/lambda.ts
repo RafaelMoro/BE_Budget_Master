@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { configure as serverlessExpress } from '@vendia/serverless-express';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { NestFactory } from '@nestjs/core';
@@ -24,13 +25,4 @@ export async function bootstrap() {
 export const handler = async (event, context) => {
   cachedServer = cachedServer ?? (await bootstrap());
   return cachedServer(event, context);
-  // if (!cachedServer) {
-  //   const nestApp = await NestFactory.create(AppModule);
-  //   await nestApp.init();
-  //   cachedServer = serverlessExpress({
-  //     app: nestApp.getHttpAdapter().getInstance(),
-  //   });
-  // }
-
-  // return cachedServer(event, context);
 };
