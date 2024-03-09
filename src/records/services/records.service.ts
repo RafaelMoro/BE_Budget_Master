@@ -335,7 +335,7 @@ export class RecordsService {
           path: 'expensesPaid',
           select: '_id shortName amountFormatted fullDate formattedTime',
         })
-        .populate('category', 'categoryName')
+        .populate('category', 'categoryName icon')
         .exec();
 
       this.verifyExpensesBelongsToUser(expenses, userId);
