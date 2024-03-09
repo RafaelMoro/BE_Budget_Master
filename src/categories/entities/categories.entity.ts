@@ -10,6 +10,9 @@ export class Category extends Document {
   @Prop({ required: true })
   subCategories: string[];
 
+  @Prop({ required: true })
+  icon: string;
+
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   sub: User | Types.ObjectId;
 }
