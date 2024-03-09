@@ -1,3 +1,8 @@
+## v0.1.3 (2024/03/09)
+
+### Pull Requests
+[#4](https://github.com/RafaelMoro/BE_Personal_Finances/pull/4) | Add icon prop into category entity/DTO
+
 ## v0.1.2 (2024/03/06)
 
 ### Pull Requests

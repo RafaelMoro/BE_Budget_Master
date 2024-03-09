@@ -10,6 +10,10 @@ export class CreateCategoriesDto {
   @IsArray()
   @IsNotEmpty()
   readonly subCategories: string[];
+
+  @IsString()
+  @IsNotEmpty()
+  readonly icon: string;
 }
 
 export class UpdateCategoriesDto extends PartialType(CreateCategoriesDto) {

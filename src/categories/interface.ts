@@ -13,6 +13,20 @@ export interface GeneralCategoriesResponse
   };
 }
 
+export interface LocalCategories {
+  foodAndDrink: string;
+  house: string;
+  utilities: string;
+  subcriptions: string;
+  transportation: string;
+  financialExpenses: string;
+  healthCare: string;
+  kids: string;
+  shopping: string;
+  entertainment: string;
+  savings: string;
+}
+
 export interface FindByNameResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     categories: null | CategoriesResponse[];
