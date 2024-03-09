@@ -1,4 +1,9 @@
-## v0.1.3 (2024/03/09)
+## v0.2.1 (2024/03/09)
+
+### Pull Requests
+[#5](https://github.com/RafaelMoro/BE_Personal_Finances/pull/5) | Fix: Return category icon when fetching records by month and year
+
+## v0.2.0 (2024/03/09)
 
 ### Pull Requests
 [#4](https://github.com/RafaelMoro/BE_Personal_Finances/pull/4) | Add icon prop into category entity/DTO
