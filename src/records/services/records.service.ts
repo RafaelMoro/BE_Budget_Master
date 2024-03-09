@@ -48,6 +48,7 @@ import { VERSION_RESPONSE } from '../../constants';
 import { SingleCategoryResponse } from '../../categories/interface';
 import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
 import { GeneralResponse } from '../../response.interface';
+import { getLocalCategory } from '../../utils/getLocalCategory';
 
 @Injectable()
 export class RecordsService {
@@ -106,12 +107,12 @@ export class RecordsService {
         });
         modelPopulated = await this.incomeModel.populate(modelPopulated, {
           path: 'category',
-          select: '_id categoryName',
+          select: '_id categoryName icon',
         });
       } else {
         modelPopulated = await this.expenseModel.populate(modelSaved, {
           path: 'category',
-          select: '_id categoryName',
+          select: '_id categoryName icon',
         });
       }
 
@@ -163,10 +164,12 @@ export class RecordsService {
         return response;
       }
 
+      const icon = getLocalCategory(category);
       // The category is a name and does not exists, then create it.
       const payload: CreateCategoriesDto = {
         categoryName: category,
         subCategories: [subCategory],
+        icon,
       };
       const response = await this.categoriesService.createOneCategory(
         payload,
@@ -252,7 +255,7 @@ export class RecordsService {
         .find({
           account: accountId,
         })
-        .populate('category', 'categoryName')
+        .populate('category', 'categoryName icon')
         .exec();
       const incomes = await this.incomeModel
         .find({
@@ -285,7 +288,7 @@ export class RecordsService {
           account: accountId,
           fullDate: { $regex: new RegExp(regexDate, 'i') },
         })
-        .populate({ path: 'category', select: 'categoryName' })
+        .populate({ path: 'category', select: 'categoryName icon' })
         .exec();
 
       this.verifyExpensesBelongsToUser(expenses, userId);
@@ -321,7 +324,7 @@ export class RecordsService {
           account: accountId,
           fullDate: { $regex: new RegExp(regexDate, 'i') },
         })
-        .populate({ path: 'category', select: 'categoryName' })
+        .populate({ path: 'category', select: 'categoryName icon' })
         .exec();
       const incomes = await this.incomeModel
         .find({
