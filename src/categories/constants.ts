@@ -23,7 +23,7 @@ export const LOCAL_CATEGORIES: LocalCategories = {
 };
 
 const FOOD_AND_DRINK_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f1'),
   __v: 0,
   categoryName: 'Food and Drink',
   subCategories: [
@@ -38,7 +38,7 @@ const FOOD_AND_DRINK_CATEGORY = {
   icon: 'foodAndDrink',
 };
 const HOUSING_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f2'),
   __v: 0,
   categoryName: 'Housing',
   subCategories: [
@@ -50,7 +50,7 @@ const HOUSING_CATEGORY = {
   icon: 'house',
 };
 const UTILITIES_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f3'),
   __v: 0,
   categoryName: 'Utilities',
   subCategories: [
@@ -66,14 +66,14 @@ const UTILITIES_CATEGORY = {
   icon: 'utilities',
 };
 const SUSCRIPTIONS_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f4'),
   __v: 0,
   categoryName: 'Subscriptions',
   subCategories: ['Streaming services', 'Gym', 'Software'],
   icon: 'subcriptions',
 };
 const TRANSPORTATION_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f5'),
   __v: 0,
   categoryName: 'Transportation',
   subCategories: [
@@ -89,7 +89,7 @@ const TRANSPORTATION_CATEGORY = {
   icon: 'transportation',
 };
 const FINANCIAL_EXPENSES_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f6'),
   __v: 0,
   categoryName: 'Financial Expenses',
   subCategories: [
@@ -110,7 +110,7 @@ const FINANCIAL_EXPENSES_CATEGORY = {
   icon: 'debtAndLoans',
 };
 const HEALTHCARE_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f7'),
   __v: 0,
   categoryName: 'Health and Personal Care',
   subCategories: [
@@ -128,7 +128,7 @@ const HEALTHCARE_CATEGORY = {
   icon: 'healthCare',
 };
 const KIDS_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f8'),
   __v: 0,
   categoryName: 'Kids',
   subCategories: [
@@ -146,7 +146,7 @@ const KIDS_CATEGORY = {
   icon: 'kids',
 };
 const SHOPPING = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86f9'),
   __v: 0,
   categoryName: 'Shopping',
   subCategories: [
@@ -169,7 +169,7 @@ const SHOPPING = {
 };
 
 const ENTERTAINMENT_AND_LEISURE_CATEGORY = {
-  _id: new Types.ObjectId(),
+  _id: new Types.ObjectId('65f0e52dab97ece195ab86fa'),
   __v: 0,
   categoryName: 'Entertainment and Leisure',
   subCategories: [
@@ -190,7 +190,7 @@ const ENTERTAINMENT_AND_LEISURE_CATEGORY = {
   icon: 'entertainment',
 };
 const SAVINGS_CATEGORY = {
-  _id: 'local-category-11', // new Types.ObjectId('local-category-11'),
+  _id: new Types.ObjectId('65f0e5db1e7a4d472dd76db5'),
   __v: 0,
   categoryName: 'Savings',
   subCategories: [
