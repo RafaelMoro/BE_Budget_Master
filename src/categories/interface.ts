@@ -6,6 +6,12 @@ export interface CategoriesResponse extends Category {
   _id: Types.ObjectId;
 }
 
+export interface FindByNameAndUserIdProps {
+  categoryName: string;
+  userId: string;
+  isCreateLocalCategoriesService?: boolean;
+}
+
 export interface GeneralCategoriesResponse
   extends Omit<GeneralResponse, 'data'> {
   data: {

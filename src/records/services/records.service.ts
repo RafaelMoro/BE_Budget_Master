@@ -64,7 +64,10 @@ export class RecordsService {
       const { category, amount } = data;
       const {
         data: { categories },
-      } = await this.categoriesService.findByNameAndUserId(category, userId);
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(data.date);
@@ -382,7 +385,10 @@ export class RecordsService {
 
       const {
         data: { categories },
-      } = await this.categoriesService.findByNameAndUserId(category, userId);
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId, categoryName } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(date);
