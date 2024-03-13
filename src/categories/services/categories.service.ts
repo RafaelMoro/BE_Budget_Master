@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Category } from '../entities/categories.entity';
 import {
   CategoriesResponse,
+  FindByNameAndUserIdProps,
   FindByNameResponse,
   GeneralCategoriesResponse,
   SingleCategoryResponse,
@@ -69,7 +70,11 @@ export class CategoriesService {
     }
   }
 
-  async findByNameAndUserId(categoryName: string, userId: string) {
+  async findByNameAndUserId({
+    categoryName,
+    userId,
+    isCreateLocalCategoriesService = false,
+  }: FindByNameAndUserIdProps) {
     try {
       const initialResponse: FindByNameResponse = {
         version: VERSION_RESPONSE,
@@ -84,6 +89,13 @@ export class CategoriesService {
 
       // If the category was not found, return that response
       if (category.length === 0) {
+        if (isCreateLocalCategoriesService) {
+          const responseCategoryNotFound = {
+            ...initialResponse,
+            message: CATEGORY_NOT_FOUND_ERROR,
+          };
+          return responseCategoryNotFound;
+        }
         throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
       }
 
@@ -123,11 +135,12 @@ export class CategoriesService {
     try {
       const [firstCategory] = ALL_LOCAL_CATEGORIES;
       const { categoryName } = firstCategory;
-      const localCategoryExist = await this.findByNameAndUserId(
+      const localCategoryExist = await this.findByNameAndUserId({
         categoryName,
         userId,
-      );
-      if (localCategoryExist.data.categories.length > 0) {
+        isCreateLocalCategoriesService: true,
+      });
+      if (localCategoryExist.message !== CATEGORY_NOT_FOUND_ERROR) {
         throw new BadRequestException(LOCAL_CATEGORIES_EXISTS_ERROR);
       }
 
