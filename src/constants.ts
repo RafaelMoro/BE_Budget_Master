@@ -1,6 +1,7 @@
 import { GeneralResponse } from './response.interface';
 
 export const VERSION_RESPONSE = 'v2.0.0';
+export const ENVIRONMENT_PRODUCTION = 'production';
 
 export const INITIAL_RESPONSE: GeneralResponse = {
   version: VERSION_RESPONSE,
