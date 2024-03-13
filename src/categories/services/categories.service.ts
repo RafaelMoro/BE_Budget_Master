@@ -16,6 +16,7 @@ import {
 } from '../dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import {
+  ALL_LOCAL_CATEGORIES,
   CATEGORY_CREATED_MESSAGE,
   CATEGORY_DELETED_MESSAGE,
   CATEGORY_NOT_FOUND_ERROR,
@@ -112,6 +113,29 @@ export class CategoriesService {
         message: CATEGORY_CREATED_MESSAGE,
         data: {
           category: model,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createLocalCategories(userId: string) {
+    try {
+      const localCategoriesModels = ALL_LOCAL_CATEGORIES.map((category) => {
+        return new this.categoryModel({ ...category, sub: userId });
+      });
+      const saveCategoriesModels = await Promise.all(
+        localCategoriesModels.map((model) => model.save()),
+      );
+      const response: GeneralCategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: CATEGORY_CREATED_MESSAGE,
+        data: {
+          categories: saveCategoriesModels,
         },
         error: null,
       };

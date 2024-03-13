@@ -33,6 +33,12 @@ export class CategoriesController {
     return this.categoriesService.createOneCategory(payload, userId);
   }
 
+  @Post('create-local-categories')
+  createLocalCategories(@Request() req) {
+    const userId = req.user.sub;
+    return this.categoriesService.createLocalCategories(userId);
+  }
+
   @Put()
   updateCategory(@Body() payload: UpdateCategoriesDto) {
     return this.categoriesService.updateCategory(payload);

@@ -1,5 +1,5 @@
-import { Types } from 'mongoose';
 import { LocalCategories } from './interface';
+import { CreateCategoriesDto } from './dtos/categories.dto';
 
 export const SUBCATEGORY_CREATED_SUCCESS = 'Subcategory created';
 export const SUBCATEGORY_ERROR = 'Subcategory already exists';
@@ -23,8 +23,6 @@ export const LOCAL_CATEGORIES: LocalCategories = {
 };
 
 const FOOD_AND_DRINK_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f1'),
-  __v: 0,
   categoryName: 'Food and Drink',
   subCategories: [
     'Bar',
@@ -38,8 +36,6 @@ const FOOD_AND_DRINK_CATEGORY = {
   icon: 'foodAndDrink',
 };
 const HOUSING_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f2'),
-  __v: 0,
   categoryName: 'Housing',
   subCategories: [
     'Rent',
@@ -50,8 +46,6 @@ const HOUSING_CATEGORY = {
   icon: 'house',
 };
 const UTILITIES_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f3'),
-  __v: 0,
   categoryName: 'Utilities',
   subCategories: [
     'Electricity',
@@ -66,15 +60,11 @@ const UTILITIES_CATEGORY = {
   icon: 'utilities',
 };
 const SUSCRIPTIONS_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f4'),
-  __v: 0,
   categoryName: 'Subscriptions',
   subCategories: ['Streaming services', 'Gym', 'Software'],
   icon: 'subcriptions',
 };
 const TRANSPORTATION_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f5'),
-  __v: 0,
   categoryName: 'Transportation',
   subCategories: [
     'Gas/Fuel',
@@ -89,8 +79,6 @@ const TRANSPORTATION_CATEGORY = {
   icon: 'transportation',
 };
 const FINANCIAL_EXPENSES_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f6'),
-  __v: 0,
   categoryName: 'Financial Expenses',
   subCategories: [
     'Counselling / Guidance',
@@ -110,8 +98,6 @@ const FINANCIAL_EXPENSES_CATEGORY = {
   icon: 'debtAndLoans',
 };
 const HEALTHCARE_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f7'),
-  __v: 0,
   categoryName: 'Health and Personal Care',
   subCategories: [
     'Barber',
@@ -128,8 +114,6 @@ const HEALTHCARE_CATEGORY = {
   icon: 'healthCare',
 };
 const KIDS_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f8'),
-  __v: 0,
   categoryName: 'Kids',
   subCategories: [
     'Child support',
@@ -146,8 +130,6 @@ const KIDS_CATEGORY = {
   icon: 'kids',
 };
 const SHOPPING = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86f9'),
-  __v: 0,
   categoryName: 'Shopping',
   subCategories: [
     'Clothes',
@@ -169,8 +151,6 @@ const SHOPPING = {
 };
 
 const ENTERTAINMENT_AND_LEISURE_CATEGORY = {
-  _id: new Types.ObjectId('65f0e52dab97ece195ab86fa'),
-  __v: 0,
   categoryName: 'Entertainment and Leisure',
   subCategories: [
     'Go Out',
@@ -190,8 +170,6 @@ const ENTERTAINMENT_AND_LEISURE_CATEGORY = {
   icon: 'entertainment',
 };
 const SAVINGS_CATEGORY = {
-  _id: new Types.ObjectId('65f0e5db1e7a4d472dd76db5'),
-  __v: 0,
   categoryName: 'Savings',
   subCategories: [
     'Savings',
@@ -205,7 +183,7 @@ const SAVINGS_CATEGORY = {
   icon: 'savings',
 };
 
-export const CATEGORIES_RECORDS = [
+export const ALL_LOCAL_CATEGORIES: CreateCategoriesDto[] = [
   FOOD_AND_DRINK_CATEGORY,
   HOUSING_CATEGORY,
   UTILITIES_CATEGORY,
