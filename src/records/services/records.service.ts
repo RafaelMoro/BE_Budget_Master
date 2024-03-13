@@ -46,7 +46,10 @@ import {
 import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import { SingleCategoryResponse } from '../../categories/interface';
-import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
+import {
+  CATEGORIES_RECORDS,
+  CATEGORY_EXISTS_MESSAGE,
+} from '../../categories/constants';
 import { GeneralResponse } from '../../response.interface';
 import { getLocalCategory } from '../../utils/getLocalCategory';
 
@@ -65,15 +68,25 @@ export class RecordsService {
     userId: string,
   ) {
     try {
+      let categoryId = null;
       const { category, subCategory, amount } = data;
-      const {
-        data: { category: categoryFoundOrCreated },
-      } = await this.findOrCreateCategoryForRecord(
-        category,
-        subCategory,
-        userId,
+      const localCategory = CATEGORIES_RECORDS.find(
+        (localCategory) => localCategory.categoryName === category,
       );
-      const { _id: categoryId } = categoryFoundOrCreated;
+
+      if (localCategory) {
+        categoryId = localCategory._id;
+      } else {
+        const {
+          data: { category: categoryFoundOrCreated },
+        } = await this.findOrCreateCategoryForRecord(
+          category,
+          subCategory,
+          userId,
+        );
+        const { _id } = categoryFoundOrCreated;
+        categoryId = _id;
+      }
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
@@ -84,6 +97,7 @@ export class RecordsService {
         amountFormatted,
         userId,
       };
+      console.log('new data', newData);
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
