@@ -1,3 +1,8 @@
+## v0.3.0 (2024/03/12)
+
+### Pull Requests
+[#8](https://github.com/RafaelMoro/BE_Personal_Finances/pull/8) |  Add service in categories to create local categories.
+
 ## v0.2.2 (2024/03/12)
 
 ### Pull Requests
