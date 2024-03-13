@@ -170,7 +170,7 @@ export class UsersService {
       const completeHostname =
         environment === ENVIRONMENT_PRODUCTION
           ? frontendUri
-          : `localhost:${frontendPort}`;
+          : `http://localhost:${frontendPort}`;
 
       const user: User = await this.findByEmail(email);
       if (!user) throw new NotFoundException(USER_NOT_FOUND_ERROR);
