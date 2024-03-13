@@ -43,12 +43,8 @@ import {
   compareDateAndTime,
   formatNumberToCurrency,
 } from '../../utils';
-import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
-import { SingleCategoryResponse } from '../../categories/interface';
-import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
 import { GeneralResponse } from '../../response.interface';
-import { getLocalCategory } from '../../utils/getLocalCategory';
 
 @Injectable()
 export class RecordsService {
@@ -65,14 +61,11 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, subCategory, amount } = data;
+      const { category, amount } = data;
       const {
-        data: { category: categoryFoundOrCreated },
-      } = await this.findOrCreateCategoryForRecord(
-        category,
-        subCategory,
-        userId,
-      );
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId(category, userId);
+      const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
@@ -84,7 +77,6 @@ export class RecordsService {
         amountFormatted,
         userId,
       };
-      console.log('new data', newData);
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
@@ -126,56 +118,6 @@ export class RecordsService {
         },
         error: null,
       };
-      return response;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  /*
-   * This method will take the category only by name.
-   * It will search if the category has been created or not, if it has been created, it will update subcategories if needed.
-   * This method returns the standarized response with the category.
-   */
-  async findOrCreateCategoryForRecord(
-    // category it's only a name
-    category: string,
-    subCategory: string,
-    userId: string,
-  ) {
-    try {
-      // Check if category already exists.
-      const categoryResponse = await this.categoriesService.findByName(
-        category,
-      );
-      const searchedCategory = categoryResponse.data?.categories;
-
-      // The category already exists with that name.
-      if (searchedCategory) {
-        const [foundCategory] = searchedCategory;
-        const response: SingleCategoryResponse = {
-          version: VERSION_RESPONSE,
-          success: true,
-          message: CATEGORY_EXISTS_MESSAGE,
-          data: {
-            category: foundCategory,
-          },
-          error: null,
-        };
-        return response;
-      }
-
-      const icon = getLocalCategory(category);
-      // The category is a name and does not exists, then create it.
-      const payload: CreateCategoriesDto = {
-        categoryName: category,
-        subCategories: [subCategory],
-        icon,
-      };
-      const response = await this.categoriesService.createOneCategory(
-        payload,
-        userId,
-      );
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -425,7 +367,6 @@ export class RecordsService {
       const {
         recordId,
         category,
-        subCategory,
         date,
         amount,
         userId: userIdChanges,
@@ -440,14 +381,10 @@ export class RecordsService {
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
       const {
-        data: {
-          category: { _id: categoryId, categoryName },
-        },
-      } = await this.findOrCreateCategoryForRecord(
-        category,
-        subCategory,
-        userId,
-      );
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId(category, userId);
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId, categoryName } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
