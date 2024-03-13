@@ -45,9 +45,8 @@ export class UsersController {
     @Req() request: Request,
     @Body() payload: ForgotPasswordBodyDto,
   ) {
-    const { hostname } = request;
     const { email } = payload;
-    const values: ForgotPasswordDto = { email, hostname };
+    const values: ForgotPasswordDto = { email };
     return this.usersService.forgotPassword(values);
   }
 
