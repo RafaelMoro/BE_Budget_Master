@@ -46,10 +46,7 @@ import {
 import { CreateCategoriesDto } from '../../categories/dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import { SingleCategoryResponse } from '../../categories/interface';
-import {
-  CATEGORIES_RECORDS,
-  CATEGORY_EXISTS_MESSAGE,
-} from '../../categories/constants';
+import { CATEGORY_EXISTS_MESSAGE } from '../../categories/constants';
 import { GeneralResponse } from '../../response.interface';
 import { getLocalCategory } from '../../utils/getLocalCategory';
 
@@ -68,25 +65,15 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      let categoryId = null;
       const { category, subCategory, amount } = data;
-      const localCategory = CATEGORIES_RECORDS.find(
-        (localCategory) => localCategory.categoryName === category,
+      const {
+        data: { category: categoryFoundOrCreated },
+      } = await this.findOrCreateCategoryForRecord(
+        category,
+        subCategory,
+        userId,
       );
-
-      if (localCategory) {
-        categoryId = localCategory._id;
-      } else {
-        const {
-          data: { category: categoryFoundOrCreated },
-        } = await this.findOrCreateCategoryForRecord(
-          category,
-          subCategory,
-          userId,
-        );
-        const { _id } = categoryFoundOrCreated;
-        categoryId = _id;
-      }
+      const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
