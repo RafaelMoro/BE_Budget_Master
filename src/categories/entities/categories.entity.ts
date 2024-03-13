@@ -4,7 +4,7 @@ import { User } from '../../users/entities/users.entity';
 
 @Schema()
 export class Category extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   categoryName: string;
 
   @Prop({ required: true })
