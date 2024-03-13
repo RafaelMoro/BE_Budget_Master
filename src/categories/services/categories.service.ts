@@ -20,6 +20,7 @@ import {
   CATEGORY_CREATED_MESSAGE,
   CATEGORY_DELETED_MESSAGE,
   CATEGORY_NOT_FOUND_ERROR,
+  LOCAL_CATEGORIES_EXISTS_ERROR,
   SUBCATEGORY_CREATED_SUCCESS,
   SUBCATEGORY_ERROR,
 } from '../constants';
@@ -124,6 +125,13 @@ export class CategoriesService {
 
   async createLocalCategories(userId: string) {
     try {
+      const [firstCategory] = ALL_LOCAL_CATEGORIES;
+      const { categoryName } = firstCategory;
+      const localCategoryExist = await this.findByName(categoryName);
+      if (localCategoryExist.data.categories.length > 0) {
+        throw new BadRequestException(LOCAL_CATEGORIES_EXISTS_ERROR);
+      }
+
       const localCategoriesModels = ALL_LOCAL_CATEGORIES.map((category) => {
         return new this.categoryModel({ ...category, sub: userId });
       });

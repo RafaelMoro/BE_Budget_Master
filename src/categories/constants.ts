@@ -7,6 +7,7 @@ export const CATEGORY_EXISTS_MESSAGE = 'Category found. ';
 export const CATEGORY_DELETED_MESSAGE = 'Category deleted';
 export const CATEGORY_NOT_FOUND_ERROR = 'Category not found';
 export const CATEGORY_CREATED_MESSAGE = 'New category created';
+export const LOCAL_CATEGORIES_EXISTS_ERROR = 'Local categories already exists';
 
 export const LOCAL_CATEGORIES: LocalCategories = {
   foodAndDrink: 'Food and Drink',
