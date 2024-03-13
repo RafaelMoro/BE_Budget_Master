@@ -69,7 +69,7 @@ export class CategoriesService {
     }
   }
 
-  async findByName(categoryName: string) {
+  async findByNameAndUserId(categoryName: string, userId: string) {
     try {
       const initialResponse: FindByNameResponse = {
         version: VERSION_RESPONSE,
@@ -79,16 +79,12 @@ export class CategoriesService {
         error: null,
       };
       const category: CategoriesResponse[] = await this.categoryModel
-        .find({ categoryName })
+        .find({ categoryName, sub: userId })
         .exec();
 
       // If the category was not found, return that response
       if (category.length === 0) {
-        const categoryNotFoundResponse: FindByNameResponse = {
-          ...initialResponse,
-          message: CATEGORY_NOT_FOUND_ERROR,
-        };
-        return categoryNotFoundResponse;
+        throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
       }
 
       const response: FindByNameResponse = {
@@ -127,7 +123,10 @@ export class CategoriesService {
     try {
       const [firstCategory] = ALL_LOCAL_CATEGORIES;
       const { categoryName } = firstCategory;
-      const localCategoryExist = await this.findByName(categoryName);
+      const localCategoryExist = await this.findByNameAndUserId(
+        categoryName,
+        userId,
+      );
       if (localCategoryExist.data.categories.length > 0) {
         throw new BadRequestException(LOCAL_CATEGORIES_EXISTS_ERROR);
       }
