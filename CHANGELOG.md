@@ -1,3 +1,8 @@
+## v0.3.1 (2024/03/12)
+
+### Pull Requests
+[#9](https://github.com/RafaelMoro/BE_Personal_Finances/pull/9) |  Fix local categories getting error if category not found
+
 ## v0.3.0 (2024/03/12)
 
 ### Pull Requests
