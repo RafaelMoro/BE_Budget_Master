@@ -85,12 +85,13 @@ export class UsersService {
       const passwordHashed = await bcrypt.hash(userModel.password, 10);
       userModel.password = passwordHashed;
       const modelSaved: UserResponse = await userModel.save();
-      const { email } = modelSaved.toJSON();
+      const responseCreateUser = modelSaved.toJSON();
+      const { email, _id: sub } = responseCreateUser;
       const response: CreateUserResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: USER_CREATED_MESSAGE,
-        data: { userCreated: { email } },
+        data: { userCreated: { email, sub } },
         error: null,
       };
       return response;
