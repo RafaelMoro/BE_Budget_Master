@@ -131,13 +131,13 @@ export class CategoriesService {
     }
   }
 
-  async createLocalCategories(userId: string) {
+  async createLocalCategories(sub: string) {
     try {
       const [firstCategory] = ALL_LOCAL_CATEGORIES;
       const { categoryName } = firstCategory;
       const localCategoryExist = await this.findByNameAndUserId({
         categoryName,
-        userId,
+        userId: sub,
         isCreateLocalCategoriesService: true,
       });
       if (localCategoryExist.message !== CATEGORY_NOT_FOUND_ERROR) {
@@ -145,7 +145,7 @@ export class CategoriesService {
       }
 
       const localCategoriesModels = ALL_LOCAL_CATEGORIES.map((category) => {
-        return new this.categoryModel({ ...category, sub: userId });
+        return new this.categoryModel({ ...category, sub: sub });
       });
       const saveCategoriesModels = await Promise.all(
         localCategoriesModels.map((model) => model.save()),
