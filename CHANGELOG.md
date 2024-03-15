@@ -1,3 +1,8 @@
+## v0.3.2 (2024/03/14)
+
+## Pull Requests
+[#10](https://github.com/RafaelMoro/BE_Personal_Finances/pull/10) |  Fix to make create local categories public
+
 ## v0.3.1 (2024/03/12)
 
 ### Pull Requests

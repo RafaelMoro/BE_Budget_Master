@@ -27,3 +27,9 @@ export class DeleteCategoryDto {
   @IsNotEmpty()
   readonly categoryId: string;
 }
+
+export class CreateLocalCategoriesDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly sub: string;
+}
