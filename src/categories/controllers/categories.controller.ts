@@ -12,9 +12,11 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CategoriesService } from '../services/categories.service';
 import {
   CreateCategoriesDto,
+  CreateLocalCategoriesDto,
   DeleteCategoryDto,
   UpdateCategoriesDto,
 } from '../dtos/categories.dto';
+import { Public } from '../../auth/decorators/public.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('categories')
@@ -31,6 +33,13 @@ export class CategoriesController {
   createCategory(@Body() payload: CreateCategoriesDto, @Request() req) {
     const userId = req.user.sub;
     return this.categoriesService.createOneCategory(payload, userId);
+  }
+
+  @Public()
+  @Post('create-local-categories')
+  createLocalCategories(@Body() payload: CreateLocalCategoriesDto) {
+    const { sub } = payload;
+    return this.categoriesService.createLocalCategories(sub);
   }
 
   @Put()

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Category } from '../entities/categories.entity';
 import {
   CategoriesResponse,
+  FindByNameAndUserIdProps,
   FindByNameResponse,
   GeneralCategoriesResponse,
   SingleCategoryResponse,
@@ -16,9 +17,11 @@ import {
 } from '../dtos/categories.dto';
 import { VERSION_RESPONSE } from '../../constants';
 import {
+  ALL_LOCAL_CATEGORIES,
   CATEGORY_CREATED_MESSAGE,
   CATEGORY_DELETED_MESSAGE,
   CATEGORY_NOT_FOUND_ERROR,
+  LOCAL_CATEGORIES_EXISTS_ERROR,
   SUBCATEGORY_CREATED_SUCCESS,
   SUBCATEGORY_ERROR,
 } from '../constants';
@@ -67,7 +70,11 @@ export class CategoriesService {
     }
   }
 
-  async findByName(categoryName: string) {
+  async findByNameAndUserId({
+    categoryName,
+    userId,
+    isCreateLocalCategoriesService = false,
+  }: FindByNameAndUserIdProps) {
     try {
       const initialResponse: FindByNameResponse = {
         version: VERSION_RESPONSE,
@@ -77,16 +84,19 @@ export class CategoriesService {
         error: null,
       };
       const category: CategoriesResponse[] = await this.categoryModel
-        .find({ categoryName })
+        .find({ categoryName, sub: userId })
         .exec();
 
       // If the category was not found, return that response
       if (category.length === 0) {
-        const categoryNotFoundResponse: FindByNameResponse = {
-          ...initialResponse,
-          message: CATEGORY_NOT_FOUND_ERROR,
-        };
-        return categoryNotFoundResponse;
+        if (isCreateLocalCategoriesService) {
+          const responseCategoryNotFound = {
+            ...initialResponse,
+            message: CATEGORY_NOT_FOUND_ERROR,
+          };
+          return responseCategoryNotFound;
+        }
+        throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
       }
 
       const response: FindByNameResponse = {
@@ -112,6 +122,40 @@ export class CategoriesService {
         message: CATEGORY_CREATED_MESSAGE,
         data: {
           category: model,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createLocalCategories(sub: string) {
+    try {
+      const [firstCategory] = ALL_LOCAL_CATEGORIES;
+      const { categoryName } = firstCategory;
+      const localCategoryExist = await this.findByNameAndUserId({
+        categoryName,
+        userId: sub,
+        isCreateLocalCategoriesService: true,
+      });
+      if (localCategoryExist.message !== CATEGORY_NOT_FOUND_ERROR) {
+        throw new BadRequestException(LOCAL_CATEGORIES_EXISTS_ERROR);
+      }
+
+      const localCategoriesModels = ALL_LOCAL_CATEGORIES.map((category) => {
+        return new this.categoryModel({ ...category, sub: sub });
+      });
+      const saveCategoriesModels = await Promise.all(
+        localCategoriesModels.map((model) => model.save()),
+      );
+      const response: GeneralCategoriesResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: CATEGORY_CREATED_MESSAGE,
+        data: {
+          categories: saveCategoriesModels,
         },
         error: null,
       };

@@ -6,7 +6,11 @@ import * as bcrypt from 'bcryptjs';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 
-import { USER_EXISTS_ERROR, VERSION_RESPONSE } from '../../constants';
+import {
+  ENVIRONMENT_PRODUCTION,
+  USER_EXISTS_ERROR,
+  VERSION_RESPONSE,
+} from '../../constants';
 import {
   DELETE_USER_MESSAGE,
   EMAIL_CHANGE_ERROR,
@@ -81,12 +85,13 @@ export class UsersService {
       const passwordHashed = await bcrypt.hash(userModel.password, 10);
       userModel.password = passwordHashed;
       const modelSaved: UserResponse = await userModel.save();
-      const { email } = modelSaved.toJSON();
+      const responseCreateUser = modelSaved.toJSON();
+      const { email, _id: sub } = responseCreateUser;
       const response: CreateUserResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: USER_CREATED_MESSAGE,
-        data: { userCreated: { email } },
+        data: { userCreated: { email, sub } },
         error: null,
       };
       return response;
@@ -161,12 +166,12 @@ export class UsersService {
 
   async forgotPassword(payload: ForgotPasswordDto) {
     try {
-      const { email, hostname } = payload;
-      const { frontendPort, backendUri } = this.configService;
+      const { email } = payload;
+      const { frontendPort, frontendUri, environment } = this.configService;
       const completeHostname =
-        hostname === LOCALHOST
-          ? `http://${hostname}:${frontendPort}`
-          : `http://${backendUri}`;
+        environment === ENVIRONMENT_PRODUCTION
+          ? frontendUri
+          : `http://localhost:${frontendPort}`;
 
       const user: User = await this.findByEmail(email);
       if (!user) throw new NotFoundException(USER_NOT_FOUND_ERROR);

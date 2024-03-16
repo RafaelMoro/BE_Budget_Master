@@ -10,6 +10,10 @@ export class CreateCategoriesDto {
   @IsArray()
   @IsNotEmpty()
   readonly subCategories: string[];
+
+  @IsString()
+  @IsNotEmpty()
+  readonly icon: string;
 }
 
 export class UpdateCategoriesDto extends PartialType(CreateCategoriesDto) {
@@ -22,4 +26,10 @@ export class DeleteCategoryDto {
   @IsMongoId()
   @IsNotEmpty()
   readonly categoryId: string;
+}
+
+export class CreateLocalCategoriesDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly sub: string;
 }

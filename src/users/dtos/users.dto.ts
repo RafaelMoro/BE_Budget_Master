@@ -46,10 +46,6 @@ export class ForgotPasswordDto {
   @IsNotEmpty()
   @IsEmail()
   readonly email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly hostname: string;
 }
 
 export class ForgotPasswordBodyDto {

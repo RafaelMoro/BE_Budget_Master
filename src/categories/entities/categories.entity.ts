@@ -4,11 +4,14 @@ import { User } from '../../users/entities/users.entity';
 
 @Schema()
 export class Category extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   categoryName: string;
 
   @Prop({ required: true })
   subCategories: string[];
+
+  @Prop({ required: true })
+  icon: string;
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   sub: User | Types.ObjectId;
