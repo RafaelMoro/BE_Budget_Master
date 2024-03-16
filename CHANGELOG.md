@@ -16,7 +16,7 @@
 ## v0.2.2 (2024/03/12)
 
 ### Pull Requests
-[#6](https://github.com/RafaelMoro/BE_Personal_Finances/pull/6) |  Fix on generating url of forgot password in email
+[#7](https://github.com/RafaelMoro/BE_Personal_Finances/pull/7) |  Fix on generating url of forgot password in email
 
 ## v0.2.1 (2024/03/09)
 
