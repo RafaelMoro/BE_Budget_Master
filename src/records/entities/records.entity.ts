@@ -57,7 +57,7 @@ export class AccountRecord extends Document {
   @Prop()
   budgets: string[];
 
-  @Prop({ unique: true })
+  @Prop()
   transferId: string;
 }
 
