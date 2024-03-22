@@ -62,6 +62,9 @@ export class CreateRecordDto {
 
   @IsArray()
   readonly budgets: string[];
+
+  @IsString()
+  readonly transferId: string;
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {
