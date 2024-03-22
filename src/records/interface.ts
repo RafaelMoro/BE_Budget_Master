@@ -10,6 +10,13 @@ export interface FindRecordsByAccountProps {
   isIncome?: boolean;
 }
 
+export interface FindTransferRecordsByMonthAndYearProps {
+  month: string;
+  year: string;
+  userId: string;
+  transferId: string;
+}
+
 export interface RemoveRecordProps {
   payload: DeleteRecordDto;
   userId: string;
@@ -22,9 +29,17 @@ export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
+export interface FindTransferRecordsResponse
+  extends Omit<GeneralResponse, 'data'> {
+  data: {
+    expense: Expense;
+    income: Income;
+  };
+}
+
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
-    records: Expense[] | Income[] | null;
+    records: Expense[] | Income[] | (Expense | Income)[] | null;
   };
 }
 

@@ -86,6 +86,22 @@ export class RecordsController {
     );
   }
 
+  @Get('/transfer/:transferId/:month/:year')
+  findTransferRecordsByMonthAndYear(
+    @Param('transferId') transferId: string,
+    @Param('month') month: string,
+    @Param('year') year: string,
+    @Request() req,
+  ) {
+    const userId = req.user.sub;
+    return this.recordsService.findTransferRecordsByMonthAndYear({
+      month,
+      year,
+      userId,
+      transferId,
+    });
+  }
+
   @Put('/expenses')
   updateExpense(@Body() payload: UpdateExpenseDto, @Request() req) {
     const userId = req.user.sub;

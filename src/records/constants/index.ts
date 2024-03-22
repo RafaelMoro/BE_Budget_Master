@@ -4,6 +4,8 @@ export const CATEGORY_ID_ERROR = 'Mongo Id does not belong to a category';
 export const RECORD_CREATED_MESSAGE = 'Record created';
 export const RECORD_DELETED = 'Record Deleted';
 export const RECORD_NOT_FOUND = 'Record not found.';
+export const TRANSFER_RECORDS_NOT_FOUND = 'No transfer records found.';
+
 export const NO_EXPENSES_INCOMES_FOUND = 'No incomes or expenses found.';
 export const NO_EXPENSES_FOUND = 'No expenses found.';
 export const NO_INCOMES_FOUND = 'No incomes found.';
