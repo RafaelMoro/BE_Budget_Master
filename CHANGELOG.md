@@ -1,3 +1,8 @@
+## v0.4.0 (2024/03/21)
+
+## Pull Requests
+[#11](https://github.com/RafaelMoro/BE_Personal_Finances/pull/11) |  Add transferId prop and create service findTransferRecordsByMonthAndYear
+
 ## v0.3.2 (2024/03/14)
 
 ## Pull Requests

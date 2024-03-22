@@ -26,6 +26,7 @@ import {
   MISSING_CATEGORY,
   MISSING_AMOUNT,
   RECORD_DELETED,
+  TRANSFER_RECORDS_NOT_FOUND,
 } from '../constants';
 import {
   FindRecordsByAccountProps,
@@ -34,6 +35,8 @@ import {
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
+  FindTransferRecordsByMonthAndYearProps,
+  FindTransferRecordsResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -288,6 +291,51 @@ export class RecordsService {
       this.verifyIncomesBelongsToUser(incomes, userId);
 
       return this.joinIncomesAndExpenses(expenses, incomes);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async findTransferRecordsByMonthAndYear({
+    month,
+    year,
+    userId,
+    transferId,
+  }: FindTransferRecordsByMonthAndYearProps) {
+    try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
+      const expenseArray = await this.expenseModel
+        .find({
+          sub: userId,
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
+          transferId,
+        })
+        .populate({ path: 'category', select: 'categoryName icon' })
+        .exec();
+      const incomeArray = await this.incomeModel
+        .find({
+          sub: userId,
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
+          transferId,
+        })
+        .populate({
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        })
+        .populate('category', 'categoryName icon')
+        .exec();
+
+      if (!expenseArray[0] || !incomeArray[0]) {
+        throw new BadRequestException(TRANSFER_RECORDS_NOT_FOUND);
+      }
+
+      const [expense] = expenseArray;
+      const [income] = incomeArray;
+      const response: FindTransferRecordsResponse = {
+        ...INITIAL_RESPONSE,
+        data: { expense, income },
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

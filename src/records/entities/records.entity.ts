@@ -56,6 +56,9 @@ export class AccountRecord extends Document {
 
   @Prop()
   budgets: string[];
+
+  @Prop()
+  transferId: string;
 }
 
 export const RecordsSchema = SchemaFactory.createForClass(AccountRecord);
