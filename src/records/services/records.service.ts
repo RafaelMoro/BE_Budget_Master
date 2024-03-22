@@ -312,7 +312,6 @@ export class RecordsService {
         })
         .populate({ path: 'category', select: 'categoryName icon' })
         .exec();
-      console.log('expenseArray', expenseArray);
       const incomeArray = await this.incomeModel
         .find({
           sub: userId,
