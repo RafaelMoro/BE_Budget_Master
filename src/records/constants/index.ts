@@ -9,6 +9,11 @@ export const TRANSFER_RECORDS_NOT_FOUND = 'No transfer records found.';
 export const NO_EXPENSES_INCOMES_FOUND = 'No incomes or expenses found.';
 export const NO_EXPENSES_FOUND = 'No expenses found.';
 export const NO_INCOMES_FOUND = 'No incomes found.';
+export const TYPE_OF_RECORD_INVALID = 'Invalid type of record';
+export const TRANSFER_EMPTY_TRANSFERID_ERROR =
+  'Transfer record cannot have an empty transferId';
+export const INCOME_EXPENSE_TRANSFERID_ERROR =
+  'Record type income or expense cannot have a transferId';
 export const MISSING_DATE = 'date prop is missing.';
 export const MISSING_CATEGORY = 'category prop is missing.';
 export const MISSING_AMOUNT = 'amount prop is missing.';

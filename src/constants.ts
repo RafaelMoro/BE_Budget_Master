@@ -11,5 +11,7 @@ export const INITIAL_RESPONSE: GeneralResponse = {
   error: null,
 };
 
+export type TypeOfRecord = 'expense' | 'income' | 'transfer';
+
 /** MESSAGED */
 export const USER_EXISTS_ERROR = 'Try with other email.';
