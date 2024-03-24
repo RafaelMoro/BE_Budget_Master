@@ -12,6 +12,9 @@ export class AccountRecord extends Document {
   @Prop({ required: true })
   shortName: string;
 
+  @Prop({ required: true })
+  typeOfRecord: string;
+
   @Prop()
   description: string;
 

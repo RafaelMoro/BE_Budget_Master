@@ -30,6 +30,10 @@ export class CreateRecordDto {
   readonly shortName: string;
 
   @IsString()
+  @IsNotEmpty()
+  readonly typeOfRecord: string;
+
+  @IsString()
   readonly description: string;
 
   @IsNumber()

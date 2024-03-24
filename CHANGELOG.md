@@ -1,3 +1,8 @@
+## v0.5.0 (2024/03/24)
+
+## Pull Requests
+[#12](https://github.com/RafaelMoro/BE_Personal_Finances/pull/12) | Add type of record prop into Record
+
 ## v0.4.0 (2024/03/21)
 
 ## Pull Requests

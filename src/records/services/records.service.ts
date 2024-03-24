@@ -27,6 +27,9 @@ import {
   MISSING_AMOUNT,
   RECORD_DELETED,
   TRANSFER_RECORDS_NOT_FOUND,
+  TRANSFER_EMPTY_TRANSFERID_ERROR,
+  INCOME_EXPENSE_TRANSFERID_ERROR,
+  TYPE_OF_RECORD_INVALID,
 } from '../constants';
 import {
   FindRecordsByAccountProps,
@@ -48,6 +51,7 @@ import {
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
 import { GeneralResponse } from '../../response.interface';
+import { isTypeOfRecord } from 'src/utils/isTypeOfRecord';
 
 @Injectable()
 export class RecordsService {
@@ -64,7 +68,17 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, amount } = data;
+      const { category, amount, typeOfRecord, transferId } = data;
+      if (isTypeOfRecord(typeOfRecord) === false) {
+        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
+      if (typeOfRecord === 'transfer' && !transferId) {
+        throw new BadRequestException(TRANSFER_EMPTY_TRANSFERID_ERROR);
+      }
+      if (typeOfRecord !== 'transfer' && transferId) {
+        throw new BadRequestException(INCOME_EXPENSE_TRANSFERID_ERROR);
+      }
+
       const {
         data: { categories },
       } = await this.categoriesService.findByNameAndUserId({
@@ -82,6 +96,7 @@ export class RecordsService {
         category: categoryId,
         amountFormatted,
         userId,
+        typeOfRecord,
       };
       const model = !isIncome
         ? new this.expenseModel(newData)
