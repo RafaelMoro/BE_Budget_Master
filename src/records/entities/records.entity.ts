@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Account } from '../../accounts/entities/accounts.entity';
@@ -53,6 +53,14 @@ export class AccountRecord extends Document {
     ],
   })
   indebtedPeople: Types.Array<Record<'string | boolean | number', any>>;
+
+  @Prop(
+    raw({
+      transferId: { type: String },
+      account: { type: String },
+    }),
+  )
+  transferRecord: Record<string, any>;
 
   @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
   account: Account | Types.ObjectId;
