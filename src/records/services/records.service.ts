@@ -3,7 +3,7 @@ import {
   BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
@@ -40,6 +40,7 @@ import {
   BatchRecordsResponse,
   FindTransferRecordsByMonthAndYearProps,
   FindTransferRecordsResponse,
+  CreateTransferProps,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -101,6 +102,108 @@ export class RecordsService {
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
+      const modelSaved: Expense | Income = await model.save();
+      let modelPopulated: Expense | Income;
+
+      // Update the prop isPaid to true of the expenses related to this income
+      if (isIncome) {
+        const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
+          .expensesPaid;
+        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
+          recordId: id,
+          isPaid: true,
+          userId,
+        }));
+        await this.updateMultipleRecords(payload);
+
+        modelPopulated = await this.incomeModel.populate(modelSaved, {
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        });
+        modelPopulated = await this.incomeModel.populate(modelPopulated, {
+          path: 'category',
+          select: '_id categoryName icon',
+        });
+      } else {
+        modelPopulated = await this.expenseModel.populate(modelSaved, {
+          path: 'category',
+          select: '_id categoryName icon',
+        });
+      }
+
+      const response: RecordCreated = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: RECORD_CREATED_MESSAGE,
+        data: {
+          record: modelPopulated,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createTransfer({ expense, income, userId }: CreateTransferProps) {
+    try {
+      const { category, amount, typeOfRecord } = expense;
+      if (
+        isTypeOfRecord(expense.typeOfRecord) === false &&
+        isTypeOfRecord(income.typeOfRecord) === false
+      ) {
+        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
+
+      const {
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId } = categoryFoundOrCreated;
+      const { fullDate, formattedTime } = formatDateToString(expense.date);
+      const amountFormatted = formatNumberToCurrency(amount);
+      const newDataExpense = {
+        ...expense,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+        amountFormatted,
+        userId,
+        typeOfRecord,
+      };
+      const newDataIncome = {
+        ...income,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+        amountFormatted,
+        userId,
+        typeOfRecord,
+      };
+      const expenseModel = new this.expenseModel(newDataExpense);
+      const incomeModel = new this.incomeModel(newDataIncome);
+      const { _id: expenseId } = expenseModel;
+      const { _id: incomeId } = incomeModel;
+      // const updatedExpenseModel = {
+      //   ...expenseModel,
+      //   transferRecord: {
+      //     transferId: incomeId,
+      //     account: income.account,
+      //   }
+      // }
+      // const updatedIncomeModel = {
+      //   ...incomeModel,
+      //   transferRecord: {
+      //     transferId: expenseId,
+      //     account: expense.account,
+      //   }
+      // }
+      const expenseSaved: Expense = await expenseModel.save();
+      const incomeSaved: Income = await incomeModel.save();
       const modelSaved: Expense | Income = await model.save();
       let modelPopulated: Expense | Income;
 
