@@ -41,6 +41,7 @@ import {
   CreateTransferProps,
   TransferCreated,
   UpdateRecordProps,
+  UpdateRecordResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -193,6 +194,9 @@ export class RecordsService {
       const updatedExpense = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
+        date: new Date(expense.date),
+        category: newDataExpense.category.toString(),
+        amount: expense.amount,
         userId,
         transferRecord: {
           transferId: incomeId.toString(),
@@ -201,27 +205,29 @@ export class RecordsService {
       };
       const updatedIncome = {
         recordId: incomeId.toString(),
+        date: new Date(income.date),
+        category: newDataIncome.category.toString(),
+        amount: income.amount,
         userId,
         transferRecord: {
           transferId: expenseId.toString(),
           account: accountExpense.toString(),
         },
       };
-      // console.log('here');
-      // const updateTransferExpense = await this.updateRecord(
-      //   updatedExpense,
-      //   false,
-      //   userId,
-      // );
-      // const updateTransferIncome = await this.updateRecord(
-      //   updatedIncome,
-      //   true,
-      //   userId,
-      // );
-      // console.log('updateTransferExpense', updateTransferExpense);
-      // console.log('updateTransferIncome', updateTransferIncome);
-
-      // let modelPopulatedIncome: Income;
+      const updateExpenseResponse = await this.updateRecord({
+        changes: updatedExpense,
+        skipFindCategory: true,
+        userId,
+      });
+      const updateTransferExpense = updateExpenseResponse?.data?.record;
+      const updateIncomeResponse = await this.updateRecord({
+        changes: updatedIncome,
+        isIncome: true,
+        skipFindCategory: true,
+        skipUpdateExpensesPaid: true,
+        userId,
+      });
+      const updateTransferIncome = updateIncomeResponse?.data?.record;
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
@@ -235,18 +241,24 @@ export class RecordsService {
         await this.updateMultipleRecords(payload);
       }
 
-      let incomePopulated = await this.incomeModel.populate(incomeModel, {
-        path: 'expensesPaid',
-        select: '_id shortName amountFormatted fullDate formattedTime',
-      });
+      let incomePopulated = await this.incomeModel.populate(
+        updateTransferIncome,
+        {
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        },
+      );
       incomePopulated = await this.incomeModel.populate(incomePopulated, {
         path: 'category',
         select: '_id categoryName icon',
       });
-      const expensePopulated = await this.expenseModel.populate(expenseSaved, {
-        path: 'category',
-        select: '_id categoryName icon',
-      });
+      const expensePopulated = await this.expenseModel.populate(
+        updateTransferExpense,
+        {
+          path: 'category',
+          select: '_id categoryName icon',
+        },
+      );
 
       const response: TransferCreated = {
         version: VERSION_RESPONSE,
@@ -568,7 +580,6 @@ export class RecordsService {
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
       let categoryId = category;
-      let categoryName = '';
       if (!skipFindCategory) {
         const {
           data: { categories },
@@ -577,10 +588,8 @@ export class RecordsService {
           userId,
         });
         const [categoryFoundOrCreated] = categories;
-        const { _id, categoryName: categoryNameFetched } =
-          categoryFoundOrCreated;
+        const { _id } = categoryFoundOrCreated;
         categoryId = _id.toString();
-        categoryName = categoryNameFetched;
       }
       const { fullDate, formattedTime } = formatDateToString(date);
       const amountFormatted = formatNumberToCurrency(amount);
@@ -591,7 +600,7 @@ export class RecordsService {
         formattedTime,
         amountFormatted,
       };
-      const updatedRecord = !isIncome
+      const updatedRecord: Income | Expense = !isIncome
         ? await this.expenseModel
             .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
             .exec()
@@ -621,15 +630,10 @@ export class RecordsService {
         await this.updateMultipleRecords(payload);
       }
 
-      const { categoryFromRecord, ...restProps } = updatedRecord.toObject();
-      const recordWithCategory = {
-        ...restProps,
-        category: { _id: categoryId, categoryName },
-      };
-      const response: GeneralResponse = {
+      const response: UpdateRecordResponse = {
         ...INITIAL_RESPONSE,
         data: {
-          record: recordWithCategory,
+          record: updatedRecord,
         },
       };
       return response;

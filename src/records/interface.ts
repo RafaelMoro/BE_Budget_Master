@@ -53,6 +53,12 @@ export interface FindTransferRecordsResponse
   };
 }
 
+export interface UpdateRecordResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    record: Expense | Income;
+  };
+}
+
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     records: Expense[] | Income[] | (Expense | Income)[] | null;
