@@ -2,14 +2,22 @@ import { Expense } from './entities/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
 import { GeneralResponse } from 'src/response.interface';
 import { Income } from './entities/incomes.entity';
-import { CreateIncomeDto } from './dtos/incomes.dto';
-import { CreateExpenseDto } from './dtos/expenses.dto';
+import { CreateIncomeDto, UpdateIncomeDto } from './dtos/incomes.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from './dtos/expenses.dto';
 
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
   userId: string;
   isIncome?: boolean;
+}
+
+export interface UpdateRecordProps {
+  changes: UpdateIncomeDto | UpdateExpenseDto;
+  isIncome?: boolean;
+  userId: string;
+  skipFindCategory?: boolean;
+  skipUpdateExpensesPaid?: boolean;
 }
 
 export interface CreateTransferProps {

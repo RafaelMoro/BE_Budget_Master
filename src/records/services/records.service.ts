@@ -40,6 +40,7 @@ import {
   FindTransferRecordsResponse,
   CreateTransferProps,
   TransferCreated,
+  UpdateRecordProps,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -206,7 +207,19 @@ export class RecordsService {
           account: accountExpense.toString(),
         },
       };
-      await this.updateMultipleRecords([updatedExpense, updatedIncome]);
+      // console.log('here');
+      // const updateTransferExpense = await this.updateRecord(
+      //   updatedExpense,
+      //   false,
+      //   userId,
+      // );
+      // const updateTransferIncome = await this.updateRecord(
+      //   updatedIncome,
+      //   true,
+      //   userId,
+      // );
+      // console.log('updateTransferExpense', updateTransferExpense);
+      // console.log('updateTransferIncome', updateTransferIncome);
 
       // let modelPopulatedIncome: Income;
 
@@ -530,11 +543,13 @@ export class RecordsService {
     }
   }
 
-  async updateRecord(
-    changes: UpdateIncomeDto | UpdateExpenseDto,
+  async updateRecord({
+    changes,
+    userId,
     isIncome = false,
-    userId: string,
-  ) {
+    skipFindCategory = false,
+    skipUpdateExpensesPaid = false,
+  }: UpdateRecordProps) {
     try {
       const {
         recordId,
@@ -552,14 +567,21 @@ export class RecordsService {
       if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
-      const {
-        data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
-        categoryName: category,
-        userId,
-      });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId, categoryName } = categoryFoundOrCreated;
+      let categoryId = category;
+      let categoryName = '';
+      if (!skipFindCategory) {
+        const {
+          data: { categories },
+        } = await this.categoriesService.findByNameAndUserId({
+          categoryName: category,
+          userId,
+        });
+        const [categoryFoundOrCreated] = categories;
+        const { _id, categoryName: categoryNameFetched } =
+          categoryFoundOrCreated;
+        categoryId = _id.toString();
+        categoryName = categoryNameFetched;
+      }
       const { fullDate, formattedTime } = formatDateToString(date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
@@ -584,7 +606,11 @@ export class RecordsService {
       if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
 
       // Update the prop isPaid to true of the expenses related to this income
-      if (isIncome && (changes as CreateIncomeDto).expensesPaid?.length > 0) {
+      if (
+        isIncome &&
+        (changes as CreateIncomeDto).expensesPaid?.length > 0 &&
+        !skipUpdateExpensesPaid
+      ) {
         const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({

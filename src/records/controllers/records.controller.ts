@@ -113,13 +113,17 @@ export class RecordsController {
   @Put('/expenses')
   updateExpense(@Body() payload: UpdateExpenseDto, @Request() req) {
     const userId = req.user.sub;
-    return this.recordsService.updateRecord(payload, false, userId);
+    return this.recordsService.updateRecord({ changes: payload, userId });
   }
 
   @Put('/incomes')
   updateIncome(@Body() payload: UpdateIncomeDto, @Request() req) {
     const userId = req.user.sub;
-    return this.recordsService.updateRecord(payload, true, userId);
+    return this.recordsService.updateRecord({
+      changes: payload,
+      isIncome: true,
+      userId,
+    });
   }
 
   @Delete('/expenses')
