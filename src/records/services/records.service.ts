@@ -70,15 +70,9 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, amount, typeOfRecord, transferId } = data;
+      const { category, amount, typeOfRecord } = data;
       if (isTypeOfRecord(typeOfRecord) === false) {
         throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
-      if (typeOfRecord === 'transfer' && !transferId) {
-        throw new BadRequestException(TRANSFER_EMPTY_TRANSFERID_ERROR);
-      }
-      if (typeOfRecord !== 'transfer' && transferId) {
-        throw new BadRequestException(INCOME_EXPENSE_TRANSFERID_ERROR);
       }
 
       const {
