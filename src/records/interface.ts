@@ -57,6 +57,13 @@ export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
   };
 }
 
+export interface TransferCreated extends Omit<GeneralResponse, 'category'> {
+  data: {
+    expense: Expense;
+    income: Income;
+  };
+}
+
 export interface JoinRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     records: (Expense | Income)[];

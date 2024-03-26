@@ -3,7 +3,7 @@ import {
   BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
@@ -41,6 +41,7 @@ import {
   FindTransferRecordsByMonthAndYearProps,
   FindTransferRecordsResponse,
   CreateTransferProps,
+  TransferCreated,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -52,7 +53,7 @@ import {
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
 import { GeneralResponse } from '../../response.interface';
-import { isTypeOfRecord } from 'src/utils/isTypeOfRecord';
+import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 
 @Injectable()
 export class RecordsService {
@@ -186,30 +187,37 @@ export class RecordsService {
       };
       const expenseModel = new this.expenseModel(newDataExpense);
       const incomeModel = new this.incomeModel(newDataIncome);
-      const { _id: expenseId } = expenseModel;
-      const { _id: incomeId } = incomeModel;
-      // const updatedExpenseModel = {
-      //   ...expenseModel,
-      //   transferRecord: {
-      //     transferId: incomeId,
-      //     account: income.account,
-      //   }
-      // }
-      // const updatedIncomeModel = {
-      //   ...incomeModel,
-      //   transferRecord: {
-      //     transferId: expenseId,
-      //     account: expense.account,
-      //   }
-      // }
+
       const expenseSaved: Expense = await expenseModel.save();
       const incomeSaved: Income = await incomeModel.save();
-      const modelSaved: Expense | Income = await model.save();
-      let modelPopulated: Expense | Income;
+      const { _id: expenseId, account: accountExpense } = expenseSaved;
+      const { _id: incomeId, account: accountIncome } = incomeSaved;
+
+      // Add transderRecord data to each document.
+      const updatedExpense = {
+        // Transform ObjectIds to string
+        recordId: expenseId.toString(),
+        userId,
+        transferRecord: {
+          transferId: incomeId.toString(),
+          account: accountIncome.toString(),
+        },
+      };
+      const updatedIncome = {
+        recordId: incomeId.toString(),
+        userId,
+        transferRecord: {
+          transferId: expenseId.toString(),
+          account: accountExpense.toString(),
+        },
+      };
+      await this.updateMultipleRecords([updatedExpense, updatedIncome]);
+
+      // let modelPopulatedIncome: Income;
 
       // Update the prop isPaid to true of the expenses related to this income
-      if (isIncome) {
-        const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
+      if (income.expensesPaid.length > 0) {
+        const expensesIds: CreateExpense[] = (income as CreateIncomeDto)
           .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
           recordId: id,
@@ -217,28 +225,28 @@ export class RecordsService {
           userId,
         }));
         await this.updateMultipleRecords(payload);
-
-        modelPopulated = await this.incomeModel.populate(modelSaved, {
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        });
-        modelPopulated = await this.incomeModel.populate(modelPopulated, {
-          path: 'category',
-          select: '_id categoryName icon',
-        });
-      } else {
-        modelPopulated = await this.expenseModel.populate(modelSaved, {
-          path: 'category',
-          select: '_id categoryName icon',
-        });
       }
 
-      const response: RecordCreated = {
+      let incomePopulated = await this.incomeModel.populate(incomeModel, {
+        path: 'expensesPaid',
+        select: '_id shortName amountFormatted fullDate formattedTime',
+      });
+      incomePopulated = await this.incomeModel.populate(incomePopulated, {
+        path: 'category',
+        select: '_id categoryName icon',
+      });
+      const expensePopulated = await this.expenseModel.populate(expenseSaved, {
+        path: 'category',
+        select: '_id categoryName icon',
+      });
+
+      const response: TransferCreated = {
         version: VERSION_RESPONSE,
         success: true,
         message: RECORD_CREATED_MESSAGE,
         data: {
-          record: modelPopulated,
+          expense: expensePopulated,
+          income: incomePopulated,
         },
         error: null,
       };
