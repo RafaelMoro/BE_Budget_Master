@@ -27,8 +27,6 @@ import {
   MISSING_AMOUNT,
   RECORD_DELETED,
   TRANSFER_RECORDS_NOT_FOUND,
-  TRANSFER_EMPTY_TRANSFERID_ERROR,
-  INCOME_EXPENSE_TRANSFERID_ERROR,
   TYPE_OF_RECORD_INVALID,
 } from '../constants';
 import {
@@ -159,7 +157,10 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
-      const { fullDate, formattedTime } = formatDateToString(expense.date);
+      // @TODO: Check if parsing the date as string into date is needed
+      const { fullDate, formattedTime } = formatDateToString(
+        new Date(expense.date),
+      );
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
