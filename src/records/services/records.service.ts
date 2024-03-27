@@ -29,6 +29,7 @@ import {
   TRANSFER_RECORDS_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
   TRANSFER_ACCOUNT_ERROR,
+  MISSING_TRANSFER_RECORD,
 } from '../constants';
 import {
   FindRecordsByAccountProps,
@@ -273,6 +274,11 @@ export class RecordsService {
           select: '_id categoryName icon',
         },
       );
+
+      // Validation if any of the transfer records has a missing transfer record
+      if (!expensePopulated.transferRecord || !incomePopulated.transferRecord) {
+        throw new BadRequestException(MISSING_TRANSFER_RECORD);
+      }
 
       const response: TransferCreated = {
         version: VERSION_RESPONSE,
