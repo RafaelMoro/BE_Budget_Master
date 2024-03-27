@@ -28,6 +28,7 @@ import {
   RECORD_DELETED,
   TRANSFER_RECORDS_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
+  TRANSFER_ACCOUNT_ERROR,
 } from '../constants';
 import {
   FindRecordsByAccountProps,
@@ -151,12 +152,17 @@ export class RecordsService {
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord } = expense;
+
+      // Validations
       if (
         expense.typeOfRecord !== 'transfer' ||
         income.typeOfRecord !== 'transfer' ||
         isTypeOfRecord(typeOfRecord) === false
       ) {
         throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
+      if (expense.account === income.account) {
+        throw new BadRequestException(TRANSFER_ACCOUNT_ERROR);
       }
 
       const {
