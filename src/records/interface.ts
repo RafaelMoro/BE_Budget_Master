@@ -2,12 +2,28 @@ import { Expense } from './entities/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
 import { GeneralResponse } from 'src/response.interface';
 import { Income } from './entities/incomes.entity';
+import { CreateIncomeDto, UpdateIncomeDto } from './dtos/incomes.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from './dtos/expenses.dto';
 
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {
   accountId: string;
   userId: string;
   isIncome?: boolean;
+}
+
+export interface UpdateRecordProps {
+  changes: UpdateIncomeDto | UpdateExpenseDto;
+  isIncome?: boolean;
+  userId: string;
+  skipFindCategory?: boolean;
+  skipUpdateExpensesPaid?: boolean;
+}
+
+export interface CreateTransferProps {
+  expense: CreateExpenseDto;
+  income: CreateIncomeDto;
+  userId: string;
 }
 
 export interface FindTransferRecordsByMonthAndYearProps {
@@ -37,6 +53,12 @@ export interface FindTransferRecordsResponse
   };
 }
 
+export interface UpdateRecordResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    record: Expense | Income;
+  };
+}
+
 export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     records: Expense[] | Income[] | (Expense | Income)[] | null;
@@ -46,6 +68,13 @@ export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
 export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
   data: {
     record: Expense | Income;
+  };
+}
+
+export interface TransferCreated extends Omit<GeneralResponse, 'category'> {
+  data: {
+    expense: Expense;
+    income: Income;
   };
 }
 

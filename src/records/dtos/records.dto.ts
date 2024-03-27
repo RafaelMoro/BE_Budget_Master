@@ -24,6 +24,14 @@ export class IndebtedPeople {
   isPaid: boolean;
 }
 
+export class TransferRecord {
+  @IsNotEmpty()
+  transferId: string;
+
+  @IsNotEmpty()
+  account: string;
+}
+
 export class CreateRecordDto {
   @IsString()
   @IsNotEmpty()
@@ -60,15 +68,16 @@ export class CreateRecordDto {
   @Type(() => IndebtedPeople)
   readonly indebtedPeople: IndebtedPeople[];
 
+  @ValidateNested()
+  @Type(() => TransferRecord)
+  readonly transferRecord: TransferRecord;
+
   @IsMongoId()
   @IsNotEmpty()
   readonly account: string;
 
   @IsArray()
   readonly budgets: string[];
-
-  @IsString()
-  readonly transferId: string;
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {
