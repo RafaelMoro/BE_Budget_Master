@@ -71,7 +71,14 @@ export class RecordsService {
   ) {
     try {
       const { category, amount, typeOfRecord } = data;
-      if (isTypeOfRecord(typeOfRecord) === false) {
+      if (
+        isTypeOfRecord(typeOfRecord) === false ||
+        typeOfRecord === 'transfer' ||
+        // Validate if the record is an expense and type of record has value income
+        (!isIncome && typeOfRecord === 'income') ||
+        // Validate if the record is an income and type of record has value expense
+        (isIncome && typeOfRecord === 'expense')
+      ) {
         throw new BadRequestException(TYPE_OF_RECORD_INVALID);
       }
 
@@ -145,8 +152,9 @@ export class RecordsService {
     try {
       const { category, amount, typeOfRecord } = expense;
       if (
-        isTypeOfRecord(expense.typeOfRecord) === false &&
-        isTypeOfRecord(income.typeOfRecord) === false
+        expense.typeOfRecord !== 'transfer' ||
+        income.typeOfRecord !== 'transfer' ||
+        isTypeOfRecord(typeOfRecord) === false
       ) {
         throw new BadRequestException(TYPE_OF_RECORD_INVALID);
       }
