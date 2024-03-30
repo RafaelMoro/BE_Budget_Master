@@ -95,8 +95,6 @@ export class RecordsService {
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      console.log('fullDate', fullDate);
-      console.log('date', data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
