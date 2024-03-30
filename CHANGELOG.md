@@ -1,3 +1,8 @@
+## v0.6.1 (2024/03/30)
+
+## Pull Requests
+[#14](https://github.com/RafaelMoro/BE_Personal_Finances/pull/43) | Fix/timezone issue
+
 ## v0.6.0 (2024/03/27)
 
 ## Pull Requests

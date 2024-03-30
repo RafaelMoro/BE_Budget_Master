@@ -95,8 +95,6 @@ export class RecordsService {
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      console.log('fullDate', fullDate);
-      console.log('date', data.date);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
@@ -156,7 +154,8 @@ export class RecordsService {
 
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
-      const { category, amount, typeOfRecord } = expense;
+      const { category, amount, typeOfRecord, date } = expense;
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
       // Validations
       if (
@@ -179,9 +178,7 @@ export class RecordsService {
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       // @TODO: Check if parsing the date as string into date is needed
-      const { fullDate, formattedTime } = formatDateToString(
-        new Date(expense.date),
-      );
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
