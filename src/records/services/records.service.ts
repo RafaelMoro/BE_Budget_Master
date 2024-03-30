@@ -56,6 +56,7 @@ import {
 import { VERSION_RESPONSE } from '../../constants';
 import { GeneralResponse } from '../../response.interface';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
+import { changeTimezone } from 'src/utils/changeTimezone';
 
 @Injectable()
 export class RecordsService {
@@ -72,7 +73,8 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, amount, typeOfRecord } = data;
+      const { category, amount, typeOfRecord, date } = data;
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
       if (
         isTypeOfRecord(typeOfRecord) === false ||
         typeOfRecord === 'transfer' ||
@@ -92,7 +94,7 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
-      const { fullDate, formattedTime } = formatDateToString(data.date);
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       console.log('fullDate', fullDate);
       console.log('date', data.date);
       const amountFormatted = formatNumberToCurrency(amount);
