@@ -155,7 +155,10 @@ export class RecordsService {
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord, date } = expense;
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      const dateWithTimezone = changeTimezone(
+        new Date(date),
+        'America/Mexico_City',
+      );
 
       // Validations
       if (

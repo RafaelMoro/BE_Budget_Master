@@ -1,7 +1,12 @@
+## v0.6.2 (2024/03/30)
+
+## Pull Requests
+[#15](https://github.com/RafaelMoro/BE_Personal_Finances/pull/15) | Fix/error create transfer
+
 ## v0.6.1 (2024/03/30)
 
 ## Pull Requests
-[#14](https://github.com/RafaelMoro/BE_Personal_Finances/pull/43) | Fix/timezone issue
+[#14](https://github.com/RafaelMoro/BE_Personal_Finances/pull/14) | Fix/timezone issue
 
 ## v0.6.0 (2024/03/27)
 
