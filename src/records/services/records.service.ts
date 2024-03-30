@@ -74,6 +74,7 @@ export class RecordsService {
   ) {
     try {
       const { category, amount, typeOfRecord, date } = data;
+      console.log('date from create record', date, typeof date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
       if (
         isTypeOfRecord(typeOfRecord) === false ||
@@ -155,6 +156,7 @@ export class RecordsService {
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord, date } = expense;
+      console.log('date from create transfer', date, typeof date);
       const dateWithTimezone = changeTimezone(
         new Date(date),
         'America/Mexico_City',
