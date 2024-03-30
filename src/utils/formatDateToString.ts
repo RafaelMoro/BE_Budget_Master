@@ -16,11 +16,11 @@ const MONTHS = [
 const WEEKDAY = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
 
 export const formatDateToString = (date: Date) => {
-  const day = date.getDate();
-  const weekday = date.getDay();
-  const month = date.getMonth();
-  const hour = date.getHours();
-  const year = date.getFullYear();
+  const day = date.getUTCDate();
+  const weekday = date.getUTCDay();
+  const month = date.getUTCMonth();
+  const hour = date.getUTCHours();
+  const year = date.getUTCFullYear();
 
   const hourString = String(hour).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
