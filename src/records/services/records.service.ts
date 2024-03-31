@@ -189,7 +189,6 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
-      // @Checar aca que el tiempo fullDat y
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       console.log('fullDate', fullDate);
       console.log('formattedTime', formattedTime);
@@ -212,6 +211,8 @@ export class RecordsService {
         userId,
         typeOfRecord,
       };
+      console.log('time expense', newDataExpense.formattedTime);
+      console.log('time income', newDataIncome.formattedTime);
       const expenseModel = new this.expenseModel(newDataExpense);
       const incomeModel = new this.incomeModel(newDataIncome);
 
