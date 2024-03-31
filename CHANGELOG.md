@@ -1,3 +1,8 @@
+## v0.6.4 (2024/03/30)
+
+## Changes
+- Fix getting wrong timezone when creating transfer records
+
 ## v0.6.3 (2024/03/30)
 
 ## Pull Requests
