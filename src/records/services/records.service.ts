@@ -74,13 +74,7 @@ export class RecordsService {
   ) {
     try {
       const { category, amount, typeOfRecord, date } = data;
-      console.log('date from create record', date, typeof date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      console.log(
-        'date with timezone expense',
-        dateWithTimezone,
-        typeof dateWithTimezone,
-      );
       if (
         isTypeOfRecord(typeOfRecord) === false ||
         typeOfRecord === 'transfer' ||
@@ -161,13 +155,7 @@ export class RecordsService {
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord, date } = expense;
-      console.log('date from create transfer', date, typeof date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      console.log(
-        'date with timezone transfer',
-        dateWithTimezone,
-        typeof dateWithTimezone,
-      );
 
       // Validations
       if (
@@ -253,14 +241,6 @@ export class RecordsService {
         userId,
       });
       const updateTransferExpense = updateExpenseResponse?.data?.record;
-      console.log(
-        'updateTransferExpense',
-        updateTransferExpense.date,
-        ' ',
-        updateTransferExpense.fullDate,
-        ' ',
-        updateTransferExpense.formattedTime,
-      );
       const updateIncomeResponse = await this.updateRecord({
         changes: updatedIncome,
         isIncome: true,
@@ -324,6 +304,20 @@ export class RecordsService {
         },
         error: null,
       };
+      console.log(
+        'response time',
+        response.data.expense.formattedTime,
+        ' ',
+        response.data.expense.fullDate,
+        ' ',
+        response.data.expense.date,
+        ' ',
+        response.data.income.formattedTime,
+        ' ',
+        response.data.income.fullDate,
+        ' ',
+        response.data.income.date,
+      );
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
