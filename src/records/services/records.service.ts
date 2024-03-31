@@ -229,7 +229,9 @@ export class RecordsService {
       const updatedExpense = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
-        date: new Date(expense.date),
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
         category: newDataExpense.category.toString(),
         amount: expense.amount,
         userId,
@@ -240,7 +242,9 @@ export class RecordsService {
       };
       const updatedIncome = {
         recordId: incomeId.toString(),
-        date: new Date(income.date),
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
         category: newDataIncome.category.toString(),
         amount: income.amount,
         userId,
