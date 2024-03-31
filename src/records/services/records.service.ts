@@ -606,6 +606,8 @@ export class RecordsService {
       if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
       let categoryId = category;
       if (!skipFindCategory) {
         const {
@@ -618,10 +620,11 @@ export class RecordsService {
         const { _id } = categoryFoundOrCreated;
         categoryId = _id.toString();
       }
-      const { fullDate, formattedTime } = formatDateToString(date);
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
         ...changes,
+        date: dateWithTimezone,
         category: categoryId,
         fullDate,
         formattedTime,
