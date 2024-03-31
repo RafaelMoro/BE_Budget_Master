@@ -195,6 +195,7 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
+        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -204,6 +205,7 @@ export class RecordsService {
       };
       const newDataIncome = {
         ...income,
+        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
