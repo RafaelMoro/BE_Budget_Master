@@ -76,6 +76,11 @@ export class RecordsService {
       const { category, amount, typeOfRecord, date } = data;
       console.log('date from create record', date, typeof date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      console.log(
+        'date with timezone expense',
+        dateWithTimezone,
+        typeof dateWithTimezone,
+      );
       if (
         isTypeOfRecord(typeOfRecord) === false ||
         typeOfRecord === 'transfer' ||
@@ -158,6 +163,11 @@ export class RecordsService {
       const { category, amount, typeOfRecord, date } = expense;
       console.log('date from create transfer', date, typeof date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      console.log(
+        'date with timezone transfer',
+        dateWithTimezone,
+        typeof dateWithTimezone,
+      );
 
       // Validations
       if (
