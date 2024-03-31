@@ -1,3 +1,8 @@
+## v0.6.6 (2024/03/10)
+
+## Pull Requests
+[#17](https://github.com/RafaelMoro/BE_Personal_Finances/pull/17) | Fix correct timezone when editing record
+
 ## v0.6.5 (2024/03/31)
 
 ## Changes
