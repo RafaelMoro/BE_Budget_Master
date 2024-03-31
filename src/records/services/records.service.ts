@@ -217,6 +217,8 @@ export class RecordsService {
 
       const expenseSaved: Expense = await expenseModel.save();
       const incomeSaved: Income = await incomeModel.save();
+      console.log('expenseSaved date', expenseSaved.date);
+      console.log('incomeSaved date', incomeSaved.date);
       const { _id: expenseId, account: accountExpense } = expenseSaved;
       const { _id: incomeId, account: accountIncome } = incomeSaved;
 
