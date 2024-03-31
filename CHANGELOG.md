@@ -1,3 +1,8 @@
+## v0.6.3 (2024/03/30)
+
+## Pull Requests
+[#16](https://github.com/RafaelMoro/BE_Personal_Finances/pull/16) | Fix/transfer time string
+
 ## v0.6.2 (2024/03/30)
 
 ## Pull Requests
