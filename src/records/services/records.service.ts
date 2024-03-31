@@ -190,8 +190,6 @@ export class RecordsService {
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      console.log('fullDate', fullDate);
-      console.log('formattedTime', formattedTime);
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
@@ -218,10 +216,6 @@ export class RecordsService {
 
       const expenseSaved: Expense = await expenseModel.save();
       const incomeSaved: Income = await incomeModel.save();
-      console.log('expense time', expenseSaved.formattedTime);
-      console.log('income time', incomeSaved.formattedTime);
-      console.log('expenseSaved date', expenseSaved.date);
-      console.log('incomeSaved date', incomeSaved.date);
       const { _id: expenseId, account: accountExpense } = expenseSaved;
       const { _id: incomeId, account: accountIncome } = incomeSaved;
 
@@ -259,6 +253,14 @@ export class RecordsService {
         userId,
       });
       const updateTransferExpense = updateExpenseResponse?.data?.record;
+      console.log(
+        'updateTransferExpense',
+        updateTransferExpense.date,
+        ' ',
+        updateTransferExpense.fullDate,
+        ' ',
+        updateTransferExpense.formattedTime,
+      );
       const updateIncomeResponse = await this.updateRecord({
         changes: updatedIncome,
         isIncome: true,
@@ -267,6 +269,14 @@ export class RecordsService {
         userId,
       });
       const updateTransferIncome = updateIncomeResponse?.data?.record;
+      console.log(
+        'updateTransferIncome',
+        updateTransferIncome.date,
+        ' ',
+        updateTransferIncome.fullDate,
+        ' ',
+        updateTransferIncome.formattedTime,
+      );
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
