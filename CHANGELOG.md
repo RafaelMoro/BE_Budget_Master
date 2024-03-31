@@ -1,3 +1,8 @@
+## v0.6.5 (2024/03/31)
+
+## Changes
+- Fix getting wrong time when creating expenses
+
 ## v0.6.4 (2024/03/30)
 
 ## Changes
