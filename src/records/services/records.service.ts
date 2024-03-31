@@ -213,13 +213,13 @@ export class RecordsService {
         userId,
         typeOfRecord,
       };
-      console.log('time expense', newDataExpense.formattedTime);
-      console.log('time income', newDataIncome.formattedTime);
       const expenseModel = new this.expenseModel(newDataExpense);
       const incomeModel = new this.incomeModel(newDataIncome);
 
       const expenseSaved: Expense = await expenseModel.save();
       const incomeSaved: Income = await incomeModel.save();
+      console.log('expense time', expenseSaved.formattedTime);
+      console.log('income time', incomeSaved.formattedTime);
       console.log('expenseSaved date', expenseSaved.date);
       console.log('incomeSaved date', incomeSaved.date);
       const { _id: expenseId, account: accountExpense } = expenseSaved;
