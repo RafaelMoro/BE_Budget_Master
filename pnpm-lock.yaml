@@ -110,7 +110,7 @@ devDependencies:
     specifier: ^4.0.7
     version: 4.0.7
   '@types/node':
-    specifier: ^16.0.0
+    specifier: ^16.18.86
     version: 16.18.86
   '@types/nodemailer':
     specifier: ^6.4.6
