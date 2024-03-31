@@ -189,8 +189,10 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
-      // @TODO: Check if parsing the date as string into date is needed
+      // @Checar aca que el tiempo fullDat y
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+      console.log('fullDate', fullDate);
+      console.log('formattedTime', formattedTime);
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
