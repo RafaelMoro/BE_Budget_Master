@@ -249,14 +249,6 @@ export class RecordsService {
         userId,
       });
       const updateTransferIncome = updateIncomeResponse?.data?.record;
-      console.log(
-        'updateTransferIncome',
-        updateTransferIncome.date,
-        ' ',
-        updateTransferIncome.fullDate,
-        ' ',
-        updateTransferIncome.formattedTime,
-      );
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
@@ -304,20 +296,6 @@ export class RecordsService {
         },
         error: null,
       };
-      console.log(
-        'response time',
-        response.data.expense.formattedTime,
-        ' ',
-        response.data.expense.fullDate,
-        ' ',
-        response.data.expense.date,
-        ' ',
-        response.data.income.formattedTime,
-        ' ',
-        response.data.income.fullDate,
-        ' ',
-        response.data.income.date,
-      );
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
