@@ -1,6 +1,11 @@
-## v0.6.6 (2024/03/10)
+## v0.6.7 (2024/03/31)
 
-## Pull Requests
+### Pull Requests
+[#18](https://github.com/RafaelMoro/BE_Personal_Finances/pull/18) | Fix/add new origin cors
+
+## v0.6.6 (2024/03/31)
+
+### Pull Requests
 [#17](https://github.com/RafaelMoro/BE_Personal_Finances/pull/17) | Fix correct timezone when editing record
 
 ## v0.6.5 (2024/03/31)
@@ -15,37 +20,37 @@
 
 ## v0.6.3 (2024/03/30)
 
-## Pull Requests
+### Pull Requests
 [#16](https://github.com/RafaelMoro/BE_Personal_Finances/pull/16) | Fix/transfer time string
 
 ## v0.6.2 (2024/03/30)
 
-## Pull Requests
+### Pull Requests
 [#15](https://github.com/RafaelMoro/BE_Personal_Finances/pull/15) | Fix/error create transfer
 
 ## v0.6.1 (2024/03/30)
 
-## Pull Requests
+### Pull Requests
 [#14](https://github.com/RafaelMoro/BE_Personal_Finances/pull/14) | Fix/timezone issue
 
 ## v0.6.0 (2024/03/27)
 
-## Pull Requests
+### Pull Requests
 [#13](https://github.com/RafaelMoro/BE_Personal_Finances/pull/13) | Add Transfer record into record entity and DTO
 
 ## v0.5.0 (2024/03/24)
 
-## Pull Requests
+### Pull Requests
 [#12](https://github.com/RafaelMoro/BE_Personal_Finances/pull/12) | Add type of record prop into Record
 
 ## v0.4.0 (2024/03/21)
 
-## Pull Requests
+### Pull Requests
 [#11](https://github.com/RafaelMoro/BE_Personal_Finances/pull/11) |  Add transferId prop and create service findTransferRecordsByMonthAndYear
 
 ## v0.3.2 (2024/03/14)
 
-## Pull Requests
+### Pull Requests
 [#10](https://github.com/RafaelMoro/BE_Personal_Finances/pull/10) |  Fix to make create local categories public
 
 ## v0.3.1 (2024/03/12)
