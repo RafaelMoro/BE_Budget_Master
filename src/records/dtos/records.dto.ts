@@ -24,10 +24,22 @@ export class IndebtedPeople {
   isPaid: boolean;
 }
 
+export class TransferRecord {
+  @IsNotEmpty()
+  transferId: string;
+
+  @IsNotEmpty()
+  account: string;
+}
+
 export class CreateRecordDto {
   @IsString()
   @IsNotEmpty()
   readonly shortName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly typeOfRecord: string;
 
   @IsString()
   readonly description: string;
@@ -55,6 +67,10 @@ export class CreateRecordDto {
   @ValidateNested()
   @Type(() => IndebtedPeople)
   readonly indebtedPeople: IndebtedPeople[];
+
+  @ValidateNested()
+  @Type(() => TransferRecord)
+  readonly transferRecord: TransferRecord;
 
   @IsMongoId()
   @IsNotEmpty()

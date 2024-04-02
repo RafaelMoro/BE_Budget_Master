@@ -26,6 +26,10 @@ import {
   MISSING_CATEGORY,
   MISSING_AMOUNT,
   RECORD_DELETED,
+  TRANSFER_RECORDS_NOT_FOUND,
+  TYPE_OF_RECORD_INVALID,
+  TRANSFER_ACCOUNT_ERROR,
+  MISSING_TRANSFER_RECORD,
 } from '../constants';
 import {
   FindRecordsByAccountProps,
@@ -34,6 +38,12 @@ import {
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
+  FindTransferRecordsByMonthAndYearProps,
+  FindTransferRecordsResponse,
+  CreateTransferProps,
+  TransferCreated,
+  UpdateRecordProps,
+  UpdateRecordResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
@@ -45,6 +55,8 @@ import {
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
 import { GeneralResponse } from '../../response.interface';
+import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
+import { changeTimezone } from 'src/utils/changeTimezone';
 
 @Injectable()
 export class RecordsService {
@@ -61,7 +73,19 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const { category, amount } = data;
+      const { category, amount, typeOfRecord, date } = data;
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      if (
+        isTypeOfRecord(typeOfRecord) === false ||
+        typeOfRecord === 'transfer' ||
+        // Validate if the record is an expense and type of record has value income
+        (!isIncome && typeOfRecord === 'income') ||
+        // Validate if the record is an income and type of record has value expense
+        (isIncome && typeOfRecord === 'expense')
+      ) {
+        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
+
       const {
         data: { categories },
       } = await this.categoriesService.findByNameAndUserId({
@@ -70,15 +94,17 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
-      const { fullDate, formattedTime } = formatDateToString(data.date);
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
+        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
         amountFormatted,
         userId,
+        typeOfRecord,
       };
       const model = !isIncome
         ? new this.expenseModel(newData)
@@ -118,6 +144,156 @@ export class RecordsService {
         message: RECORD_CREATED_MESSAGE,
         data: {
           record: modelPopulated,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createTransfer({ expense, income, userId }: CreateTransferProps) {
+    try {
+      const { category, amount, typeOfRecord, date } = expense;
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+      // Validations
+      if (
+        expense.typeOfRecord !== 'transfer' ||
+        income.typeOfRecord !== 'transfer' ||
+        isTypeOfRecord(typeOfRecord) === false
+      ) {
+        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
+      if (expense.account === income.account) {
+        throw new BadRequestException(TRANSFER_ACCOUNT_ERROR);
+      }
+
+      const {
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId } = categoryFoundOrCreated;
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+      const amountFormatted = formatNumberToCurrency(amount);
+      const newDataExpense = {
+        ...expense,
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+        amountFormatted,
+        userId,
+        typeOfRecord,
+      };
+      const newDataIncome = {
+        ...income,
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+        amountFormatted,
+        userId,
+        typeOfRecord,
+      };
+      const expenseModel = new this.expenseModel(newDataExpense);
+      const incomeModel = new this.incomeModel(newDataIncome);
+
+      const expenseSaved: Expense = await expenseModel.save();
+      const incomeSaved: Income = await incomeModel.save();
+      const { _id: expenseId, account: accountExpense } = expenseSaved;
+      const { _id: incomeId, account: accountIncome } = incomeSaved;
+
+      // Add transderRecord data to each document.
+      const updatedExpense = {
+        // Transform ObjectIds to string
+        recordId: expenseId.toString(),
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
+        category: newDataExpense.category.toString(),
+        amount: expense.amount,
+        userId,
+        transferRecord: {
+          transferId: incomeId.toString(),
+          account: accountIncome.toString(),
+        },
+      };
+      const updatedIncome = {
+        recordId: incomeId.toString(),
+        date: dateWithTimezone,
+        fullDate,
+        formattedTime,
+        category: newDataIncome.category.toString(),
+        amount: income.amount,
+        userId,
+        transferRecord: {
+          transferId: expenseId.toString(),
+          account: accountExpense.toString(),
+        },
+      };
+      const updateExpenseResponse = await this.updateRecord({
+        changes: updatedExpense,
+        skipFindCategory: true,
+        userId,
+      });
+      const updateTransferExpense = updateExpenseResponse?.data?.record;
+      const updateIncomeResponse = await this.updateRecord({
+        changes: updatedIncome,
+        isIncome: true,
+        skipFindCategory: true,
+        skipUpdateExpensesPaid: true,
+        userId,
+      });
+      const updateTransferIncome = updateIncomeResponse?.data?.record;
+
+      // Update the prop isPaid to true of the expenses related to this income
+      if (income.expensesPaid.length > 0) {
+        const expensesIds: CreateExpense[] = (income as CreateIncomeDto)
+          .expensesPaid;
+        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
+          recordId: id,
+          isPaid: true,
+          userId,
+        }));
+        await this.updateMultipleRecords(payload);
+      }
+
+      let incomePopulated = await this.incomeModel.populate(
+        updateTransferIncome,
+        {
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        },
+      );
+      incomePopulated = await this.incomeModel.populate(incomePopulated, {
+        path: 'category',
+        select: '_id categoryName icon',
+      });
+      const expensePopulated = await this.expenseModel.populate(
+        updateTransferExpense,
+        {
+          path: 'category',
+          select: '_id categoryName icon',
+        },
+      );
+
+      // Validation if any of the transfer records has a missing transfer record
+      if (!expensePopulated.transferRecord || !incomePopulated.transferRecord) {
+        throw new BadRequestException(MISSING_TRANSFER_RECORD);
+      }
+
+      const response: TransferCreated = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: RECORD_CREATED_MESSAGE,
+        data: {
+          expense: expensePopulated,
+          income: incomePopulated,
         },
         error: null,
       };
@@ -293,6 +469,51 @@ export class RecordsService {
     }
   }
 
+  async findTransferRecordsByMonthAndYear({
+    month,
+    year,
+    userId,
+    transferId,
+  }: FindTransferRecordsByMonthAndYearProps) {
+    try {
+      const regexDate = `${month}.*${year}|${year}.*${month}`;
+      const expenseArray = await this.expenseModel
+        .find({
+          sub: userId,
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
+          transferId,
+        })
+        .populate({ path: 'category', select: 'categoryName icon' })
+        .exec();
+      const incomeArray = await this.incomeModel
+        .find({
+          sub: userId,
+          fullDate: { $regex: new RegExp(regexDate, 'i') },
+          transferId,
+        })
+        .populate({
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        })
+        .populate('category', 'categoryName icon')
+        .exec();
+
+      if (!expenseArray[0] || !incomeArray[0]) {
+        throw new BadRequestException(TRANSFER_RECORDS_NOT_FOUND);
+      }
+
+      const [expense] = expenseArray;
+      const [income] = incomeArray;
+      const response: FindTransferRecordsResponse = {
+        ...INITIAL_RESPONSE,
+        data: { expense, income },
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   joinIncomesAndExpenses(expenses: Expense[], incomes: Income[]) {
     if (expenses.length === 0 && incomes.length === 0) {
       const noRecordsResponse: MultipleRecordsResponse = {
@@ -361,11 +582,13 @@ export class RecordsService {
     }
   }
 
-  async updateRecord(
-    changes: UpdateIncomeDto | UpdateExpenseDto,
+  async updateRecord({
+    changes,
+    userId,
     isIncome = false,
-    userId: string,
-  ) {
+    skipFindCategory = false,
+    skipUpdateExpensesPaid = false,
+  }: UpdateRecordProps) {
     try {
       const {
         recordId,
@@ -383,24 +606,31 @@ export class RecordsService {
       if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
-      const {
-        data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
-        categoryName: category,
-        userId,
-      });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId, categoryName } = categoryFoundOrCreated;
-      const { fullDate, formattedTime } = formatDateToString(date);
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+      let categoryId = category;
+      if (!skipFindCategory) {
+        const {
+          data: { categories },
+        } = await this.categoriesService.findByNameAndUserId({
+          categoryName: category,
+          userId,
+        });
+        const [categoryFoundOrCreated] = categories;
+        const { _id } = categoryFoundOrCreated;
+        categoryId = _id.toString();
+      }
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
         ...changes,
+        date: dateWithTimezone,
         category: categoryId,
         fullDate,
         formattedTime,
         amountFormatted,
       };
-      const updatedRecord = !isIncome
+      const updatedRecord: Income | Expense = !isIncome
         ? await this.expenseModel
             .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
             .exec()
@@ -415,7 +645,11 @@ export class RecordsService {
       if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
 
       // Update the prop isPaid to true of the expenses related to this income
-      if (isIncome && (changes as CreateIncomeDto).expensesPaid?.length > 0) {
+      if (
+        isIncome &&
+        (changes as CreateIncomeDto).expensesPaid?.length > 0 &&
+        !skipUpdateExpensesPaid
+      ) {
         const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
         const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
@@ -426,15 +660,10 @@ export class RecordsService {
         await this.updateMultipleRecords(payload);
       }
 
-      const { categoryFromRecord, ...restProps } = updatedRecord.toObject();
-      const recordWithCategory = {
-        ...restProps,
-        category: { _id: categoryId, categoryName },
-      };
-      const response: GeneralResponse = {
+      const response: UpdateRecordResponse = {
         ...INITIAL_RESPONSE,
         data: {
-          record: recordWithCategory,
+          record: updatedRecord,
         },
       };
       return response;

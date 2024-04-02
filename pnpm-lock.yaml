@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@codegenie/serverless-express':
+    specifier: ^4.13.0
+    version: 4.13.0
   '@nestjs-modules/mailer':
     specifier: 1.8.1
     version: 1.8.1(@nestjs/common@9.4.3)(@nestjs/core@9.4.3)(nodemailer@6.9.11)
@@ -82,9 +85,6 @@ dependencies:
     version: 4.6.3(express@4.18.3)
 
 devDependencies:
-  '@codegenie/serverless-express':
-    specifier: ^4.13.0
-    version: 4.13.0
   '@nestjs/cli':
     specifier: ^9.0.0
     version: 9.5.0
@@ -110,7 +110,7 @@ devDependencies:
     specifier: ^4.0.7
     version: 4.0.7
   '@types/node':
-    specifier: ^16.0.0
+    specifier: ^16.18.86
     version: 16.18.86
   '@types/nodemailer':
     specifier: ^6.4.6
@@ -1198,7 +1198,7 @@ packages:
   /@codegenie/serverless-express@4.13.0:
     resolution: {integrity: sha512-xjTotGExm+2j45T6XTvDuTJO1105jKLf152j9nXXeJboYH3dwd8Ted6guv+jDFNouf0uKOO7AhGRQdCTpLVIiw==}
     engines: {node: '>=12'}
-    dev: true
+    dev: false
 
   /@colors/colors@1.5.0:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}

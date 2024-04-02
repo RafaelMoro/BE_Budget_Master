@@ -15,6 +15,7 @@ import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
 import { Param } from '@nestjs/common/decorators';
+import { CreateTransferDto } from '../dtos/transfer.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('records')
 export class RecordsController {
@@ -30,6 +31,13 @@ export class RecordsController {
   createIncome(@Body() payload: CreateIncomeDto, @Request() req) {
     const userId = req.user.sub;
     return this.recordsService.createOneRecord(payload, true, userId);
+  }
+
+  @Post('/transfer')
+  createTransfer(@Body() payload: CreateTransferDto, @Request() req) {
+    const { expense, income } = payload;
+    const userId = req.user.sub;
+    return this.recordsService.createTransfer({ expense, income, userId });
   }
 
   @Get('/incomes/:accountId')
@@ -86,16 +94,36 @@ export class RecordsController {
     );
   }
 
+  @Get('/transfer/:transferId/:month/:year')
+  findTransferRecordsByMonthAndYear(
+    @Param('transferId') transferId: string,
+    @Param('month') month: string,
+    @Param('year') year: string,
+    @Request() req,
+  ) {
+    const userId = req.user.sub;
+    return this.recordsService.findTransferRecordsByMonthAndYear({
+      month,
+      year,
+      userId,
+      transferId,
+    });
+  }
+
   @Put('/expenses')
   updateExpense(@Body() payload: UpdateExpenseDto, @Request() req) {
     const userId = req.user.sub;
-    return this.recordsService.updateRecord(payload, false, userId);
+    return this.recordsService.updateRecord({ changes: payload, userId });
   }
 
   @Put('/incomes')
   updateIncome(@Body() payload: UpdateIncomeDto, @Request() req) {
     const userId = req.user.sub;
-    return this.recordsService.updateRecord(payload, true, userId);
+    return this.recordsService.updateRecord({
+      changes: payload,
+      isIncome: true,
+      userId,
+    });
   }
 
   @Delete('/expenses')
