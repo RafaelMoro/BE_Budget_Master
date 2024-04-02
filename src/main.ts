@@ -18,7 +18,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GeneralAppExceptionFilter());
   app.enableCors({
-    origin: [frontendUri, 'http://localhost:3000'],
+    origin: frontendUri,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
