@@ -98,7 +98,6 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
-        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -182,7 +181,6 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
-        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -192,7 +190,6 @@ export class RecordsService {
       };
       const newDataIncome = {
         ...income,
-        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -212,7 +209,7 @@ export class RecordsService {
       const updatedExpense = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
-        date: dateWithTimezone,
+        date: expense.date,
         fullDate,
         formattedTime,
         category: newDataExpense.category.toString(),
@@ -225,7 +222,7 @@ export class RecordsService {
       };
       const updatedIncome = {
         recordId: incomeId.toString(),
-        date: dateWithTimezone,
+        date: income.date,
         fullDate,
         formattedTime,
         category: newDataIncome.category.toString(),
@@ -624,7 +621,6 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
         ...changes,
-        date: dateWithTimezone,
         category: categoryId,
         fullDate,
         formattedTime,
