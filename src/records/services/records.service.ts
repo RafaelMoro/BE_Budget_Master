@@ -74,9 +74,7 @@ export class RecordsService {
   ) {
     try {
       const { category, amount, typeOfRecord, date } = data;
-      console.log('date', date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      console.log('dateWithTimezone', dateWithTimezone);
       if (
         isTypeOfRecord(typeOfRecord) === false ||
         typeOfRecord === 'transfer' ||
@@ -157,7 +155,9 @@ export class RecordsService {
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord, date } = expense;
+      console.log('date', date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      console.log('dateWithTimezone', dateWithTimezone);
 
       // Validations
       if (
@@ -183,7 +183,6 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
-        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -193,7 +192,6 @@ export class RecordsService {
       };
       const newDataIncome = {
         ...income,
-        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
@@ -213,7 +211,7 @@ export class RecordsService {
       const updatedExpense = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
-        date: dateWithTimezone,
+        date: expense.date,
         fullDate,
         formattedTime,
         category: newDataExpense.category.toString(),
@@ -226,7 +224,7 @@ export class RecordsService {
       };
       const updatedIncome = {
         recordId: incomeId.toString(),
-        date: dateWithTimezone,
+        date: income.date,
         fullDate,
         formattedTime,
         category: newDataIncome.category.toString(),
