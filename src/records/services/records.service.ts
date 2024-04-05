@@ -221,7 +221,7 @@ export class RecordsService {
           account: accountIncome.toString(),
         },
       };
-      console.log('updatedExpense', updatedExpense.date);
+      console.log('updated expense', updatedExpense.date);
       const updatedIncome = {
         recordId: incomeId.toString(),
         date: income.date,
@@ -235,13 +235,14 @@ export class RecordsService {
           account: accountExpense.toString(),
         },
       };
-      console.log('updatedIncome', updatedIncome.date);
+      console.log('updated income', updatedIncome.date);
       const updateExpenseResponse = await this.updateRecord({
         changes: updatedExpense,
         skipFindCategory: true,
         userId,
       });
       const updateTransferExpense = updateExpenseResponse?.data?.record;
+      console.log('updatedExpense', updateTransferExpense.date);
       const updateIncomeResponse = await this.updateRecord({
         changes: updatedIncome,
         isIncome: true,
@@ -250,6 +251,7 @@ export class RecordsService {
         userId,
       });
       const updateTransferIncome = updateIncomeResponse?.data?.record;
+      console.log('updatedIncome', updateTransferIncome.date);
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
