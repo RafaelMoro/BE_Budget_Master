@@ -74,9 +74,7 @@ export class RecordsService {
   ) {
     try {
       const { category, amount, typeOfRecord, date } = data;
-      console.log('date', date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      console.log('dateWithTimezone', dateWithTimezone);
       if (
         isTypeOfRecord(typeOfRecord) === false ||
         typeOfRecord === 'transfer' ||
@@ -100,6 +98,7 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
         ...data,
+        date: dateWithTimezone,
         fullDate,
         formattedTime,
         category: categoryId,
