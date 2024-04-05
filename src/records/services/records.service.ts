@@ -626,7 +626,6 @@ export class RecordsService {
       const amountFormatted = formatNumberToCurrency(amount);
       const newChanges = {
         ...changes,
-        date: dateWithTimezone,
         category: categoryId,
         fullDate,
         formattedTime,
