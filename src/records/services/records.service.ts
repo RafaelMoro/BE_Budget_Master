@@ -157,7 +157,6 @@ export class RecordsService {
       const { category, amount, typeOfRecord, date } = expense;
       console.log('date', date);
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      console.log('dateWithTimezone', dateWithTimezone);
 
       // Validations
       if (
@@ -222,6 +221,7 @@ export class RecordsService {
           account: accountIncome.toString(),
         },
       };
+      console.log('updatedExpense', updatedExpense.date);
       const updatedIncome = {
         recordId: incomeId.toString(),
         date: income.date,
@@ -235,6 +235,7 @@ export class RecordsService {
           account: accountExpense.toString(),
         },
       };
+      console.log('updatedIncome', updatedIncome.date);
       const updateExpenseResponse = await this.updateRecord({
         changes: updatedExpense,
         skipFindCategory: true,
