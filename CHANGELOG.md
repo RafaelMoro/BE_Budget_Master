@@ -1,3 +1,8 @@
+## v0.6.8 (2024/04/04)
+
+### Changes
+- Delete date prop transformed with timezone when saving it into db when creating and updating transfers and records
+
 ## v0.6.7 (2024/03/31)
 
 ### Pull Requests
