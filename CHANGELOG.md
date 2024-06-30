@@ -1,3 +1,9 @@
+## v0.7.0 (2024-06-30)
+
+### Pull Requests
+[#22](https://github.com/RafaelMoro/BE_Personal_Finances/pull/22) | Add GH actions on verify PR's, update changelog and bump versions
+
+
 ## v0.6.8 (2024/04/04)
 
 ### Changes
