@@ -1,6 +1,6 @@
 {
   "name": "be_personal_finances",
-  "version": "0.6.8",
+  "version": "0.7.1",
   "description": "",
   "author": "",
   "private": true,
@@ -81,6 +81,9 @@
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.0.0",
     "typescript": "^4.3.5"
+  },
+  "engines": {
+    "node": ">=18.19.0"
   },
   "jest": {
     "moduleFileExtensions": [

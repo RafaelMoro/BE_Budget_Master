@@ -14,6 +14,7 @@ export default registerAs('config', () => ({
   frontendPort: process.env.FRONTEND_PORT,
   environment: process.env.ENVIRONMENT,
   frontendUri: process.env.FRONTEND_URI,
+  testFrontendUri: process.env.TEST_FRONTEND_URI,
   mailer: {
     email: process.env.MAILER_MAIL,
     pwd: process.env.MAILER_PWD,
