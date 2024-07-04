@@ -1,3 +1,9 @@
+## v0.7.1 (2024-07-04)
+
+### Pull Requests
+[#23](https://github.com/RafaelMoro/BE_Budget_Master/pull/23) | Add testFrontendUri env into app execution
+
+
 ## v0.7.0 (2024-06-30)
 
 ### Pull Requests
