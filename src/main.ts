@@ -6,6 +6,7 @@ import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.f
 dotenv.config();
 
 const frontendUri = process.env.FRONTEND_URI;
+const testFrontendUri = process.env.TEST_FRONTEND_URI;
 const PORT = process.env.PORT || 8080;
 
 async function bootstrap() {
@@ -18,7 +19,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GeneralAppExceptionFilter());
   app.enableCors({
-    origin: frontendUri,
+    origin: [frontendUri, testFrontendUri],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
