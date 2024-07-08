@@ -28,6 +28,10 @@ export class RecordsHistory {
 
   @IsNumber()
   @IsNotEmpty()
+  readonly recordAmount: string;
+
+  @IsNumber()
+  @IsNotEmpty()
   readonly budgetCurrentAmount: number;
 
   @IsNumber()

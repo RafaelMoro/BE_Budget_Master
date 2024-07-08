@@ -24,6 +24,7 @@ export class BudgetHistory extends Document {
       {
         recordId: { type: String },
         recordName: { type: String },
+        recordAmount: { type: Number },
         recordDate: { type: Date },
         budgetCurrentAmount: { type: Number },
         budgetUpdatedAmount: { type: Number },
