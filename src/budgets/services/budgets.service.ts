@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Budget } from '../entities/budgets.entity';
 import { Model } from 'mongoose';
@@ -37,10 +41,13 @@ export class BudgetsService {
   async getBudgets(sub: string) {
     try {
       const budgets = await this.budgetModel.find({ sub }, { sub: 0 }).exec();
+      if (budgets.length === 0) {
+        return new NotFoundException('No budgets found');
+      }
       const response: GeneralBudgetsResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Budgets fetched successfully',
+        message: null,
         data: {
           budgets,
         },
@@ -55,12 +62,17 @@ export class BudgetsService {
   async getSingleBudget(bugetId: string) {
     try {
       const budgets = await this.budgetModel.find({ _id: bugetId }).exec();
-      const response: GeneralBudgetsResponse = {
+      if (budgets.length === 0) {
+        return new NotFoundException('Budget not found');
+      }
+
+      const [singleBudget] = budgets;
+      const response: SingleBudgetResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Budgets fetched successfully',
+        message: null,
         data: {
-          budgets,
+          budget: singleBudget,
         },
         error: null,
       };
