@@ -84,6 +84,7 @@ export class BudgetHistoryService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
@@ -107,16 +108,23 @@ export class BudgetHistoryService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
 
   async updateBudgetHistory(changes: UpdateBudgetHistoryDto) {
     try {
-      const { budgetHistoryId } = changes;
+      // Excluding budget id from the changes
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { budgetHistoryId, budget, ...restChanges } = changes;
       const updateBudgetHistory: BudgetHistoryResponse =
         await this.budgetHistoryModel
-          .findByIdAndUpdate(budgetHistoryId, { $set: changes }, { new: true })
+          .findByIdAndUpdate(
+            budgetHistoryId,
+            { $set: restChanges },
+            { new: true },
+          )
           .exec();
       if (!updateBudgetHistory)
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
@@ -131,6 +139,7 @@ export class BudgetHistoryService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
