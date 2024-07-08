@@ -12,4 +12,10 @@ export interface SingleBudgetResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
+export interface GeneralBudgetsResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    budgets: BudgetsResponse[];
+  };
+}
+
 export type TypeBudget = 'periodic' | 'one-time';
