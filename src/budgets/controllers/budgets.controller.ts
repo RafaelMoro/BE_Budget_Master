@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Get,
+  Param,
 } from '@nestjs/common';
 import { CreateBudgetsDto } from '../dtos/budgets.dto';
 import { BudgetsService } from '../services/budgets.service';
@@ -24,5 +25,10 @@ export class BudgetsController {
   getCategories(@Request() req) {
     const userId = req.user.sub;
     return this.budgetServices.getBudgets(userId);
+  }
+
+  @Get(':budgetId')
+  getCategory(@Param('budgetId') budgetId: string) {
+    return this.budgetServices.getSingleBudget(budgetId);
   }
 }

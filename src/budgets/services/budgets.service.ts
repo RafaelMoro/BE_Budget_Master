@@ -51,4 +51,22 @@ export class BudgetsService {
       throw new BadRequestException(error.message);
     }
   }
+
+  async getSingleBudget(bugetId: string) {
+    try {
+      const budgets = await this.budgetModel.find({ _id: bugetId }).exec();
+      const response: GeneralBudgetsResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Budgets fetched successfully',
+        data: {
+          budgets,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }
