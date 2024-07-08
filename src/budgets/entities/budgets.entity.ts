@@ -10,9 +10,12 @@ export class Budget extends Document {
   description: string;
 
   @Prop({ required: true })
+  typeBudget: string;
+
+  @Prop({ required: true, type: Date })
   startDate: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Date })
   endDate: Date;
 
   @Prop({ required: true })
@@ -21,13 +24,13 @@ export class Budget extends Document {
   @Prop({ required: true })
   limit: number;
 
-  @Prop({ required: true })
+  @Prop()
   period: string;
 
-  @Prop({ required: true })
+  @Prop()
   isActive: boolean;
 
-  @Prop({ required: true })
+  @Prop({ type: Date })
   nestResetDate: Date;
 }
 
