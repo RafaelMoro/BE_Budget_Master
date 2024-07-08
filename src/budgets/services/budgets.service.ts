@@ -6,14 +6,19 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Budget } from '../entities/budgets.entity';
 import { Model } from 'mongoose';
-import { CreateBudgetsDto } from '../dtos/budgets.dto';
+
+import { CreateBudgetsDto, DeleteBudgetDto } from '../dtos/budgets.dto';
 import {
   BudgetsResponse,
   GeneralBudgetsResponse,
   SingleBudgetResponse,
 } from '../budgets.interface';
 import { VERSION_RESPONSE } from 'src/constants';
-import { BUDGET_CREATED_MESSAGE } from '../budgets.constants';
+import {
+  BUDGET_CREATED_MESSAGE,
+  BUDGET_DELETED_MESSAGE,
+  BUDGET_NOT_FOUND_ERROR,
+} from '../budgets.constants';
 
 @Injectable()
 export class BudgetsService {
@@ -83,6 +88,35 @@ export class BudgetsService {
         message: null,
         data: {
           budget: singleBudget,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeBudgetHistory({
+    payload,
+    sub,
+  }: {
+    payload: DeleteBudgetDto;
+    sub: string;
+  }) {
+    try {
+      const { budgetId } = payload;
+      const budgetDeleted: BudgetsResponse =
+        await this.budgetModel.findOneAndDelete({ _id: budgetId, sub });
+      if (!budgetDeleted) throw new NotFoundException(BUDGET_NOT_FOUND_ERROR);
+
+      const response: SingleBudgetResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: BUDGET_DELETED_MESSAGE,
+        data: {
+          budget: budgetDeleted,
         },
         error: null,
       };

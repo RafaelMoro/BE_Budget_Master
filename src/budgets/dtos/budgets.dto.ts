@@ -1,13 +1,16 @@
+import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsString,
 } from 'class-validator';
 import { TypeBudget } from '../budgets.interface';
-import { Type } from 'class-transformer';
 
 export class CreateBudgetsDto {
   @IsString()
@@ -53,4 +56,16 @@ export class CreateBudgetsDto {
   // Format "DD:MM:YYYY | DD:MM:YYYY"
   @IsArray()
   readonly previousPeriods: string[];
+}
+
+export class UpdateBudgetDto extends PartialType(CreateBudgetsDto) {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetId: Types.ObjectId;
+}
+
+export class DeleteBudgetDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetId: string;
 }

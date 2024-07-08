@@ -6,8 +6,9 @@ import {
   Request,
   Get,
   Param,
+  Delete,
 } from '@nestjs/common';
-import { CreateBudgetsDto } from '../dtos/budgets.dto';
+import { CreateBudgetsDto, DeleteBudgetDto } from '../dtos/budgets.dto';
 import { BudgetsService } from '../services/budgets.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
@@ -32,5 +33,11 @@ export class BudgetsController {
   getSingleBudget(@Param('budgetId') budgetId: string, @Request() req) {
     const sub = req.user.sub;
     return this.budgetServices.getSingleBudget({ budgetId, sub });
+  }
+
+  @Delete()
+  removeBudget(@Body() payload: DeleteBudgetDto, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetServices.removeBudgetHistory({ payload, sub });
   }
 }
