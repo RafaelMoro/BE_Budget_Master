@@ -14,6 +14,7 @@ import {
 } from '../budget-history.dto';
 import {
   BudgetHistoryResponse,
+  GeneralBudgetHistoryResponse,
   SingleBudgetHistoryResponse,
 } from '../budget-history.interface';
 import { VERSION_RESPONSE } from '../../constants';
@@ -56,7 +57,7 @@ export class BudgetHistoryService {
     }
   }
 
-  async getBudgetHistory({
+  async getSingleBudgetHistory({
     sub,
     budgetHistoryId,
   }: {
@@ -79,6 +80,30 @@ export class BudgetHistoryService {
         message: null,
         data: {
           budgetHistory,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getBudgetsHistory(sub: string) {
+    try {
+      const budgetsHistory = await this.budgetHistoryModel
+        .find({ sub }, { sub: 0 })
+        .exec();
+      if (budgetsHistory.length === 0) {
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      }
+      const response: GeneralBudgetHistoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: {
+          budgetsHistory: budgetsHistory,
         },
         error: null,
       };

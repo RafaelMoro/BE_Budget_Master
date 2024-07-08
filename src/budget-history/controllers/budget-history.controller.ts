@@ -28,13 +28,19 @@ export class BudgetHistoryController {
     return this.budgetHistoryService.createBudgtHistory({ payload, sub });
   }
 
+  @Get()
+  getBudgetsHistory(@Request() req) {
+    const userId = req.user.sub;
+    return this.budgetHistoryService.getBudgetsHistory(userId);
+  }
+
   @Get(':budgetHistoryId')
   getSingleBudgetHistory(
     @Param('budgetHistoryId') budgetHistoryId: string,
     @Request() req,
   ) {
     const userId = req.user.sub;
-    return this.budgetHistoryService.getBudgetHistory({
+    return this.budgetHistoryService.getSingleBudgetHistory({
       sub: userId,
       budgetHistoryId,
     });
