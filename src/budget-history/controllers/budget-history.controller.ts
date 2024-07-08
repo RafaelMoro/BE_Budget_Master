@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -9,7 +10,10 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BudgetHistoryService } from '../services/budget-history.service';
-import { CreateBudgetHistoryDto } from '../budget-history.dto';
+import {
+  CreateBudgetHistoryDto,
+  DeleteBudgetHistoryDto,
+} from '../budget-history.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('budget-history')
@@ -31,5 +35,10 @@ export class BudgetHistoryController {
       sub: userId,
       budgetHistoryId,
     });
+  }
+
+  @Delete()
+  removeIncome(@Body() payload: DeleteBudgetHistoryDto) {
+    return this.budgetHistoryService.removeBudgetHistory(payload);
   }
 }
