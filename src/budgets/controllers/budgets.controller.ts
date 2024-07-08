@@ -17,18 +17,20 @@ export class BudgetsController {
   constructor(private budgetServices: BudgetsService) {}
 
   @Post()
-  createCategory(@Body() payload: CreateBudgetsDto) {
-    return this.budgetServices.createBudget(payload);
+  createBudget(@Body() payload: CreateBudgetsDto, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetServices.createBudget({ payload, sub });
   }
 
   @Get()
-  getCategories(@Request() req) {
+  getBudgets(@Request() req) {
     const userId = req.user.sub;
     return this.budgetServices.getBudgets(userId);
   }
 
   @Get(':budgetId')
-  getCategory(@Param('budgetId') budgetId: string) {
-    return this.budgetServices.getSingleBudget(budgetId);
+  getSingleBudget(@Param('budgetId') budgetId: string, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetServices.getSingleBudget({ budgetId, sub });
   }
 }

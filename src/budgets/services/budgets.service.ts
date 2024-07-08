@@ -19,9 +19,16 @@ import { BUDGET_CREATED_MESSAGE } from '../budgets.constants';
 export class BudgetsService {
   constructor(@InjectModel(Budget.name) private budgetModel: Model<Budget>) {}
 
-  async createBudget(payload: CreateBudgetsDto) {
+  async createBudget({
+    payload,
+    sub,
+  }: {
+    payload: CreateBudgetsDto;
+    sub: string;
+  }) {
     try {
-      const newBudget = new this.budgetModel(payload);
+      const updatedPayload = { ...payload, sub };
+      const newBudget = new this.budgetModel(updatedPayload);
       const model: BudgetsResponse = await newBudget.save();
       const response: SingleBudgetResponse = {
         version: VERSION_RESPONSE,
@@ -42,7 +49,7 @@ export class BudgetsService {
     try {
       const budgets = await this.budgetModel.find({ sub }, { sub: 0 }).exec();
       if (budgets.length === 0) {
-        return new NotFoundException('No budgets found');
+        throw new NotFoundException('No budgets found');
       }
       const response: GeneralBudgetsResponse = {
         version: VERSION_RESPONSE,
@@ -55,15 +62,18 @@ export class BudgetsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
 
-  async getSingleBudget(bugetId: string) {
+  async getSingleBudget({ budgetId, sub }: { budgetId: string; sub: string }) {
     try {
-      const budgets = await this.budgetModel.find({ _id: bugetId }).exec();
+      const budgets = await this.budgetModel
+        .find({ _id: budgetId, sub })
+        .exec();
       if (budgets.length === 0) {
-        return new NotFoundException('Budget not found');
+        throw new NotFoundException('Budget not found');
       }
 
       const [singleBudget] = budgets;
@@ -78,6 +88,7 @@ export class BudgetsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }

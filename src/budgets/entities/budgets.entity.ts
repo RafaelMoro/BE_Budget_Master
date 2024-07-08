@@ -12,6 +12,9 @@ export class Budget extends Document {
   @Prop({ required: true })
   typeBudget: string;
 
+  @Prop({ required: true })
+  sub: string;
+
   @Prop({ required: true, type: Date })
   startDate: Date;
 
