@@ -1,11 +1,11 @@
 import {
   IsArray,
   IsDate,
+  IsMongoId,
   IsNotEmpty,
   IsNumber,
   IsString,
 } from 'class-validator';
-import { CreateExpense } from '../records/entities/expenses.entity';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 import { Budget } from '../budgets/entities/budgets.entity';
@@ -13,7 +13,16 @@ import { Budget } from '../budgets/entities/budgets.entity';
 export class RecordsHistory {
   @IsString()
   @IsNotEmpty()
-  recordId: CreateExpense;
+  recordId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  recordName: string;
+
+  @IsDate()
+  @Type(() => Date)
+  @IsNotEmpty()
+  readonly recordDate: Date;
 
   @IsNumber()
   @IsNotEmpty()
@@ -52,3 +61,9 @@ export class CreateBudgetHistoryDto {
 }
 
 export class UpdateBudgetHistory extends PartialType(CreateBudgetHistoryDto) {}
+
+export class DeleteBudgetHistoryDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetHistoryId: string;
+}

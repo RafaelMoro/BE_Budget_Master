@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Budget } from '../budgets/entities/budgets.entity';
-import { CreateExpense } from '../records/entities/expenses.entity';
 
 @Schema()
 export class BudgetHistory extends Document {
@@ -23,7 +22,9 @@ export class BudgetHistory extends Document {
   @Prop({
     type: [
       {
-        recordId: { type: Types.ObjectId, ref: CreateExpense.name },
+        recordId: { type: String },
+        recordName: { type: String },
+        recordDate: { type: Date },
         budgetCurrentAmount: { type: Number },
         budgetUpdatedAmount: { type: Number },
       },
