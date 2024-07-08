@@ -15,7 +15,6 @@ export class CreateBudgetsDto {
   readonly name: string;
 
   @IsString()
-  @IsNotEmpty()
   readonly description: string;
 
   @IsString()
