@@ -122,15 +122,21 @@ export class BudgetHistoryService {
     }
   }
 
-  async updateBudgetHistory(changes: UpdateBudgetHistoryDto) {
+  async updateBudgetHistory({
+    changes,
+    sub,
+  }: {
+    changes: UpdateBudgetHistoryDto;
+    sub: string;
+  }) {
     try {
       // Excluding budget id from the changes
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { budgetHistoryId, budget, ...restChanges } = changes;
       const updateBudgetHistory: BudgetHistoryResponse =
         await this.budgetHistoryModel
-          .findByIdAndUpdate(
-            budgetHistoryId,
+          .findOneAndUpdate(
+            { _id: budgetHistoryId, sub },
             { $set: restChanges },
             { new: true },
           )

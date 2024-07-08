@@ -47,7 +47,11 @@ export class BudgetHistoryController {
   }
 
   @Put()
-  updateBudgetHistory(@Body() payload: UpdateBudgetHistoryDto) {
-    return this.budgetHistoryService.updateBudgetHistory(payload);
+  updateBudgetHistory(@Body() payload: UpdateBudgetHistoryDto, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetHistoryService.updateBudgetHistory({
+      changes: payload,
+      sub,
+    });
   }
 }
