@@ -89,11 +89,20 @@ export class BudgetHistoryService {
     }
   }
 
-  async removeBudgetHistory(payload: DeleteBudgetHistoryDto) {
+  async removeBudgetHistory({
+    payload,
+    sub,
+  }: {
+    payload: DeleteBudgetHistoryDto;
+    sub: string;
+  }) {
     try {
       const { budgetHistoryId } = payload;
       const budgetHistoryDeleted: BudgetHistoryResponse =
-        await this.budgetHistoryModel.findByIdAndDelete(budgetHistoryId);
+        await this.budgetHistoryModel.findOneAndDelete({
+          _id: budgetHistoryId,
+          sub,
+        });
       if (!budgetHistoryDeleted)
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
 

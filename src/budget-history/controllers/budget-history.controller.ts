@@ -41,8 +41,9 @@ export class BudgetHistoryController {
   }
 
   @Delete()
-  removeBudgetHistory(@Body() payload: DeleteBudgetHistoryDto) {
-    return this.budgetHistoryService.removeBudgetHistory(payload);
+  removeBudgetHistory(@Body() payload: DeleteBudgetHistoryDto, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetHistoryService.removeBudgetHistory({ payload, sub });
   }
 
   @Put()
