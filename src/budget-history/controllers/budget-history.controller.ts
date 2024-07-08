@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { BudgetHistoryService } from '../services/budget-history.service';
 import {
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
+  UpdateBudgetHistoryDto,
 } from '../budget-history.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -21,12 +23,12 @@ export class BudgetHistoryController {
   constructor(private budgetHistoryService: BudgetHistoryService) {}
 
   @Post()
-  createCategory(@Body() payload: CreateBudgetHistoryDto) {
+  createBudgetHistory(@Body() payload: CreateBudgetHistoryDto) {
     return this.budgetHistoryService.createBudgtHistory(payload);
   }
 
   @Get(':budgetHistoryId')
-  getCategory(
+  getSingleBudgetHistory(
     @Param('budgetHistoryId') budgetHistoryId: string,
     @Request() req,
   ) {
@@ -38,7 +40,12 @@ export class BudgetHistoryController {
   }
 
   @Delete()
-  removeIncome(@Body() payload: DeleteBudgetHistoryDto) {
+  removeBudgetHistory(@Body() payload: DeleteBudgetHistoryDto) {
     return this.budgetHistoryService.removeBudgetHistory(payload);
+  }
+
+  @Put()
+  updateBudgetHistory(@Body() payload: UpdateBudgetHistoryDto) {
+    return this.budgetHistoryService.updateBudgetHistory(payload);
   }
 }

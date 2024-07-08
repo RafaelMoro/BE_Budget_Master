@@ -1,6 +1,4 @@
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
   IsArray,
   IsDate,
   IsMongoId,
@@ -12,6 +10,7 @@ import {
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 import { Budget } from '../budgets/entities/budgets.entity';
+import { Types } from 'mongoose';
 
 export class RecordsHistory {
   @IsString()
@@ -61,13 +60,17 @@ export class CreateBudgetHistoryDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @ArrayMinSize(5)
-  @ArrayMaxSize(5)
   @Type(() => RecordsHistory)
   readonly records: RecordsHistory[];
 }
 
-export class UpdateBudgetHistory extends PartialType(CreateBudgetHistoryDto) {}
+export class UpdateBudgetHistoryDto extends PartialType(
+  CreateBudgetHistoryDto,
+) {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetHistoryId: Types.ObjectId;
+}
 
 export class DeleteBudgetHistoryDto {
   @IsMongoId()

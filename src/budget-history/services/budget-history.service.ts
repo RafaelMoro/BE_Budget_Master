@@ -6,6 +6,7 @@ import { BudgetHistory } from '../budget-history.entity';
 import {
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
+  UpdateBudgetHistoryDto,
 } from '../budget-history.dto';
 import {
   BudgetHistoryResponse,
@@ -86,6 +87,30 @@ export class BudgetHistoryService {
         message: BUDGET_HISTORY_DELETED_MESSAGE,
         data: {
           budget: budgetHistoryDeleted,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateBudgetHistory(changes: UpdateBudgetHistoryDto) {
+    try {
+      const { budgetHistoryId } = changes;
+      const updateBudgetHistory: BudgetHistoryResponse =
+        await this.budgetHistoryModel
+          .findByIdAndUpdate(budgetHistoryId, { $set: changes }, { new: true })
+          .exec();
+      if (!updateBudgetHistory)
+        throw new BadRequestException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      const response: SingleBudgetHistoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: {
+          budget: updateBudgetHistory,
         },
         error: null,
       };
