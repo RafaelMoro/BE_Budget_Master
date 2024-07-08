@@ -42,7 +42,7 @@ export class RecordsHistory {
 export class CreateBudgetHistoryDto {
   @IsNotEmpty()
   @IsString()
-  readonly budget: Budget;
+  readonly budget: Budget | Types.ObjectId;
 
   @IsDate()
   @Type(() => Date)

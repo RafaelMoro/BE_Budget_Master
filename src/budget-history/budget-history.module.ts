@@ -15,5 +15,6 @@ import { BudgetHistory, BudgetHistorySchema } from './budget-history.entity';
   ],
   controllers: [BudgetHistoryController],
   providers: [BudgetHistoryService],
+  exports: [BudgetHistoryService],
 })
 export class BudgetHistoryModule {}

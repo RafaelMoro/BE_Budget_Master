@@ -3,6 +3,7 @@ import { BudgetsController } from './controllers/budgets.controller';
 import { BudgetsService } from './services/budgets.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Budget, BudgetSchema } from './entities/budgets.entity';
+import { BudgetHistoryModule } from '../budget-history/budget-history.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { Budget, BudgetSchema } from './entities/budgets.entity';
         schema: BudgetSchema,
       },
     ]),
+    BudgetHistoryModule,
   ],
   controllers: [BudgetsController],
   providers: [BudgetsService],

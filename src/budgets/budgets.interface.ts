@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
 import { Budget } from './entities/budgets.entity';
+import { BudgetHistoryResponse } from '../budget-history/budget-history.interface';
 
 export interface BudgetsResponse extends Budget {
   _id: Types.ObjectId;
@@ -9,6 +10,13 @@ export interface BudgetsResponse extends Budget {
 export interface SingleBudgetResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     budget: BudgetsResponse;
+  };
+}
+
+export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    budget: BudgetsResponse;
+    budgetHistory: BudgetHistoryResponse;
   };
 }
 

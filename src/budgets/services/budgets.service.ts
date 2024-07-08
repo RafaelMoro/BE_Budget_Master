@@ -14,6 +14,7 @@ import {
 } from '../dtos/budgets.dto';
 import {
   BudgetsResponse,
+  CreateBudgetResponse,
   GeneralBudgetsResponse,
   SingleBudgetResponse,
 } from '../budgets.interface';
@@ -23,10 +24,15 @@ import {
   BUDGET_DELETED_MESSAGE,
   BUDGET_NOT_FOUND_ERROR,
 } from '../budgets.constants';
+import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
+import { CreateBudgetHistoryDto } from '../../budget-history/budget-history.dto';
 
 @Injectable()
 export class BudgetsService {
-  constructor(@InjectModel(Budget.name) private budgetModel: Model<Budget>) {}
+  constructor(
+    @InjectModel(Budget.name) private budgetModel: Model<Budget>,
+    private budgetHistoryService: BudgetHistoryService,
+  ) {}
 
   async createBudget({
     payload,
@@ -39,12 +45,30 @@ export class BudgetsService {
       const updatedPayload = { ...payload, sub };
       const newBudget = new this.budgetModel(updatedPayload);
       const model: BudgetsResponse = await newBudget.save();
-      const response: SingleBudgetResponse = {
+
+      // Create budget history
+      const payloadBudgetHistory: CreateBudgetHistoryDto = {
+        budget: model?._id,
+        startDate: model.startDate,
+        endDate: model.endDate,
+        records: [],
+      };
+      const budgetHistoryResponse =
+        await this.budgetHistoryService.createBudgtHistory({
+          payload: payloadBudgetHistory,
+          sub,
+        });
+      const {
+        data: { budgetHistory },
+      } = budgetHistoryResponse;
+
+      const response: CreateBudgetResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: BUDGET_CREATED_MESSAGE,
         data: {
           budget: model,
+          budgetHistory,
         },
         error: null,
       };
