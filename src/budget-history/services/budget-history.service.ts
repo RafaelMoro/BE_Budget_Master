@@ -66,7 +66,7 @@ export class BudgetHistoryService {
     try {
       const budgets = await this.budgetHistoryModel
         .find({ _id: budgetHistoryId, userId: sub })
-        .populate('budgetId')
+        .populate('budget')
         .exec();
       if (budgets.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
