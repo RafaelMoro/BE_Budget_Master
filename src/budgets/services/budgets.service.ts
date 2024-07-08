@@ -7,7 +7,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Budget } from '../entities/budgets.entity';
 import { Model } from 'mongoose';
 
-import { CreateBudgetsDto, DeleteBudgetDto } from '../dtos/budgets.dto';
+import {
+  CreateBudgetsDto,
+  DeleteBudgetDto,
+  UpdateBudgetDto,
+} from '../dtos/budgets.dto';
 import {
   BudgetsResponse,
   GeneralBudgetsResponse,
@@ -117,6 +121,41 @@ export class BudgetsService {
         message: BUDGET_DELETED_MESSAGE,
         data: {
           budget: budgetDeleted,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateBudget({
+    changes,
+    sub,
+  }: {
+    changes: UpdateBudgetDto;
+    sub: string;
+  }) {
+    try {
+      // Excluding budget id from the changes
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { budgetId } = changes;
+      const updateBudget: BudgetsResponse = await this.budgetModel
+        .findOneAndUpdate(
+          { _id: budgetId, sub },
+          { $set: changes },
+          { new: true },
+        )
+        .exec();
+      if (!updateBudget) throw new NotFoundException(BUDGET_NOT_FOUND_ERROR);
+      const response: SingleBudgetResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Budget history updated',
+        data: {
+          budget: updateBudget,
         },
         error: null,
       };
