@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Budget } from '../entities/budgets.entity';
 import { Model } from 'mongoose';
 import { CreateBudgetsDto } from '../dtos/budgets.dto';
+import { BudgetsResponse, SingleBudgetResponse } from '../budgets.interface';
+import { VERSION_RESPONSE } from 'src/constants';
+import { BUDGET_CREATED_MESSAGE } from '../budgets.constants';
 
 @Injectable()
 export class BudgetsService {
@@ -11,9 +14,17 @@ export class BudgetsService {
   async createBudget(payload: CreateBudgetsDto) {
     try {
       const newBudget = new this.budgetModel(payload);
-      const model = await newBudget.save();
-      return model;
-      // It's missing to format response
+      const model: BudgetsResponse = await newBudget.save();
+      const response: SingleBudgetResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: BUDGET_CREATED_MESSAGE,
+        data: {
+          budget: model,
+        },
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
