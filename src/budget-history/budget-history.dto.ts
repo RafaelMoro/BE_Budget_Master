@@ -44,16 +44,6 @@ export class CreateBudgetHistoryDto {
   @IsString()
   readonly budget: Budget | Types.ObjectId;
 
-  @IsDate()
-  @Type(() => Date)
-  @IsNotEmpty()
-  readonly startDate: Date;
-
-  @IsDate()
-  @Type(() => Date)
-  @IsNotEmpty()
-  readonly endDate: Date;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RecordsHistory)

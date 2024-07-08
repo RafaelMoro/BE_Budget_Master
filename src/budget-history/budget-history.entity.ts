@@ -10,12 +10,6 @@ export class BudgetHistory extends Document {
   @Prop({ required: true })
   sub: string;
 
-  @Prop({ required: true, type: Date })
-  startDate: Date;
-
-  @Prop({ required: true, type: Date })
-  endDate: Date;
-
   @Prop({
     type: [
       {

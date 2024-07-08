@@ -49,8 +49,6 @@ export class BudgetsService {
       // Create budget history
       const payloadBudgetHistory: CreateBudgetHistoryDto = {
         budget: model?._id,
-        startDate: model.startDate,
-        endDate: model.endDate,
         records: [],
       };
       const budgetHistoryResponse =
