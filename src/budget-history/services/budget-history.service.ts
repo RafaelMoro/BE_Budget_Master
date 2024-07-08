@@ -61,7 +61,7 @@ export class BudgetHistoryService {
         .find({ _id: budgetHistoryId, userId: sub })
         .populate('budgetId')
         .exec();
-      if (!budgets) {
+      if (budgets.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
       }
 
@@ -112,7 +112,7 @@ export class BudgetHistoryService {
           .findByIdAndUpdate(budgetHistoryId, { $set: changes }, { new: true })
           .exec();
       if (!updateBudgetHistory)
-        throw new BadRequestException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
