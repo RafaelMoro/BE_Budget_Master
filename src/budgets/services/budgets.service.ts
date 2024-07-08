@@ -4,14 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Budget } from '../entities/budgets.entity';
+import { Budget } from '../budgets.entity';
 import { Model } from 'mongoose';
 
 import {
   CreateBudgetsDto,
   DeleteBudgetDto,
   UpdateBudgetDto,
-} from '../dtos/budgets.dto';
+} from '../budgets.dto';
 import {
   BudgetsResponse,
   CreateBudgetResponse,

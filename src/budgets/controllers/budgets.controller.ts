@@ -13,7 +13,7 @@ import {
   CreateBudgetsDto,
   DeleteBudgetDto,
   UpdateBudgetDto,
-} from '../dtos/budgets.dto';
+} from '../budgets.dto';
 import { BudgetsService } from '../services/budgets.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 

@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 import { Account } from '../../accounts/entities/accounts.entity';
 import { Category } from '../../categories/entities/categories.entity';
-import { Budget } from '../../budgets/entities/budgets.entity';
+import { Budget } from '../../budgets/budgets.entity';
 
 @Schema()
 export class AccountRecord extends Document {

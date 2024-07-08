@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Budget } from '../budgets/entities/budgets.entity';
+import { Budget } from '../budgets/budgets.entity';
 
 @Schema()
 export class BudgetHistory extends Document {

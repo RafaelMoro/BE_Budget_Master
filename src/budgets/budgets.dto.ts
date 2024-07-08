@@ -10,7 +10,7 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { TypeBudget } from '../budgets.interface';
+import { TypeBudget } from './budgets.interface';
 
 export class CreateBudgetsDto {
   @IsString()

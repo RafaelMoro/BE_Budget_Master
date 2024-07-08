@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
-import { Budget } from './entities/budgets.entity';
+import { Budget } from './budgets.entity';
 import { BudgetHistoryResponse } from '../budget-history/budget-history.interface';
 
 export interface BudgetsResponse extends Budget {
