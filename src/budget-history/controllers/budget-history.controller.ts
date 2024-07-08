@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BudgetHistoryService } from '../services/budget-history.service';
 import { CreateBudgetHistoryDto } from '../budget-history.dto';
@@ -11,5 +19,17 @@ export class BudgetHistoryController {
   @Post()
   createCategory(@Body() payload: CreateBudgetHistoryDto) {
     return this.budgetHistoryService.createBudgtHistory(payload);
+  }
+
+  @Get(':budgetHistoryId')
+  getCategory(
+    @Param('budgetHistoryId') budgetHistoryId: string,
+    @Request() req,
+  ) {
+    const userId = req.user.sub;
+    return this.budgetHistoryService.getBudgetHistory({
+      sub: userId,
+      budgetHistoryId,
+    });
   }
 }

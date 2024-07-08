@@ -13,7 +13,8 @@ export interface SingleBudgetHistoryResponse
   };
 }
 
-export interface GeneralBudgetsResponse extends Omit<GeneralResponse, 'data'> {
+export interface GeneralBudgetHistoryResponse
+  extends Omit<GeneralResponse, 'data'> {
   data: {
     budgets: BudgetHistoryResponse[];
   };

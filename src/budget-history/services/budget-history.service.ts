@@ -6,6 +6,7 @@ import { BudgetHistory } from '../budget-history.entity';
 import { CreateBudgetHistoryDto } from '../budget-history.dto';
 import {
   BudgetHistoryResponse,
+  GeneralBudgetHistoryResponse,
   SingleBudgetHistoryResponse,
 } from '../budget-history.interface';
 import { VERSION_RESPONSE } from '../../constants';
@@ -28,6 +29,33 @@ export class BudgetHistoryService {
         message: BUDGET_HISTORY_CREATED,
         data: {
           budget: model,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getBudgetHistory({
+    sub,
+    budgetHistoryId,
+  }: {
+    sub: string;
+    budgetHistoryId: string;
+  }) {
+    try {
+      const budgets = await this.budgetHistoryModel
+        .find({ _id: budgetHistoryId, userId: sub })
+        .populate('budgetId')
+        .exec();
+      const response: GeneralBudgetHistoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Budgets fetched successfully',
+        data: {
+          budgets,
         },
         error: null,
       };
