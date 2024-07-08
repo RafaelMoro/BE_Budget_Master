@@ -12,6 +12,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
 import { CategoriesModule } from './categories/categories.module';
 import { BudgetsModule } from './budgets/budgets.module';
+import { BudgetHistoryModule } from './budget-history/budget-history.module';
 import config from './config';
 
 @Module({
@@ -43,6 +44,7 @@ import config from './config';
     RecordsModule,
     CategoriesModule,
     BudgetsModule,
+    BudgetHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
