@@ -9,13 +9,13 @@ export interface BudgetHistoryResponse extends BudgetHistory {
 export interface SingleBudgetHistoryResponse
   extends Omit<GeneralResponse, 'data'> {
   data: {
-    budget: BudgetHistoryResponse;
+    budgetHistory: BudgetHistoryResponse;
   };
 }
 
 export interface GeneralBudgetHistoryResponse
   extends Omit<GeneralResponse, 'data'> {
   data: {
-    budgets: BudgetHistoryResponse[];
+    budgetsHistory: BudgetHistoryResponse[];
   };
 }

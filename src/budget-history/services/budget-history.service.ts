@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -10,7 +14,6 @@ import {
 } from '../budget-history.dto';
 import {
   BudgetHistoryResponse,
-  GeneralBudgetHistoryResponse,
   SingleBudgetHistoryResponse,
 } from '../budget-history.interface';
 import { VERSION_RESPONSE } from '../../constants';
@@ -36,7 +39,7 @@ export class BudgetHistoryService {
         success: true,
         message: BUDGET_HISTORY_CREATED,
         data: {
-          budget: model,
+          budgetHistory: model,
         },
         error: null,
       };
@@ -58,12 +61,17 @@ export class BudgetHistoryService {
         .find({ _id: budgetHistoryId, userId: sub })
         .populate('budgetId')
         .exec();
-      const response: GeneralBudgetHistoryResponse = {
+      if (!budgets) {
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      }
+
+      const [budgetHistory] = budgets;
+      const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Budgets fetched successfully',
+        message: null,
         data: {
-          budgets,
+          budgetHistory,
         },
         error: null,
       };
@@ -79,14 +87,14 @@ export class BudgetHistoryService {
       const budgetHistoryDeleted: BudgetHistoryResponse =
         await this.budgetHistoryModel.findByIdAndDelete(budgetHistoryId);
       if (!budgetHistoryDeleted)
-        throw new BadRequestException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
 
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: BUDGET_HISTORY_DELETED_MESSAGE,
         data: {
-          budget: budgetHistoryDeleted,
+          budgetHistory: budgetHistoryDeleted,
         },
         error: null,
       };
@@ -108,9 +116,9 @@ export class BudgetHistoryService {
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: null,
+        message: 'Budget history updated',
         data: {
-          budget: updateBudgetHistory,
+          budgetHistory: updateBudgetHistory,
         },
         error: null,
       };
