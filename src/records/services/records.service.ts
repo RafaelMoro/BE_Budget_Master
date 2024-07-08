@@ -136,7 +136,7 @@ export class RecordsService {
           select: '_id categoryName icon',
         });
         modelPopulated = await this.expenseModel.populate(modelSaved, {
-          path: 'budgets',
+          path: 'linkedBudgets',
         });
       }
 
@@ -447,7 +447,7 @@ export class RecordsService {
           fullDate: { $regex: new RegExp(regexDate, 'i') },
         })
         .populate({ path: 'category', select: 'categoryName icon' })
-        .populate('budgets')
+        .populate('linkedBudgets')
         .exec();
       const incomes = await this.incomeModel
         .find({
@@ -459,7 +459,7 @@ export class RecordsService {
           select: '_id shortName amountFormatted fullDate formattedTime',
         })
         .populate('category', 'categoryName icon')
-        .populate('budgets')
+        .populate('linkedBudgets')
         .exec();
 
       this.verifyExpensesBelongsToUser(expenses, userId);

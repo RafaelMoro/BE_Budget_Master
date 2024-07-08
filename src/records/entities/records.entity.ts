@@ -66,6 +66,9 @@ export class AccountRecord extends Document {
   @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
   account: Account | Types.ObjectId;
 
+  @Prop()
+  budgets: string[];
+
   @Prop({
     type: [
       {
@@ -74,7 +77,7 @@ export class AccountRecord extends Document {
       },
     ],
   })
-  budgets: Types.Array<Budget>;
+  linkedBudgets: Types.Array<Budget>;
 }
 
 export const RecordsSchema = SchemaFactory.createForClass(AccountRecord);
