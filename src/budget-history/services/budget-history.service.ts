@@ -30,9 +30,16 @@ export class BudgetHistoryService {
     private budgetHistoryModel: Model<BudgetHistory>,
   ) {}
 
-  async createBudgtHistory(payload: CreateBudgetHistoryDto) {
+  async createBudgtHistory({
+    payload,
+    sub,
+  }: {
+    payload: CreateBudgetHistoryDto;
+    sub: string;
+  }) {
     try {
-      const newBudget = new this.budgetHistoryModel(payload);
+      const payloadWithSub = { ...payload, sub };
+      const newBudget = new this.budgetHistoryModel(payloadWithSub);
       const model: BudgetHistoryResponse = await newBudget.save();
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,

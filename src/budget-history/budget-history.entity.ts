@@ -5,13 +5,10 @@ import { Budget } from '../budgets/entities/budgets.entity';
 @Schema()
 export class BudgetHistory extends Document {
   @Prop({ type: Types.ObjectId, ref: Budget.name, required: true })
-  budgetId: Budget | Types.ObjectId;
+  budget: Budget | Types.ObjectId;
 
   @Prop({ required: true })
-  userId: string;
-
-  @Prop({ required: true })
-  budgetName: string;
+  sub: string;
 
   @Prop({ required: true, type: Date })
   startDate: Date;

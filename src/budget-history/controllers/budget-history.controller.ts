@@ -23,8 +23,9 @@ export class BudgetHistoryController {
   constructor(private budgetHistoryService: BudgetHistoryService) {}
 
   @Post()
-  createBudgetHistory(@Body() payload: CreateBudgetHistoryDto) {
-    return this.budgetHistoryService.createBudgtHistory(payload);
+  createBudgetHistory(@Body() payload: CreateBudgetHistoryDto, @Request() req) {
+    const sub = req.user.sub;
+    return this.budgetHistoryService.createBudgtHistory({ payload, sub });
   }
 
   @Get(':budgetHistoryId')
