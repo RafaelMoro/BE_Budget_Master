@@ -15,6 +15,7 @@ import {
   AddRecordToBudgetHistoryDto,
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
+  RemoveRecordFromBudgetHistoryDto,
   UpdateBudgetHistoryDto,
 } from '../budget-history.dto';
 
@@ -38,6 +39,20 @@ export class BudgetHistoryController {
     const sub = req.user.sub;
     return this.budgetHistoryService.addRecordToBudgetHistory({
       newRecord: record,
+      sub,
+      budgetHistoryId,
+    });
+  }
+
+  @Post('delete-record')
+  deleteRecordFromBudgetHistory(
+    @Body() payload: RemoveRecordFromBudgetHistoryDto,
+    @Request() req,
+  ) {
+    const { budgetHistoryId, record } = payload;
+    const sub = req.user.sub;
+    return this.budgetHistoryService.removeRecordFromBudgetHistory({
+      recordToBeDeleted: record,
       sub,
       budgetHistoryId,
     });

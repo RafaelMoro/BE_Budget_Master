@@ -73,3 +73,12 @@ export class AddRecordToBudgetHistoryDto {
   @Type(() => RecordsHistory)
   readonly record: RecordsHistory;
 }
+
+export class RemoveRecordFromBudgetHistoryDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetHistoryId: Types.ObjectId;
+
+  @IsMongoId()
+  readonly record: string;
+}

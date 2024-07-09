@@ -10,12 +10,14 @@ import { BudgetHistory } from '../budget-history.entity';
 import {
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
+  RecordsHistory,
   UpdateBudgetHistoryDto,
 } from '../budget-history.dto';
 import {
   AddRecordToBudgetHistoryProps,
   BudgetHistoryResponse,
   GeneralBudgetHistoryResponse,
+  RemoveRecordFromBudgetHistoryProps,
   SingleBudgetHistoryResponse,
 } from '../budget-history.interface';
 import { VERSION_RESPONSE } from '../../constants';
@@ -205,6 +207,52 @@ export class BudgetHistoryService {
       const updatedBudgetHistory = {
         ...firstBudgetHistory.toObject(),
         records: newRecords,
+      };
+
+      const updateBudgetHistoryModel =
+        await this.budgetHistoryModel.findByIdAndUpdate(
+          budgetHistoryId,
+          { $set: updatedBudgetHistory },
+          { new: true },
+        );
+      const response: SingleBudgetHistoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Record added to budget history',
+        data: {
+          budgetHistory: updateBudgetHistoryModel,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeRecordFromBudgetHistory({
+    recordToBeDeleted,
+    sub,
+    budgetHistoryId,
+  }: RemoveRecordFromBudgetHistoryProps) {
+    try {
+      const budgetsHistory = await this.budgetHistoryModel
+        .find({ _id: budgetHistoryId, sub })
+        .exec();
+      if (budgetsHistory.length === 0) {
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      }
+
+      const [firstBudgetHistory] = budgetsHistory;
+      // We have to set as unkown as the type first is Types.Array<Record<'string | date | number', any>> and does not match with RecordsHistory[]
+      const records: RecordsHistory[] =
+        firstBudgetHistory.records as unknown as RecordsHistory[];
+      const filteredRecord = records.filter(
+        (record) => record?.recordId !== recordToBeDeleted.toString(),
+      );
+      const updatedBudgetHistory = {
+        ...firstBudgetHistory.toObject(),
+        records: filteredRecord,
       };
 
       const updateBudgetHistoryModel =

@@ -26,3 +26,9 @@ export interface AddRecordToBudgetHistoryProps {
   sub: string;
   budgetHistoryId: Types.ObjectId;
 }
+
+export interface RemoveRecordFromBudgetHistoryProps {
+  recordToBeDeleted: string;
+  sub: string;
+  budgetHistoryId: Types.ObjectId;
+}
