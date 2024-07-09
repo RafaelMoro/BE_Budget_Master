@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
 import { BudgetHistory } from './budget-history.entity';
+import { RecordsHistory } from './budget-history.dto';
 
 export interface BudgetHistoryResponse extends BudgetHistory {
   _id: Types.ObjectId;
@@ -18,4 +19,10 @@ export interface GeneralBudgetHistoryResponse
   data: {
     budgetsHistory: BudgetHistoryResponse[];
   };
+}
+
+export interface AddRecordToBudgetHistoryProps {
+  newRecord: RecordsHistory;
+  sub: string;
+  budgetHistoryId: Types.ObjectId;
 }

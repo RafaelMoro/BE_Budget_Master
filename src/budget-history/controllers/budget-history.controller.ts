@@ -12,6 +12,7 @@ import {
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { BudgetHistoryService } from '../services/budget-history.service';
 import {
+  AddRecordToBudgetHistoryDto,
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
   UpdateBudgetHistoryDto,
@@ -26,6 +27,20 @@ export class BudgetHistoryController {
   createBudgetHistory(@Body() payload: CreateBudgetHistoryDto, @Request() req) {
     const sub = req.user.sub;
     return this.budgetHistoryService.createBudgtHistory({ payload, sub });
+  }
+
+  @Post('add-record')
+  addRecordToBudgetHistory(
+    @Body() payload: AddRecordToBudgetHistoryDto,
+    @Request() req,
+  ) {
+    const { budgetHistoryId, record } = payload;
+    const sub = req.user.sub;
+    return this.budgetHistoryService.addRecordToBudgetHistory({
+      newRecord: record,
+      sub,
+      budgetHistoryId,
+    });
   }
 
   @Get()

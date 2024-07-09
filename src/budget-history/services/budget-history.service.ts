@@ -13,6 +13,7 @@ import {
   UpdateBudgetHistoryDto,
 } from '../budget-history.dto';
 import {
+  AddRecordToBudgetHistoryProps,
   BudgetHistoryResponse,
   GeneralBudgetHistoryResponse,
   SingleBudgetHistoryResponse,
@@ -181,6 +182,53 @@ export class BudgetHistoryService {
       return response;
     } catch (error) {
       if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async addRecordToBudgetHistory({
+    newRecord,
+    sub,
+    budgetHistoryId,
+  }: AddRecordToBudgetHistoryProps) {
+    try {
+      const budgetsHistory = await this.budgetHistoryModel
+        .find({ _id: budgetHistoryId, sub })
+        .exec();
+      if (!budgetsHistory) {
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      }
+      console.log('budget history record', budgetsHistory);
+
+      // const [firstBudgetHistory] = budgetsHistory;
+      // const newRecords = firstBudgetHistory.records;
+      // newRecords.push(newRecord);
+
+      // console.log('new records', newRecords);
+      // const updatedBudgetHistory = {
+      //   ...firstBudgetHistory,
+      //   records: newRecords,
+      // };
+
+      // console.log('updated budget history', updatedBudgetHistory);
+
+      // const updateBudgetHistoryModel =
+      //   await this.budgetHistoryModel.findByIdAndUpdate(
+      //     budgetHistoryId,
+      //     { $set: updatedBudgetHistory },
+      //     { new: true },
+      //   );
+      // const response: SingleBudgetHistoryResponse = {
+      //   version: VERSION_RESPONSE,
+      //   success: true,
+      //   message: 'Record added to budget history',
+      //   data: {
+      //     budgetHistory: updateBudgetHistoryModel,
+      //   },
+      //   error: null,
+      // };
+      // return response;
+    } catch (error) {
       throw new BadRequestException(error.message);
     }
   }

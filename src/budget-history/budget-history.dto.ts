@@ -63,3 +63,13 @@ export class DeleteBudgetHistoryDto {
   @IsNotEmpty()
   readonly budgetHistoryId: string;
 }
+
+export class AddRecordToBudgetHistoryDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetHistoryId: Types.ObjectId;
+
+  @ValidateNested({ each: true })
+  @Type(() => RecordsHistory)
+  readonly record: RecordsHistory;
+}
