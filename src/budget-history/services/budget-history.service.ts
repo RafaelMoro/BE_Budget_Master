@@ -195,39 +195,34 @@ export class BudgetHistoryService {
       const budgetsHistory = await this.budgetHistoryModel
         .find({ _id: budgetHistoryId, sub })
         .exec();
-      if (!budgetsHistory) {
+      if (budgetsHistory.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
       }
-      console.log('budget history record', budgetsHistory);
 
-      // const [firstBudgetHistory] = budgetsHistory;
-      // const newRecords = firstBudgetHistory.records;
-      // newRecords.push(newRecord);
+      const [firstBudgetHistory] = budgetsHistory;
+      const newRecords = firstBudgetHistory.records;
+      newRecords.push(newRecord);
+      const updatedBudgetHistory = {
+        ...firstBudgetHistory.toObject(),
+        records: newRecords,
+      };
 
-      // console.log('new records', newRecords);
-      // const updatedBudgetHistory = {
-      //   ...firstBudgetHistory,
-      //   records: newRecords,
-      // };
-
-      // console.log('updated budget history', updatedBudgetHistory);
-
-      // const updateBudgetHistoryModel =
-      //   await this.budgetHistoryModel.findByIdAndUpdate(
-      //     budgetHistoryId,
-      //     { $set: updatedBudgetHistory },
-      //     { new: true },
-      //   );
-      // const response: SingleBudgetHistoryResponse = {
-      //   version: VERSION_RESPONSE,
-      //   success: true,
-      //   message: 'Record added to budget history',
-      //   data: {
-      //     budgetHistory: updateBudgetHistoryModel,
-      //   },
-      //   error: null,
-      // };
-      // return response;
+      const updateBudgetHistoryModel =
+        await this.budgetHistoryModel.findByIdAndUpdate(
+          budgetHistoryId,
+          { $set: updatedBudgetHistory },
+          { new: true },
+        );
+      const response: SingleBudgetHistoryResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: 'Record added to budget history',
+        data: {
+          budgetHistory: updateBudgetHistoryModel,
+        },
+        error: null,
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
