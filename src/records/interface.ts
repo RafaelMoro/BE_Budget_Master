@@ -1,8 +1,8 @@
 import { Expense } from '../expenses/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
-import { GeneralResponse } from 'src/response.interface';
-import { Income } from './entities/incomes.entity';
-import { CreateIncomeDto, UpdateIncomeDto } from './dtos/incomes.dto';
+import { GeneralResponse } from '../response.interface';
+import { Income } from '../incomes/incomes.entity';
+import { CreateIncomeDto, UpdateIncomeDto } from '../incomes/incomes.dto';
 import { CreateExpenseDto, UpdateExpenseDto } from '../expenses/expenses.dto';
 
 /** Interfaces of services */

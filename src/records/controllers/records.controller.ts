@@ -14,7 +14,7 @@ import {
   CreateExpenseDto,
   UpdateExpenseDto,
 } from '../../expenses/expenses.dto';
-import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
+import { CreateIncomeDto, UpdateIncomeDto } from '../../incomes/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
 import { Param } from '@nestjs/common/decorators';
