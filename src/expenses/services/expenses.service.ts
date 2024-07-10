@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 
 import { CreateExpense, Expense } from '../expenses.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { RecordsService } from '../../records/services/records.service';
 import { CreateExpenseDto } from '../expenses.dto';
 import {
   EXPENSE_CREATED_MESSAGE,
@@ -21,8 +20,29 @@ export class ExpensesService {
   constructor(
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     private categoriesService: CategoriesService,
-    private recordsService: RecordsService,
   ) {}
+
+  async findOrCreateCategory({
+    category,
+    userId,
+  }: {
+    category: string;
+    userId: string;
+  }) {
+    try {
+      const {
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId } = categoryFoundOrCreated;
+      return categoryId;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 
   async createExpense(data: CreateExpenseDto, userId: string) {
     const { category, amount, typeOfRecord, date } = data;
@@ -32,7 +52,7 @@ export class ExpensesService {
       throw new BadRequestException(TYPE_OF_RECORD_INVALID);
     }
 
-    const categoryId = await this.recordsService.findOrCreateCategory({
+    const categoryId = await this.findOrCreateCategory({
       category,
       userId,
     });
