@@ -28,7 +28,7 @@ export class RecordsHistory {
 
   @IsNumber()
   @IsNotEmpty()
-  readonly recordAmount: string;
+  readonly recordAmount: number;
 
   @IsNumber()
   @IsNotEmpty()
