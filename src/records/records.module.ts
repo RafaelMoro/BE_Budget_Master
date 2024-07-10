@@ -6,6 +6,7 @@ import { CreateIncome, IncomeSchema } from './entities/incomes.entity';
 import { AccountRecord, RecordsSchema } from './entities/records.entity';
 import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
+import { BudgetHistoryModule } from '../budget-history/budget-history.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CategoriesModule } from '../categories/categories.module';
       },
     ]),
     CategoriesModule,
+    BudgetHistoryModule,
   ],
   controllers: [RecordsController],
   providers: [RecordsService],

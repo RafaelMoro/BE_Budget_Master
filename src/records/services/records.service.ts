@@ -10,6 +10,7 @@ import { AccountRecord } from '../entities/records.entity';
 import { CreateExpense, Expense } from '../entities/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
+import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
   EXPENSE_NOT_FOUND,
@@ -65,6 +66,7 @@ export class RecordsService {
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
+    private budgetHistoryService: BudgetHistoryService,
   ) {}
 
   async createOneRecord(
@@ -105,10 +107,12 @@ export class RecordsService {
         userId,
         typeOfRecord,
       };
+
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);
       const modelSaved: Expense | Income = await model.save();
+
       let modelPopulated: Expense | Income;
 
       // Update the prop isPaid to true of the expenses related to this income
@@ -138,6 +142,27 @@ export class RecordsService {
         modelPopulated = await this.expenseModel.populate(modelSaved, {
           path: 'linkedBudgets',
         });
+      }
+
+      // Check if it has a budget and add it into budget history
+      if (
+        modelPopulated.linkedBudgets?.length > 0 &&
+        typeOfRecord === 'expense'
+      ) {
+        for await (const budget of modelPopulated.linkedBudgets) {
+          await this.budgetHistoryService.addRecordToBudgetHistory({
+            budgetId: budget._id,
+            sub: userId,
+            newRecord: {
+              recordId: modelPopulated._id.toString(),
+              recordName: modelPopulated.shortName,
+              recordDate: date,
+              recordAmount: modelPopulated.amount,
+              budgetCurrentAmount: budget.currentAmount,
+              budgetUpdatedAmount: budget.currentAmount + modelPopulated.amount,
+            },
+          });
+        }
       }
 
       const response: RecordCreated = {
