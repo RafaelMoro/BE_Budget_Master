@@ -67,7 +67,7 @@ export class DeleteBudgetHistoryDto {
 export class AddRecordToBudgetHistoryDto {
   @IsMongoId()
   @IsNotEmpty()
-  readonly budgetHistoryId: Types.ObjectId;
+  readonly budgetId: Types.ObjectId;
 
   @ValidateNested({ each: true })
   @Type(() => RecordsHistory)

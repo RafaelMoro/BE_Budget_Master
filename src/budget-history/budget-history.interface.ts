@@ -24,7 +24,7 @@ export interface GeneralBudgetHistoryResponse
 export interface AddRecordToBudgetHistoryProps {
   newRecord: RecordsHistory;
   sub: string;
-  budgetHistoryId: Types.ObjectId;
+  budgetId: Types.ObjectId;
 }
 
 export interface RemoveRecordFromBudgetHistoryProps {

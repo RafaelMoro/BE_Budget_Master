@@ -35,12 +35,12 @@ export class BudgetHistoryController {
     @Body() payload: AddRecordToBudgetHistoryDto,
     @Request() req,
   ) {
-    const { budgetHistoryId, record } = payload;
+    const { budgetId, record } = payload;
     const sub = req.user.sub;
     return this.budgetHistoryService.addRecordToBudgetHistory({
       newRecord: record,
       sub,
-      budgetHistoryId,
+      budgetId,
     });
   }
 

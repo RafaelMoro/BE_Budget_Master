@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { BudgetHistory } from '../budget-history.entity';
 import {
@@ -191,17 +191,19 @@ export class BudgetHistoryService {
   async addRecordToBudgetHistory({
     newRecord,
     sub,
-    budgetHistoryId,
+    budgetId,
   }: AddRecordToBudgetHistoryProps) {
     try {
+      // Searching by converting string to object id, otherwise, it won't find it.
       const budgetsHistory = await this.budgetHistoryModel
-        .find({ _id: budgetHistoryId, sub })
+        .find({ budget: new Types.ObjectId(budgetId), sub })
         .exec();
       if (budgetsHistory.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
       }
 
       const [firstBudgetHistory] = budgetsHistory;
+      const { _id: budgetHistoryId } = firstBudgetHistory;
       const newRecords = firstBudgetHistory.records;
       newRecords.push(newRecord);
       const updatedBudgetHistory = {
