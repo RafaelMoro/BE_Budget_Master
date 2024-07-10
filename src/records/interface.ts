@@ -1,9 +1,9 @@
-import { Expense } from './entities/expenses.entity';
+import { Expense } from '../expenses/expenses.entity';
 import { DeleteRecordDto } from './dtos/records.dto';
 import { GeneralResponse } from 'src/response.interface';
 import { Income } from './entities/incomes.entity';
 import { CreateIncomeDto, UpdateIncomeDto } from './dtos/incomes.dto';
-import { CreateExpenseDto, UpdateExpenseDto } from './dtos/expenses.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from '../expenses/expenses.dto';
 
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {

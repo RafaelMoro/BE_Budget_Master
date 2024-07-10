@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RecordsController } from './controllers/records.controller';
-import { CreateExpense, ExpenseSchema } from './entities/expenses.entity';
 import { CreateIncome, IncomeSchema } from './entities/incomes.entity';
 import { AccountRecord, RecordsSchema } from './entities/records.entity';
 import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
+import { CreateExpense, ExpenseSchema } from '../expenses/expenses.entity';
 
 @Module({
   imports: [

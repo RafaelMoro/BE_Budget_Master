@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { AccountRecord } from '../entities/records.entity';
-import { CreateExpense, Expense } from '../entities/expenses.entity';
+import { CreateExpense, Expense } from '../../expenses/expenses.entity';
 import { CreateIncome, Income } from '../entities/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { INITIAL_RESPONSE } from '../../constants';
@@ -46,7 +46,10 @@ import {
   UpdateRecordResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
-import { CreateExpenseDto, UpdateExpenseDto } from '../dtos/expenses.dto';
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+} from '../../expenses/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import {
   formatDateToString,
