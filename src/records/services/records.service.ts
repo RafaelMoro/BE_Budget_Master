@@ -70,6 +70,28 @@ export class RecordsService {
     private categoriesService: CategoriesService,
   ) {}
 
+  async findOrCreateCategory({
+    category,
+    userId,
+  }: {
+    category: string;
+    userId: string;
+  }) {
+    try {
+      const {
+        data: { categories },
+      } = await this.categoriesService.findByNameAndUserId({
+        categoryName: category,
+        userId,
+      });
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId } = categoryFoundOrCreated;
+      return categoryId;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async createOneRecord(
     data: CreateExpenseDto | CreateIncomeDto,
     isIncome = false,
@@ -89,14 +111,7 @@ export class RecordsService {
         throw new BadRequestException(TYPE_OF_RECORD_INVALID);
       }
 
-      const {
-        data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
-        categoryName: category,
-        userId,
-      });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId } = categoryFoundOrCreated;
+      const categoryId = await this.findOrCreateCategory({ category, userId });
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newData = {
@@ -108,6 +123,7 @@ export class RecordsService {
         userId,
         typeOfRecord,
       };
+
       const model = !isIncome
         ? new this.expenseModel(newData)
         : new this.incomeModel(newData);

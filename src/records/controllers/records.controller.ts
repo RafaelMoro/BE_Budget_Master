@@ -10,7 +10,10 @@ import {
 } from '@nestjs/common';
 
 import { DeleteRecordDto } from '../dtos/records.dto';
-import { CreateExpenseDto, UpdateExpenseDto } from '../../expenses/expenses.dto';
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+} from '../../expenses/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../dtos/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
