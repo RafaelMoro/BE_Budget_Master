@@ -80,7 +80,7 @@ export class RecordsService {
     try {
       const {
         data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
+      } = await this.categoriesService.findOrCreateByNameAndUserId({
         categoryName: category,
         userId,
       });
@@ -190,7 +190,7 @@ export class RecordsService {
 
       const {
         data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
+      } = await this.categoriesService.findOrCreateByNameAndUserId({
         categoryName: category,
         userId,
       });
@@ -630,7 +630,7 @@ export class RecordsService {
       if (!skipFindCategory) {
         const {
           data: { categories },
-        } = await this.categoriesService.findByNameAndUserId({
+        } = await this.categoriesService.findOrCreateByNameAndUserId({
           categoryName: category,
           userId,
         });

@@ -32,7 +32,7 @@ export class ExpensesService {
     try {
       const {
         data: { categories },
-      } = await this.categoriesService.findByNameAndUserId({
+      } = await this.categoriesService.findOrCreateByNameAndUserId({
         categoryName: category,
         userId,
       });
