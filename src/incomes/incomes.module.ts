@@ -4,6 +4,7 @@ import { IncomesService } from './services/incomes.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CreateIncome, IncomeSchema } from './incomes.entity';
 import { CategoriesModule } from '../categories/categories.module';
+import { ExpensesModule } from '../expenses/expenses.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CategoriesModule } from '../categories/categories.module';
       },
     ]),
     CategoriesModule,
+    ExpensesModule,
   ],
   controllers: [IncomesController],
   providers: [IncomesService],

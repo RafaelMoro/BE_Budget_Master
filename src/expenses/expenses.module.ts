@@ -17,5 +17,6 @@ import { CategoriesModule } from '../categories/categories.module';
   ],
   controllers: [ExpensesController],
   providers: [ExpensesService],
+  exports: [ExpensesService],
 })
 export class ExpensesModule {}

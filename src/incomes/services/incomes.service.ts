@@ -14,12 +14,14 @@ import { UpdateExpenseDto } from 'src/expenses/expenses.dto';
 import { BatchIncomesResponse, IncomeCreated } from '../incomes.interface';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from 'src/constants';
 import { INCOME_CREATED_MESSAGE } from '../incomes.constants';
+import { ExpensesService } from '../../expenses/services/expenses.service';
 
 @Injectable()
 export class IncomesService {
   constructor(
     @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
+    private expensesService: ExpensesService,
   ) {}
 
   async findOrCreateCategory({
@@ -81,7 +83,7 @@ export class IncomesService {
           isPaid: true,
           userId,
         }));
-        // await this.updateMultipleIncomes(payload);
+        await this.expensesService.updateMultipleExpenses(payload);
       }
 
       modelPopulated = await this.incomeModel.populate(modelSaved, {

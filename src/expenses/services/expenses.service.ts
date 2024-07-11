@@ -4,16 +4,16 @@ import { Model } from 'mongoose';
 
 import { CreateExpense, Expense } from '../expenses.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { CreateExpenseDto } from '../expenses.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from '../expenses.dto';
 import {
   EXPENSE_CREATED_MESSAGE,
   TYPE_OF_RECORD_INVALID,
 } from '../expenses.constants';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from 'src/utils';
-import { VERSION_RESPONSE } from 'src/constants';
-import { ExpenseCreated } from '../expenses.interface';
+import { formatDateToString, formatNumberToCurrency } from '../../utils';
+import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
+import { BatchExpensesResponse, ExpenseCreated } from '../expenses.interface';
 
 @Injectable()
 export class ExpensesService {
@@ -88,5 +88,30 @@ export class ExpensesService {
       error: null,
     };
     return response;
+  }
+
+  async updateMultipleExpenses(changes: UpdateExpenseDto[]) {
+    try {
+      const updatedRecords = await Promise.all(
+        changes.map((change) =>
+          this.expenseModel.findByIdAndUpdate(
+            change.recordId,
+            { $set: change },
+            { new: true },
+          ),
+        ),
+      );
+      const checkUpdatedRecords = updatedRecords.map((record, index) => {
+        if (!record) return `record id ${changes[index].recordId} not found`;
+        return record;
+      });
+      const response: BatchExpensesResponse = {
+        ...INITIAL_RESPONSE,
+        data: checkUpdatedRecords,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

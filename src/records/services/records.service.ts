@@ -576,7 +576,9 @@ export class RecordsService {
     return response;
   }
 
-  // Deprecated
+  /**
+   * @deprecated This method is deprecated and will be removed in future versions. Please use the new RecordsServiceV2 class instead.
+   */
   async createMultipleRecords(
     data: CreateExpenseDto[] | CreateIncomeDto[],
     isIncome = false,

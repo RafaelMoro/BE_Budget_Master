@@ -6,3 +6,7 @@ export interface ExpenseCreated extends Omit<GeneralResponse, 'category'> {
     expense: Expense;
   };
 }
+
+export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
+  data: (Expense | string)[];
+}
