@@ -22,28 +22,6 @@ export class ExpensesService {
     private categoriesService: CategoriesService,
   ) {}
 
-  async findOrCreateCategory({
-    category,
-    userId,
-  }: {
-    category: string;
-    userId: string;
-  }) {
-    try {
-      const {
-        data: { categories },
-      } = await this.categoriesService.findOrCreateByNameAndUserId({
-        categoryName: category,
-        userId,
-      });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId } = categoryFoundOrCreated;
-      return categoryId;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async createExpense(data: CreateExpenseDto, userId: string) {
     const { category, amount, typeOfRecord, date } = data;
     const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
@@ -52,10 +30,13 @@ export class ExpensesService {
       throw new BadRequestException(TYPE_OF_RECORD_INVALID);
     }
 
-    const categoryId = await this.findOrCreateCategory({
-      category,
-      userId,
-    });
+    const categoryId =
+      await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+        {
+          categoryName: category,
+          userId,
+        },
+      );
     const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
     const amountFormatted = formatNumberToCurrency(amount);
     const newData = {
