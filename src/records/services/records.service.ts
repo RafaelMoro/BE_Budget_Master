@@ -34,7 +34,6 @@ import {
 import {
   FindRecordsByAccountProps,
   RemoveRecordProps,
-  RecordCreated,
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
@@ -87,85 +86,6 @@ export class RecordsService {
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
       return categoryId;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async createOneRecord(
-    data: CreateExpenseDto | CreateIncomeDto,
-    isIncome = false,
-    userId: string,
-  ) {
-    try {
-      const { category, amount, typeOfRecord, date } = data;
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-      if (
-        isTypeOfRecord(typeOfRecord) === false ||
-        typeOfRecord === 'transfer' ||
-        // Validate if the record is an expense and type of record has value income
-        (!isIncome && typeOfRecord === 'income') ||
-        // Validate if the record is an income and type of record has value expense
-        (isIncome && typeOfRecord === 'expense')
-      ) {
-        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
-
-      const categoryId = await this.findOrCreateCategory({ category, userId });
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newData = {
-        ...data,
-        fullDate,
-        formattedTime,
-        category: categoryId,
-        amountFormatted,
-        userId,
-        typeOfRecord,
-      };
-
-      const model = !isIncome
-        ? new this.expenseModel(newData)
-        : new this.incomeModel(newData);
-      const modelSaved: Expense | Income = await model.save();
-      let modelPopulated: Expense | Income;
-
-      // Update the prop isPaid to true of the expenses related to this income
-      if (isIncome) {
-        const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
-          .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
-          recordId: id,
-          isPaid: true,
-          userId,
-        }));
-        await this.updateMultipleRecords(payload);
-
-        modelPopulated = await this.incomeModel.populate(modelSaved, {
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        });
-        modelPopulated = await this.incomeModel.populate(modelPopulated, {
-          path: 'category',
-          select: '_id categoryName icon',
-        });
-      } else {
-        modelPopulated = await this.expenseModel.populate(modelSaved, {
-          path: 'category',
-          select: '_id categoryName icon',
-        });
-      }
-
-      const response: RecordCreated = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: RECORD_CREATED_MESSAGE,
-        data: {
-          record: modelPopulated,
-        },
-        error: null,
-      };
-      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

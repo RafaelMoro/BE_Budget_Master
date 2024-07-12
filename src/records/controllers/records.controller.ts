@@ -24,18 +24,6 @@ import { CreateTransferDto } from '../dtos/transfer.dto';
 export class RecordsController {
   constructor(private recordsService: RecordsService) {}
 
-  @Post('/expenses')
-  createExpense(@Body() payload: CreateExpenseDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.recordsService.createOneRecord(payload, false, userId);
-  }
-
-  @Post('/incomes')
-  createIncome(@Body() payload: CreateIncomeDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.recordsService.createOneRecord(payload, true, userId);
-  }
-
   @Post('/transfer')
   createTransfer(@Body() payload: CreateTransferDto, @Request() req) {
     const { expense, income } = payload;

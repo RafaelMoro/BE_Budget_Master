@@ -65,12 +65,6 @@ export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
-export interface RecordCreated extends Omit<GeneralResponse, 'category'> {
-  data: {
-    record: Expense | Income;
-  };
-}
-
 export interface TransferCreated extends Omit<GeneralResponse, 'category'> {
   data: {
     expense: Expense;
