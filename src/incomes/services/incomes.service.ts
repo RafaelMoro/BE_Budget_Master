@@ -8,11 +8,11 @@ import { CreateIncomeDto, UpdateIncomeDto } from '../incomes.dto';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { TYPE_OF_RECORD_INVALID } from '../../records/constants';
 import { changeTimezone } from '../../utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from 'src/utils';
-import { CreateExpense } from 'src/expenses/expenses.entity';
-import { UpdateExpenseDto } from 'src/expenses/expenses.dto';
+import { formatDateToString, formatNumberToCurrency } from '../../utils';
+import { CreateExpense } from '../../expenses/expenses.entity';
+import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import { BatchIncomesResponse, IncomeCreated } from '../incomes.interface';
-import { INITIAL_RESPONSE, VERSION_RESPONSE } from 'src/constants';
+import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
 import { INCOME_CREATED_MESSAGE } from '../incomes.constants';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 
