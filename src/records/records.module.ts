@@ -7,6 +7,7 @@ import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
 import { CreateExpense, ExpenseSchema } from '../expenses/expenses.entity';
 import { ExpensesModule } from '../expenses/expenses.module';
+import { IncomesModule } from '../incomes/incomes.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ExpensesModule } from '../expenses/expenses.module';
     ]),
     CategoriesModule,
     ExpensesModule,
+    IncomesModule,
   ],
   controllers: [RecordsController],
   providers: [RecordsService],

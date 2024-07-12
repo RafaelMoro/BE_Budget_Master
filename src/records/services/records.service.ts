@@ -22,9 +22,6 @@ import {
   RECORD_UNAUTHORIZED_ERROR,
   UNAUTHORIZED_EXPENSES_ERROR,
   UNAUTHORIZED_INCOMES_ERROR,
-  MISSING_DATE,
-  MISSING_CATEGORY,
-  MISSING_AMOUNT,
   RECORD_DELETED,
   TRANSFER_RECORDS_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
@@ -41,8 +38,6 @@ import {
   FindTransferRecordsResponse,
   CreateTransferProps,
   TransferCreated,
-  UpdateRecordProps,
-  UpdateRecordResponse,
 } from '../interface';
 import { DeleteRecordDto } from '../dtos/records.dto';
 import {
@@ -60,6 +55,7 @@ import { GeneralResponse } from '../../response.interface';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../expenses/services/expenses.service';
+import { IncomesService } from '../../incomes/services/incomes.service';
 
 @Injectable()
 export class RecordsService {
@@ -69,6 +65,7 @@ export class RecordsService {
     @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
     private expensesService: ExpensesService,
+    private incomesService: IncomesService,
   ) {}
 
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
@@ -157,14 +154,13 @@ export class RecordsService {
         userId,
       });
       const updateTransferExpense = updateExpenseResponse?.data?.expense;
-      const updateIncomeResponse = await this.updateRecord({
+      const updateIncomeResponse = await this.incomesService.updateIncome({
         changes: updatedIncome,
-        isIncome: true,
         skipFindCategory: true,
         skipUpdateExpensesPaid: true,
         userId,
       });
-      const updateTransferIncome = updateIncomeResponse?.data?.record;
+      const updateTransferIncome = updateIncomeResponse?.data?.income;
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
@@ -494,95 +490,6 @@ export class RecordsService {
         newModels.map((account) => account.save()),
       );
       return savedModels;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async updateRecord({
-    changes,
-    userId,
-    isIncome = false,
-    skipFindCategory = false,
-    skipUpdateExpensesPaid = false,
-  }: UpdateRecordProps) {
-    try {
-      const {
-        recordId,
-        category,
-        date,
-        amount,
-        userId: userIdChanges,
-      } = changes;
-
-      // Verify that the record belongs to the user
-      if (userId !== userIdChanges) {
-        throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
-      }
-      if (!date) throw new UnauthorizedException(MISSING_DATE);
-      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
-      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
-
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-
-      let categoryId = category;
-      if (!skipFindCategory) {
-        const {
-          data: { categories },
-        } = await this.categoriesService.findOrCreateByNameAndUserId({
-          categoryName: category,
-          userId,
-        });
-        const [categoryFoundOrCreated] = categories;
-        const { _id } = categoryFoundOrCreated;
-        categoryId = _id.toString();
-      }
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newChanges = {
-        ...changes,
-        category: categoryId,
-        fullDate,
-        formattedTime,
-        amountFormatted,
-      };
-      const updatedRecord: Income | Expense = !isIncome
-        ? await this.expenseModel
-            .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
-            .exec()
-        : await this.incomeModel
-            .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
-            .populate({
-              path: 'expensesPaid',
-              select: '_id shortName amountFormatted fullDate formattedTime',
-            })
-            .exec();
-
-      if (!updatedRecord) throw new BadRequestException(RECORD_NOT_FOUND);
-
-      // Update the prop isPaid to true of the expenses related to this income
-      if (
-        isIncome &&
-        (changes as CreateIncomeDto).expensesPaid?.length > 0 &&
-        !skipUpdateExpensesPaid
-      ) {
-        const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
-          .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
-          recordId: expense._id,
-          isPaid: true,
-          userId,
-        }));
-        await this.updateMultipleRecords(payload);
-      }
-
-      const response: UpdateRecordResponse = {
-        ...INITIAL_RESPONSE,
-        data: {
-          record: updatedRecord,
-        },
-      };
-      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

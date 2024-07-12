@@ -19,5 +19,6 @@ import { ExpensesModule } from '../expenses/expenses.module';
   ],
   controllers: [IncomesController],
   providers: [IncomesService],
+  exports: [IncomesService],
 })
 export class IncomesModule {}
