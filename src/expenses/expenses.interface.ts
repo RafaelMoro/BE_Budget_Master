@@ -1,7 +1,8 @@
 import { GeneralResponse } from '../response.interface';
+import { UpdateExpenseDto } from './expenses.dto';
 import { Expense } from './expenses.entity';
 
-export interface ExpenseCreated extends Omit<GeneralResponse, 'category'> {
+export interface ResponseSingleExpense extends Omit<GeneralResponse, 'data'> {
   data: {
     expense: Expense;
   };
@@ -9,4 +10,10 @@ export interface ExpenseCreated extends Omit<GeneralResponse, 'category'> {
 
 export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | string)[];
+}
+
+export interface UpdateExpenseProps {
+  changes: UpdateExpenseDto;
+  userId: string;
+  skipFindCategory?: boolean;
 }

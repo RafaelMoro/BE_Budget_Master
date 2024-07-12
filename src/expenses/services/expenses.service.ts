@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -7,13 +11,24 @@ import { CategoriesService } from '../../categories/services/categories.service'
 import { CreateExpenseDto, UpdateExpenseDto } from '../expenses.dto';
 import {
   EXPENSE_CREATED_MESSAGE,
+  EXPENSE_NOT_FOUND,
+  EXPENSE_UNAUTHORIZED_ERROR,
   TYPE_OF_RECORD_INVALID,
 } from '../expenses.constants';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../utils';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
-import { BatchExpensesResponse, ExpenseCreated } from '../expenses.interface';
+import {
+  BatchExpensesResponse,
+  ResponseSingleExpense,
+  UpdateExpenseProps,
+} from '../expenses.interface';
+import {
+  MISSING_AMOUNT,
+  MISSING_CATEGORY,
+  MISSING_DATE,
+} from '../../records/constants';
 
 @Injectable()
 export class ExpensesService {
@@ -59,7 +74,7 @@ export class ExpensesService {
       },
     );
 
-    const response: ExpenseCreated = {
+    const response: ResponseSingleExpense = {
       version: VERSION_RESPONSE,
       success: true,
       message: EXPENSE_CREATED_MESSAGE,
@@ -69,6 +84,69 @@ export class ExpensesService {
       error: null,
     };
     return response;
+  }
+
+  async updateExpense({
+    changes,
+    userId,
+    skipFindCategory = false,
+  }: UpdateExpenseProps) {
+    try {
+      const {
+        recordId,
+        category,
+        date,
+        amount,
+        userId: userIdChanges,
+      } = changes;
+
+      // Verify that the record belongs to the user
+      if (userId !== userIdChanges) {
+        throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
+      }
+      if (!date) throw new UnauthorizedException(MISSING_DATE);
+      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
+      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
+
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+      let categoryId = category;
+      if (!skipFindCategory) {
+        const categoryIdFetched =
+          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+            {
+              categoryName: category,
+              userId,
+            },
+          );
+        categoryId = categoryIdFetched.toString();
+      }
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+      const amountFormatted = formatNumberToCurrency(amount);
+      const newChanges = {
+        ...changes,
+        category: categoryId,
+        fullDate,
+        formattedTime,
+        amountFormatted,
+      };
+
+      const updatedRecord: Expense = await this.expenseModel
+        .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .exec();
+
+      if (!updatedRecord) throw new BadRequestException(EXPENSE_NOT_FOUND);
+
+      const response: ResponseSingleExpense = {
+        ...INITIAL_RESPONSE,
+        data: {
+          expense: updatedRecord,
+        },
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async updateMultipleExpenses(changes: UpdateExpenseDto[]) {
