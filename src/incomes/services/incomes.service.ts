@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -6,14 +10,27 @@ import { CreateIncome, Income } from '../incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { CreateIncomeDto, UpdateIncomeDto } from '../incomes.dto';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
-import { TYPE_OF_RECORD_INVALID } from '../../records/constants';
+import {
+  MISSING_AMOUNT,
+  MISSING_CATEGORY,
+  MISSING_DATE,
+  TYPE_OF_RECORD_INVALID,
+} from '../../records/constants';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../utils';
 import { CreateExpense } from '../../expenses/expenses.entity';
 import { UpdateExpenseDto } from '../../expenses/expenses.dto';
-import { BatchIncomesResponse, IncomeCreated } from '../incomes.interface';
+import {
+  BatchIncomesResponse,
+  ResponseSingleIncome,
+  UpdateIncomeProps,
+} from '../incomes.interface';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
-import { INCOME_CREATED_MESSAGE } from '../incomes.constants';
+import {
+  INCOME_CREATED_MESSAGE,
+  INCOME_NOT_FOUND,
+  INCOME_UNAUTHORIZED_ERROR,
+} from '../incomes.constants';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 
 @Injectable()
@@ -76,7 +93,7 @@ export class IncomesService {
         select: '_id categoryName icon',
       });
 
-      const response: IncomeCreated = {
+      const response: ResponseSingleIncome = {
         version: VERSION_RESPONSE,
         success: true,
         message: INCOME_CREATED_MESSAGE,
@@ -84,6 +101,82 @@ export class IncomesService {
           income: modelPopulated,
         },
         error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateIncome({
+    changes,
+    userId,
+    skipFindCategory = false,
+    skipUpdateExpensesPaid = false,
+  }: UpdateIncomeProps) {
+    try {
+      const {
+        recordId,
+        category,
+        date,
+        amount,
+        userId: userIdChanges,
+      } = changes;
+
+      // Verify that the record belongs to the user
+      if (userId !== userIdChanges) {
+        throw new UnauthorizedException(INCOME_UNAUTHORIZED_ERROR);
+      }
+      if (!date) throw new UnauthorizedException(MISSING_DATE);
+      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
+      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
+
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+      let categoryId = category;
+      if (!skipFindCategory) {
+        const categoryIdFetched =
+          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+            {
+              categoryName: category,
+              userId,
+            },
+          );
+        categoryId = categoryIdFetched.toString();
+      }
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+      const amountFormatted = formatNumberToCurrency(amount);
+      const newChanges = {
+        ...changes,
+        category: categoryId,
+        fullDate,
+        formattedTime,
+        amountFormatted,
+      };
+
+      const updatedRecord: Income = await this.incomeModel
+        .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .exec();
+
+      if (!updatedRecord) throw new BadRequestException(INCOME_NOT_FOUND);
+
+      // Update the prop isPaid to true of the expenses related to this income
+      if (changes.expensesPaid?.length > 0 && !skipUpdateExpensesPaid) {
+        const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
+          .expensesPaid;
+        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
+          recordId: id,
+          isPaid: true,
+          userId,
+        }));
+        await this.expensesService.updateMultipleExpenses(payload);
+      }
+
+      const response: ResponseSingleIncome = {
+        ...INITIAL_RESPONSE,
+        data: {
+          income: updatedRecord,
+        },
       };
       return response;
     } catch (error) {
