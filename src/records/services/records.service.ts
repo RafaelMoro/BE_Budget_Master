@@ -69,28 +69,6 @@ export class RecordsService {
     private categoriesService: CategoriesService,
   ) {}
 
-  async findOrCreateCategory({
-    category,
-    userId,
-  }: {
-    category: string;
-    userId: string;
-  }) {
-    try {
-      const {
-        data: { categories },
-      } = await this.categoriesService.findOrCreateByNameAndUserId({
-        categoryName: category,
-        userId,
-      });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId } = categoryFoundOrCreated;
-      return categoryId;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
       const { category, amount, typeOfRecord, date } = expense;
