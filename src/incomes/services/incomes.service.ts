@@ -76,8 +76,8 @@ export class IncomesService {
       if (modelSaved.expensesPaid.length > 0) {
         const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
           .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
-          recordId: id,
+        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
+          recordId: expense._id,
           isPaid: true,
           userId,
         }));
@@ -164,8 +164,8 @@ export class IncomesService {
       if (changes.expensesPaid?.length > 0 && !skipUpdateExpensesPaid) {
         const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
-          recordId: id,
+        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
+          recordId: expense._id,
           isPaid: true,
           userId,
         }));

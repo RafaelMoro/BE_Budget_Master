@@ -58,7 +58,8 @@ import {
 import { VERSION_RESPONSE } from '../../constants';
 import { GeneralResponse } from '../../response.interface';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
-import { changeTimezone } from 'src/utils/changeTimezone';
+import { changeTimezone } from '../../utils/changeTimezone';
+import { ExpensesService } from '../../expenses/services/expenses.service';
 
 @Injectable()
 export class RecordsService {
@@ -67,6 +68,7 @@ export class RecordsService {
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
+    private expensesService: ExpensesService,
   ) {}
 
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
@@ -123,12 +125,10 @@ export class RecordsService {
       const { _id: incomeId, account: accountIncome } = incomeSaved;
 
       // Add transderRecord data to each document.
-      const updatedExpense = {
+      const updatedExpense: UpdateExpenseDto = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
         date: expense.date,
-        fullDate,
-        formattedTime,
         category: newDataExpense.category.toString(),
         amount: expense.amount,
         userId,
@@ -150,12 +150,13 @@ export class RecordsService {
           account: accountExpense.toString(),
         },
       };
-      const updateExpenseResponse = await this.updateRecord({
+
+      const updateExpenseResponse = await this.expensesService.updateExpense({
         changes: updatedExpense,
         skipFindCategory: true,
         userId,
       });
-      const updateTransferExpense = updateExpenseResponse?.data?.record;
+      const updateTransferExpense = updateExpenseResponse?.data?.expense;
       const updateIncomeResponse = await this.updateRecord({
         changes: updatedIncome,
         isIncome: true,
@@ -169,8 +170,8 @@ export class RecordsService {
       if (income.expensesPaid.length > 0) {
         const expensesIds: CreateExpense[] = (income as CreateIncomeDto)
           .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
-          recordId: id,
+        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
+          recordId: expense._id,
           isPaid: true,
           userId,
         }));
@@ -567,8 +568,8 @@ export class RecordsService {
       ) {
         const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
           .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((id) => ({
-          recordId: id,
+        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
+          recordId: expense._id,
           isPaid: true,
           userId,
         }));
@@ -653,11 +654,13 @@ export class RecordsService {
         // Check if there are any expenses related to this income
         if (income?.expensesPaid?.length > 0) {
           // set expenses as not paid
-          const payload: UpdateExpenseDto[] = income.expensesPaid.map((id) => ({
-            recordId: id,
-            isPaid: false,
-            userId,
-          }));
+          const payload: UpdateExpenseDto[] = income.expensesPaid.map(
+            (expense) => ({
+              recordId: expense._id,
+              isPaid: false,
+              userId,
+            }),
+          );
           await this.updateMultipleRecords(payload);
         }
       }
