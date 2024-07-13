@@ -19,6 +19,13 @@ export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | string)[];
 }
 
+export interface FindExpensesByMonthYearProps {
+  accountId: string;
+  month: string;
+  year: string;
+  userId: string;
+}
+
 export interface FindAllExpensesByAccountResponse {
   expenses: Expense[];
   message: string | null;

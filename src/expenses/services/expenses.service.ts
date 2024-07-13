@@ -31,6 +31,7 @@ import {
   BatchExpensesResponse,
   DeleteMultipleExpensesResponse,
   FindAllExpensesByAccountResponse,
+  FindExpensesByMonthYearProps,
   RemoveExpenseProps,
   ResponseMultipleExpenses,
   ResponseSingleExpense,
@@ -129,12 +130,12 @@ export class ExpensesService {
   /**
    * Method used to search for expenses to be related to an income.
    */
-  async findAllExpensesByMonthAndYear(
-    accountId: string,
-    month: string,
-    year: string,
-    userId: string,
-  ): Promise<ResponseMultipleExpenses> {
+  async findAllExpensesByMonthAndYear({
+    accountId,
+    month,
+    year,
+    userId,
+  }: FindExpensesByMonthYearProps): Promise<ResponseMultipleExpenses> {
     try {
       const monthNumber = getMonthNumber(month);
       const yearNumber = Number(year);
