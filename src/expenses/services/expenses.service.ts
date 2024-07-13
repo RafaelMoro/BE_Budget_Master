@@ -362,7 +362,6 @@ export class ExpensesService {
         ...INITIAL_RESPONSE,
         data: checkUpdatedRecords,
       };
-      console.log('response', response);
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);

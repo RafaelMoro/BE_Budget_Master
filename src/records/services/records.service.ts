@@ -1,10 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 
-import { AccountRecord } from '../entities/records.entity';
-import { CreateExpense, Expense } from '../../expenses/expenses.entity';
-import { CreateIncome, Income } from '../../incomes/incomes.entity';
+import { Expense } from '../../expenses/expenses.entity';
+import { Income } from '../../incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
@@ -23,7 +20,7 @@ import {
   TransferCreated,
 } from '../interface';
 import { UpdateExpenseDto } from '../../expenses/expenses.dto';
-import { CreateIncomeDto, UpdateIncomeDto } from '../../incomes/incomes.dto';
+import { UpdateIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
@@ -38,9 +35,6 @@ import { IncomesService } from '../../incomes/services/incomes.service';
 @Injectable()
 export class RecordsService {
   constructor(
-    @InjectModel(AccountRecord.name) private recordModel: Model<AccountRecord>,
-    @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
-    @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
     private categoriesService: CategoriesService,
     private expensesService: ExpensesService,
     private incomesService: IncomesService,
@@ -131,48 +125,33 @@ export class RecordsService {
         skipFindCategory: true,
         userId,
       });
-      const updateTransferExpense = updateExpenseResponse?.data?.expense;
-      const updateIncomeResponse = await this.incomesService.updateIncome({
+      const updatedTransferExpense = updateExpenseResponse?.data?.expense;
+      const updatedIncomeResponse = await this.incomesService.updateIncome({
         changes: updatedIncome,
         skipFindCategory: true,
         skipUpdateExpensesPaid: true,
         userId,
       });
-      const updateTransferIncome = updateIncomeResponse?.data?.income;
+      const updateTransferIncome = updatedIncomeResponse?.data?.income;
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
-        const expensesIds: CreateExpense[] = (income as CreateIncomeDto)
-          .expensesPaid;
+        const expensesIds = updateTransferIncome.expensesPaid.map(
+          (expense) => expense._id,
+        );
         const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
-          recordId: expense._id,
+          recordId: expense,
           isPaid: true,
           userId,
         }));
         await this.expensesService.updateMultipleExpenses(payload);
       }
 
-      let incomePopulated = await this.incomeModel.populate(
-        updateTransferIncome,
-        {
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        },
-      );
-      incomePopulated = await this.incomeModel.populate(incomePopulated, {
-        path: 'category',
-        select: '_id categoryName icon',
-      });
-      const expensePopulated = await this.expenseModel.populate(
-        updateTransferExpense,
-        {
-          path: 'category',
-          select: '_id categoryName icon',
-        },
-      );
-
       // Validation if any of the transfer records has a missing transfer record
-      if (!expensePopulated.transferRecord || !incomePopulated.transferRecord) {
+      if (
+        !updatedTransferExpense.transferRecord ||
+        !updateTransferIncome.transferRecord
+      ) {
         throw new BadRequestException(MISSING_TRANSFER_RECORD);
       }
 
@@ -181,8 +160,8 @@ export class RecordsService {
         success: true,
         message: RECORD_CREATED_MESSAGE,
         data: {
-          expense: expensePopulated,
-          income: incomePopulated,
+          expense: updatedTransferExpense,
+          income: updateTransferIncome,
         },
         error: null,
       };
