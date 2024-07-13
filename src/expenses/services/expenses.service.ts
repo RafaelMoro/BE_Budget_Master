@@ -128,9 +128,9 @@ export class ExpensesService {
   }
 
   /**
-   * Method used to search for expenses to be related to an income.
+   * Method used to search for expenses (only type expense, not transfer) that are related to an income.
    */
-  async findAllExpensesByMonthAndYear({
+  async findOnlyExpensesByMonthAndYear({
     accountId,
     month,
     year,
@@ -164,11 +164,77 @@ export class ExpensesService {
         throw new NotFoundException(EXPENSES_NOT_FOUND);
       }
 
+      const expensesPopulated: Expense[] = await this.expenseModel.populate(
+        expenses,
+        {
+          path: 'category',
+          select: '_id categoryName icon',
+        },
+      );
+
       const response: ResponseMultipleExpenses = {
         ...INITIAL_RESPONSE,
-        data: { expenses },
+        data: { expenses: expensesPopulated },
       };
       return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method used to get expenses (expenses and transfers) by month and year.
+   * This method is used by the records service to get all incomes and expenses by month and year
+   */
+  async findExpensesByMonthAndYearForRecords({
+    accountId,
+    month,
+    year,
+    userId,
+  }: FindExpensesByMonthYearProps): Promise<FindAllExpensesByAccountResponse> {
+    try {
+      const monthNumber = getMonthNumber(month);
+      const yearNumber = Number(year);
+
+      const startDate = new Date(yearNumber, monthNumber, 1);
+      const endDate = new Date(yearNumber, monthNumber + 1, 1);
+
+      const expenses: Expense[] = await this.expenseModel
+        .aggregate([
+          {
+            $match: {
+              date: {
+                $gte: startDate,
+                $lt: endDate,
+              },
+              userId,
+              account: accountId,
+            },
+          },
+        ])
+        .exec();
+
+      this.verifyExpensesBelongsToUser(expenses, userId);
+      if (expenses.length === 0) {
+        return {
+          message: EXPENSES_NOT_FOUND,
+          expenses,
+        };
+      }
+
+      const expensesPopulated: Expense[] = await this.expenseModel.populate(
+        expenses,
+        {
+          path: 'category',
+          select: '_id categoryName icon',
+        },
+      );
+
+      return {
+        expenses: expensesPopulated,
+        message: null,
+      };
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);

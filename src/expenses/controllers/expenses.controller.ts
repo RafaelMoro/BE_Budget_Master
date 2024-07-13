@@ -48,7 +48,7 @@ export class ExpensesController {
     @Request() req,
   ) {
     const userId = req.user.sub;
-    return this.expensesService.findAllExpensesByMonthAndYear({
+    return this.expensesService.findOnlyExpensesByMonthAndYear({
       accountId,
       month,
       year,
