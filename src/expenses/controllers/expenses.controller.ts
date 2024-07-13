@@ -6,6 +6,8 @@ import {
   Request,
   Put,
   Delete,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ExpensesService } from '../services/expenses.service';
@@ -36,5 +38,21 @@ export class ExpensesController {
   removeExpense(@Body() payload: DeleteExpenseDto, @Request() req) {
     const userId = req.user.sub;
     return this.expensesService.removeExpense({ payload, userId });
+  }
+
+  @Get(':accountId/:month/:year')
+  findExpensesByAccountMonthAndYear(
+    @Param('accountId') accountId: string,
+    @Param('month') month: string,
+    @Param('year') year: string,
+    @Request() req,
+  ) {
+    const userId = req.user.sub;
+    return this.expensesService.findAllExpensesByMonthAndYear(
+      accountId,
+      month,
+      year,
+      userId,
+    );
   }
 }

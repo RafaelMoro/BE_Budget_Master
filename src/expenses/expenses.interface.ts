@@ -8,6 +8,13 @@ export interface ResponseSingleExpense extends Omit<GeneralResponse, 'data'> {
   };
 }
 
+export interface ResponseMultipleExpenses
+  extends Omit<GeneralResponse, 'data'> {
+  data: {
+    expenses: Expense[];
+  };
+}
+
 export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | string)[];
 }

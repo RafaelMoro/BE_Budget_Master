@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +15,9 @@ import {
   EXPENSE_DELETED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
+  EXPENSES_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
+  UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
@@ -23,6 +26,7 @@ import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
   RemoveExpenseProps,
+  ResponseMultipleExpenses,
   ResponseSingleExpense,
   UpdateExpenseProps,
 } from '../expenses.interface';
@@ -31,6 +35,7 @@ import {
   MISSING_CATEGORY,
   MISSING_DATE,
 } from '../../records/constants';
+import { getMonthNumber } from 'src/utils/getMonthNumber';
 
 @Injectable()
 export class ExpensesService {
@@ -40,52 +45,59 @@ export class ExpensesService {
   ) {}
 
   async createExpense(data: CreateExpenseDto, userId: string) {
-    const { category, amount, typeOfRecord, date } = data;
-    const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+    try {
+      const { category, amount, typeOfRecord, date } = data;
+      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
-    if (isTypeOfRecord(typeOfRecord) === false || typeOfRecord !== 'expense') {
-      throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-    }
+      if (
+        isTypeOfRecord(typeOfRecord) === false ||
+        typeOfRecord !== 'expense'
+      ) {
+        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+      }
 
-    const categoryId =
-      await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+      const categoryId =
+        await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+          {
+            categoryName: category,
+            userId,
+          },
+        );
+      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+      const amountFormatted = formatNumberToCurrency(amount);
+      const newData = {
+        ...data,
+        fullDate,
+        formattedTime,
+        category: categoryId,
+        amountFormatted,
+        userId,
+        typeOfRecord,
+      };
+
+      const model = new this.expenseModel(newData);
+      const modelSaved: Expense = await model.save();
+      const modelPopulated: Expense = await this.expenseModel.populate(
+        modelSaved,
         {
-          categoryName: category,
-          userId,
+          path: 'category',
+          select: '_id categoryName icon',
         },
       );
-    const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-    const amountFormatted = formatNumberToCurrency(amount);
-    const newData = {
-      ...data,
-      fullDate,
-      formattedTime,
-      category: categoryId,
-      amountFormatted,
-      userId,
-      typeOfRecord,
-    };
 
-    const model = new this.expenseModel(newData);
-    const modelSaved: Expense = await model.save();
-    const modelPopulated: Expense = await this.expenseModel.populate(
-      modelSaved,
-      {
-        path: 'category',
-        select: '_id categoryName icon',
-      },
-    );
-
-    const response: ResponseSingleExpense = {
-      version: VERSION_RESPONSE,
-      success: true,
-      message: EXPENSE_CREATED_MESSAGE,
-      data: {
-        expense: modelPopulated,
-      },
-      error: null,
-    };
-    return response;
+      const response: ResponseSingleExpense = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: EXPENSE_CREATED_MESSAGE,
+        data: {
+          expense: modelPopulated,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async createTransferExpense(data: CreateExpenseDto) {
@@ -95,6 +107,62 @@ export class ExpensesService {
       const { _id: expenseId, account: accountExpense } = modelSaved;
       return { expenseId, accountExpense };
     } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  verifyExpensesBelongsToUser(expenses: Expense[], userId: string) {
+    if (expenses.length === 0) return expenses;
+    if (expenses[0]?.userId !== userId) {
+      throw new UnauthorizedException(UNAUTHORIZED_EXPENSES_ERROR);
+    }
+
+    return expenses;
+  }
+
+  // This service is used to search for expenses to be related to an income.
+  async findAllExpensesByMonthAndYear(
+    accountId: string,
+    month: string,
+    year: string,
+    userId: string,
+  ): Promise<ResponseMultipleExpenses> {
+    try {
+      const monthNumber = getMonthNumber(month);
+      const yearNumber = Number(year);
+
+      const startDate = new Date(yearNumber, monthNumber, 1);
+      const endDate = new Date(yearNumber, monthNumber + 1, 1);
+      console.log('startDate', startDate);
+      console.log('endDate', endDate);
+
+      const expenses: Expense[] = await this.expenseModel
+        .aggregate([
+          {
+            $match: {
+              date: {
+                $gte: startDate,
+                $lt: endDate,
+              },
+              userId,
+              typeOfRecord: 'expense',
+            },
+          },
+        ])
+        .exec();
+
+      this.verifyExpensesBelongsToUser(expenses, userId);
+      if (expenses.length === 0) {
+        throw new NotFoundException(EXPENSES_NOT_FOUND);
+      }
+
+      const response: ResponseMultipleExpenses = {
+        ...INITIAL_RESPONSE,
+        data: { expenses },
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
