@@ -226,43 +226,6 @@ export class RecordsService {
     return incomes;
   }
 
-  // This service is used to search for expenses to be related to an income.
-  async findAllExpensesByMonthAndYear(
-    accountId: string,
-    month: string,
-    year: string,
-    userId: string,
-  ): Promise<GeneralResponse> {
-    try {
-      const regexDate = `${month}.*${year}|${year}.*${month}`;
-      const expenses: Expense[] = await this.expenseModel
-        .find({
-          account: accountId,
-          fullDate: { $regex: new RegExp(regexDate, 'i') },
-        })
-        .populate({ path: 'category', select: 'categoryName icon' })
-        .exec();
-
-      this.verifyExpensesBelongsToUser(expenses, userId);
-      if (expenses.length === 0) {
-        const noExpensesResponse: GeneralResponse = {
-          ...INITIAL_RESPONSE,
-          message: NO_EXPENSES_FOUND,
-          data: null,
-        };
-        return noExpensesResponse;
-      }
-
-      const response: MultipleRecordsResponse = {
-        ...INITIAL_RESPONSE,
-        data: { records: expenses },
-      };
-      return response;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async findAllIncomesAndExpensesByMonthAndYear(
     accountId: string,
     month: string,

@@ -31,23 +31,6 @@ export class RecordsController {
     return this.recordsService.createTransfer({ expense, income, userId });
   }
 
-  // This endpoint is used to search for expenses to be related to an income.
-  @Get('/expenses/:accountId/:month/:year')
-  findExpensesByAccountMonthAndYear(
-    @Param('accountId') accountId: string,
-    @Param('month') month: string,
-    @Param('year') year: string,
-    @Request() req,
-  ) {
-    const userId = req.user.sub;
-    return this.recordsService.findAllExpensesByMonthAndYear(
-      accountId,
-      month,
-      year,
-      userId,
-    );
-  }
-
   @Get('/expenses-and-incomes/:accountId/:month/:year')
   findAllIncomesAndExpensesByAccountAndMonth(
     @Param('accountId') accountId: string,
