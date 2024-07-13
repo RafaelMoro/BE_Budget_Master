@@ -12,6 +12,13 @@ export interface BatchIncomesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Income | string)[];
 }
 
+export interface FindIncomesByMonthYearProps {
+  accountId: string;
+  month: string;
+  year: string;
+  userId: string;
+}
+
 export interface FindAllIncomesByAccountResponse {
   incomes: Income[];
   message: string | null;

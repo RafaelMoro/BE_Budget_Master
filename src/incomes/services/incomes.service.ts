@@ -28,6 +28,7 @@ import {
   BatchIncomesResponse,
   DeleteMultipleIncomesResponse,
   FindAllIncomesByAccountResponse,
+  FindIncomesByMonthYearProps,
   RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
@@ -42,6 +43,7 @@ import {
   UNAUTHORIZED_INCOMES_ERROR,
 } from '../incomes.constants';
 import { ExpensesService } from '../../expenses/services/expenses.service';
+import { getMonthNumber } from '../../utils/getMonthNumber';
 
 @Injectable()
 export class IncomesService {
@@ -288,6 +290,66 @@ export class IncomesService {
       throw new UnauthorizedException(UNAUTHORIZED_INCOMES_ERROR);
     }
     return incomes;
+  }
+
+  /**
+   * Method to get all incomes (incomes and transfer) by month, year, account and user Id.
+   * This method is used by the records service to get all incomes and expenses by month and year.
+   */
+  async findIncomesByMonthYear({
+    accountId,
+    userId,
+    month,
+    year,
+  }: FindIncomesByMonthYearProps): Promise<FindAllIncomesByAccountResponse> {
+    try {
+      const monthNumber = getMonthNumber(month);
+      const yearNumber = Number(year);
+
+      const startDate = new Date(yearNumber, monthNumber, 1);
+      const endDate = new Date(yearNumber, monthNumber + 1, 1);
+
+      const incomes: Income[] = await this.incomeModel
+        .aggregate([
+          {
+            $match: {
+              date: {
+                $gte: startDate,
+                $lt: endDate,
+              },
+              userId,
+              account: accountId,
+            },
+          },
+        ])
+        .exec();
+
+      this.verifyIncomesBelongsToUser(incomes, userId);
+      if (incomes.length === 0) {
+        return {
+          incomes,
+          message: INCOMES_NOT_FOUND,
+        };
+      }
+
+      let incomesPopulated: Income[];
+      incomesPopulated = await this.incomeModel.populate(incomes, {
+        path: 'expensesPaid',
+        select: '_id shortName amountFormatted fullDate formattedTime',
+      });
+      incomesPopulated = await this.incomeModel.populate(incomesPopulated, {
+        path: 'category',
+        select: '_id categoryName icon',
+      });
+
+      return {
+        incomes: incomesPopulated,
+        message: null,
+      };
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
   }
 
   /**
