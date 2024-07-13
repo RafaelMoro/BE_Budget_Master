@@ -301,7 +301,7 @@ export class IncomesService {
     userId,
     month,
     year,
-  }: FindIncomesByMonthYearProps): Promise<FindAllIncomesByAccountResponse> {
+  }: FindIncomesByMonthYearProps): Promise<Income[]> {
     try {
       const monthNumber = getMonthNumber(month);
       const yearNumber = Number(year);
@@ -326,10 +326,7 @@ export class IncomesService {
 
       this.verifyIncomesBelongsToUser(incomes, userId);
       if (incomes.length === 0) {
-        return {
-          incomes,
-          message: INCOMES_NOT_FOUND,
-        };
+        return incomes;
       }
 
       let incomesPopulated: Income[];
@@ -342,10 +339,7 @@ export class IncomesService {
         select: '_id categoryName icon',
       });
 
-      return {
-        incomes: incomesPopulated,
-        message: null,
-      };
+      return incomesPopulated;
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);

@@ -192,7 +192,7 @@ export class ExpensesService {
     month,
     year,
     userId,
-  }: FindExpensesByMonthYearProps): Promise<FindAllExpensesByAccountResponse> {
+  }: FindExpensesByMonthYearProps): Promise<Expense[]> {
     try {
       const monthNumber = getMonthNumber(month);
       const yearNumber = Number(year);
@@ -217,10 +217,7 @@ export class ExpensesService {
 
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
-        return {
-          message: EXPENSES_NOT_FOUND,
-          expenses,
-        };
+        return expenses;
       }
 
       const expensesPopulated: Expense[] = await this.expenseModel.populate(
@@ -231,10 +228,7 @@ export class ExpensesService {
         },
       );
 
-      return {
-        expenses: expensesPopulated,
-        message: null,
-      };
+      return expensesPopulated;
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);

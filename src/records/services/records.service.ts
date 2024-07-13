@@ -231,22 +231,19 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const expensesResponse =
+      const expenses =
         await this.expensesService.findExpensesByMonthAndYearForRecords({
           accountId,
           month,
           year,
           userId,
         });
-      const incomesResponse = await this.incomesService.findIncomesByMonthYear({
+      const incomes = await this.incomesService.findIncomesByMonthYear({
         accountId,
         month,
         year,
         userId,
       });
-
-      const { expenses, message: expensesMessage } = expensesResponse;
-      const { incomes, message: incomesMessage } = incomesResponse;
 
       return this.joinIncomesAndExpenses(expenses, incomes);
     } catch (error) {
