@@ -231,28 +231,22 @@ export class RecordsService {
     userId: string,
   ) {
     try {
-      const regexDate = `${month}.*${year}|${year}.*${month}`;
-      const expenses = await this.expenseModel
-        .find({
-          account: accountId,
-          fullDate: { $regex: new RegExp(regexDate, 'i') },
-        })
-        .populate({ path: 'category', select: 'categoryName icon' })
-        .exec();
-      const incomes = await this.incomeModel
-        .find({
-          account: accountId,
-          fullDate: { $regex: new RegExp(month, 'i') },
-        })
-        .populate({
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        })
-        .populate('category', 'categoryName icon')
-        .exec();
+      const expensesResponse =
+        await this.expensesService.findExpensesByMonthAndYearForRecords({
+          accountId,
+          month,
+          year,
+          userId,
+        });
+      const incomesResponse = await this.incomesService.findIncomesByMonthYear({
+        accountId,
+        month,
+        year,
+        userId,
+      });
 
-      this.verifyExpensesBelongsToUser(expenses, userId);
-      this.verifyIncomesBelongsToUser(incomes, userId);
+      const { expenses, message: expensesMessage } = expensesResponse;
+      const { incomes, message: incomesMessage } = incomesResponse;
 
       return this.joinIncomesAndExpenses(expenses, incomes);
     } catch (error) {
