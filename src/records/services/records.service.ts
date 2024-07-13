@@ -297,30 +297,6 @@ export class RecordsService {
     return response;
   }
 
-  /**
-   * @deprecated This method is deprecated and will be removed in future versions. Please use the new RecordsServiceV2 class instead.
-   */
-  async createMultipleRecords(
-    data: CreateExpenseDto[] | CreateIncomeDto[],
-    isIncome = false,
-  ) {
-    try {
-      const newModels = !isIncome
-        ? data.map((account) => {
-            return new this.expenseModel(account);
-          })
-        : data.map((account) => {
-            return new this.incomeModel(account);
-          });
-      const savedModels = await Promise.all(
-        newModels.map((account) => account.save()),
-      );
-      return savedModels;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async updateMultipleRecords(
     changes: UpdateIncomeDto[] | UpdateExpenseDto[],
     isIncome = false,
