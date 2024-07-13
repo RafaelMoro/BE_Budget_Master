@@ -133,8 +133,6 @@ export class ExpensesService {
 
       const startDate = new Date(yearNumber, monthNumber, 1);
       const endDate = new Date(yearNumber, monthNumber + 1, 1);
-      console.log('startDate', startDate);
-      console.log('endDate', endDate);
 
       const expenses: Expense[] = await this.expenseModel
         .aggregate([
@@ -146,6 +144,7 @@ export class ExpensesService {
               },
               userId,
               typeOfRecord: 'expense',
+              account: accountId,
             },
           },
         ])
