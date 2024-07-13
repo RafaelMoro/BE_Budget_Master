@@ -48,11 +48,6 @@ export class RecordsController {
     );
   }
 
-  @Get('/expenses-and-incomes/:accountId')
-  findExpenseAndIncomesByAccount(@Param('accountId') accountId: string) {
-    return this.recordsService.findAllIncomesAndExpenses(accountId);
-  }
-
   @Get('/expenses-and-incomes/:accountId/:month/:year')
   findAllIncomesAndExpensesByAccountAndMonth(
     @Param('accountId') accountId: string,

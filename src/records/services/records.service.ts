@@ -226,31 +226,6 @@ export class RecordsService {
     return incomes;
   }
 
-  async findAllIncomesAndExpenses(accountId: string) {
-    try {
-      const expenses = await this.expenseModel
-        .find({
-          account: accountId,
-        })
-        .populate('category', 'categoryName icon')
-        .exec();
-      const incomes = await this.incomeModel
-        .find({
-          account: accountId,
-        })
-        .populate({
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        })
-        .populate('category', 'categoryName')
-        .exec();
-
-      return this.joinIncomesAndExpenses(expenses, incomes);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   // This service is used to search for expenses to be related to an income.
   async findAllExpensesByMonthAndYear(
     accountId: string,
