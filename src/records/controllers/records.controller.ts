@@ -5,11 +5,9 @@ import {
   Get,
   Put,
   UseGuards,
-  Delete,
   Request,
 } from '@nestjs/common';
 
-import { DeleteRecordDto } from '../dtos/records.dto';
 import {
   CreateExpenseDto,
   UpdateExpenseDto,
@@ -71,16 +69,6 @@ export class RecordsController {
   @Post('/incomes/multiple')
   createMultiple(@Body() payload: CreateIncomeDto[]) {
     return this.recordsService.createMultipleRecords(payload, true);
-  }
-
-  @Delete('/expenses/multiple')
-  deleteMultipleExpenses(@Body() payload: DeleteRecordDto[]) {
-    return this.recordsService.deleteMultipleRecords(payload);
-  }
-
-  @Delete('/incomes/multiple')
-  deleteMultipleIncomes(@Body() payload: DeleteRecordDto[]) {
-    return this.recordsService.deleteMultipleRecords(payload, true);
   }
 
   @Put('/expenses/multiple')

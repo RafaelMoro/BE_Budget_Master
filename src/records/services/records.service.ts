@@ -34,7 +34,6 @@ import {
   CreateTransferProps,
   TransferCreated,
 } from '../interface';
-import { DeleteRecordDto } from '../dtos/records.dto';
 import {
   CreateExpenseDto,
   UpdateExpenseDto,
@@ -46,7 +45,6 @@ import {
   formatNumberToCurrency,
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
-import { GeneralResponse } from '../../response.interface';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../expenses/services/expenses.service';
@@ -426,33 +424,6 @@ export class RecordsService {
       if (userId !== recordUserId) {
         throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
       }
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async deleteMultipleRecords(records: DeleteRecordDto[], isIncome = false) {
-    try {
-      const recordsIds = records.map((record) => record.recordId);
-      const deletedRecords: Expense[] | Income[] = !isIncome
-        ? await Promise.all(
-            recordsIds.map((id) => this.expenseModel.findByIdAndDelete(id)),
-          )
-        : await Promise.all(
-            recordsIds.map((id) => this.incomeModel.findByIdAndDelete(id)),
-          );
-      const checkDeletedRecords = deletedRecords.map(
-        (record: Expense | Income, index: number) => {
-          if (!record) return `record id ${records[index].recordId} not found`;
-          return record;
-        },
-      );
-
-      const response: BatchRecordsResponse = {
-        ...INITIAL_RESPONSE,
-        data: checkDeletedRecords,
-      };
-      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
