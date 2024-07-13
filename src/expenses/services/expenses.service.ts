@@ -127,6 +127,16 @@ export class ExpensesService {
     return expenses;
   }
 
+  getStartEndDate({ month, year }: { month: string; year: string }) {
+    const monthNumber = getMonthNumber(month);
+    const yearNumber = Number(year);
+
+    const startDate = new Date(yearNumber, monthNumber, 1);
+    const endDate = new Date(yearNumber, monthNumber + 1, 1);
+
+    return { startDate, endDate };
+  }
+
   /**
    * Method used to search for expenses (only type expense, not transfer) that are related to an income.
    */
@@ -137,12 +147,7 @@ export class ExpensesService {
     userId,
   }: FindExpensesByMonthYearProps): Promise<ResponseMultipleExpenses> {
     try {
-      const monthNumber = getMonthNumber(month);
-      const yearNumber = Number(year);
-
-      const startDate = new Date(yearNumber, monthNumber, 1);
-      const endDate = new Date(yearNumber, monthNumber + 1, 1);
-
+      const { startDate, endDate } = this.getStartEndDate({ month, year });
       const expenses: Expense[] = await this.expenseModel
         .aggregate([
           {
@@ -194,12 +199,7 @@ export class ExpensesService {
     userId,
   }: FindExpensesByMonthYearProps): Promise<Expense[]> {
     try {
-      const monthNumber = getMonthNumber(month);
-      const yearNumber = Number(year);
-
-      const startDate = new Date(yearNumber, monthNumber, 1);
-      const endDate = new Date(yearNumber, monthNumber + 1, 1);
-
+      const { startDate, endDate } = this.getStartEndDate({ month, year });
       const expenses: Expense[] = await this.expenseModel
         .aggregate([
           {

@@ -224,6 +224,9 @@ export class RecordsService {
     return incomes;
   }
 
+  /**
+   * Method used to get all record by month and year.
+   */
   async findAllIncomesAndExpensesByMonthAndYear(
     accountId: string,
     month: string,
