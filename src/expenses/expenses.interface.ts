@@ -19,6 +19,15 @@ export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | string)[];
 }
 
+export interface FindAllExpensesByAccountResponse {
+  expenses: Expense[];
+  message: string | null;
+}
+
+export interface DeleteMultipleExpensesResponse {
+  expenses: (Expense | string)[];
+}
+
 export interface UpdateExpenseProps {
   changes: UpdateExpenseDto;
   userId: string;

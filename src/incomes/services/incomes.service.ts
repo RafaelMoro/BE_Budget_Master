@@ -8,7 +8,11 @@ import { Model } from 'mongoose';
 
 import { CreateIncome, Income } from '../incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { CreateIncomeDto, UpdateIncomeDto } from '../incomes.dto';
+import {
+  CreateIncomeDto,
+  DeleteIncomeDto,
+  UpdateIncomeDto,
+} from '../incomes.dto';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import {
   MISSING_AMOUNT,
@@ -22,6 +26,8 @@ import { CreateExpense } from '../../expenses/expenses.entity';
 import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import {
   BatchIncomesResponse,
+  DeleteMultipleIncomesResponse,
+  FindAllIncomesByAccountResponse,
   RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
@@ -32,6 +38,8 @@ import {
   INCOME_DELETED_MESSAGE,
   INCOME_NOT_FOUND,
   INCOME_UNAUTHORIZED_ERROR,
+  INCOMES_NOT_FOUND,
+  UNAUTHORIZED_INCOMES_ERROR,
 } from '../incomes.constants';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 
@@ -269,6 +277,81 @@ export class IncomesService {
         data: checkUpdatedRecords,
       };
       return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  verifyIncomesBelongsToUser(incomes: Income[], userId: string) {
+    if (incomes.length === 0) return incomes;
+    if (incomes[0]?.userId !== userId) {
+      throw new UnauthorizedException(UNAUTHORIZED_INCOMES_ERROR);
+    }
+    return incomes;
+  }
+
+  /**
+   * Method to get all incomes by account.
+   * This method is used by the accounts service when deleting an account.
+   */
+  async findAllIncomesByAccount({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }): Promise<FindAllIncomesByAccountResponse> {
+    try {
+      const incomes: Income[] = await this.incomeModel
+        .aggregate([
+          {
+            $match: {
+              userId,
+              account: accountId,
+            },
+          },
+        ])
+        .exec();
+
+      this.verifyIncomesBelongsToUser(incomes, userId);
+      if (incomes.length === 0) {
+        return {
+          incomes,
+          message: INCOMES_NOT_FOUND,
+        };
+      }
+
+      return {
+        incomes,
+        message: null,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method to delete all incomes given an array of income Ids.
+   * This method is used by the accounts service when deleting an account.
+   */
+  async deleteMultipleIncomes(
+    records: DeleteIncomeDto[],
+  ): Promise<DeleteMultipleIncomesResponse> {
+    try {
+      const incomesIds = records.map((record) => record.incomeId);
+      const deletedRecords: Income[] = await Promise.all(
+        incomesIds.map((id) => this.incomeModel.findByIdAndDelete(id)),
+      );
+      const checkDeletedRecords = deletedRecords.map(
+        (record: Income, index: number) => {
+          if (!record) return `record id ${records[index].incomeId} not found`;
+          return record;
+        },
+      );
+
+      return {
+        incomes: checkDeletedRecords,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

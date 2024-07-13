@@ -9,7 +9,11 @@ import { Model } from 'mongoose';
 
 import { CreateExpense, Expense } from '../expenses.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { CreateExpenseDto, UpdateExpenseDto } from '../expenses.dto';
+import {
+  CreateExpenseDto,
+  DeleteExpenseDto,
+  UpdateExpenseDto,
+} from '../expenses.dto';
 import {
   EXPENSE_CREATED_MESSAGE,
   EXPENSE_DELETED_MESSAGE,
@@ -25,6 +29,8 @@ import { formatDateToString, formatNumberToCurrency } from '../../utils';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
+  DeleteMultipleExpensesResponse,
+  FindAllExpensesByAccountResponse,
   RemoveExpenseProps,
   ResponseMultipleExpenses,
   ResponseSingleExpense,
@@ -120,7 +126,9 @@ export class ExpensesService {
     return expenses;
   }
 
-  // This service is used to search for expenses to be related to an income.
+  /**
+   * Method used to search for expenses to be related to an income.
+   */
   async findAllExpensesByMonthAndYear(
     accountId: string,
     month: string,
@@ -160,6 +168,47 @@ export class ExpensesService {
         data: { expenses },
       };
       return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method to get all expenses by account.
+   * This method is used by the accounts service when deleting an account.
+   */
+  async findAllExpensesByAccount({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }): Promise<FindAllExpensesByAccountResponse> {
+    try {
+      const expenses: Expense[] = await this.expenseModel
+        .aggregate([
+          {
+            $match: {
+              userId,
+              account: accountId,
+            },
+          },
+        ])
+        .exec();
+
+      this.verifyExpensesBelongsToUser(expenses, userId);
+      if (expenses.length === 0) {
+        return {
+          expenses,
+          message: EXPENSES_NOT_FOUND,
+        };
+      }
+
+      return {
+        expenses,
+        message: null,
+      };
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
@@ -286,6 +335,33 @@ export class ExpensesService {
         },
       };
       return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method to delete all expenses given an array of expense Ids.
+   * This method is used by the accounts service when deleting an account.
+   */
+  async deleteMultipleExpenses(
+    records: DeleteExpenseDto[],
+  ): Promise<DeleteMultipleExpensesResponse> {
+    try {
+      const expensesIds = records.map((record) => record.expenseId);
+      const deletedRecords: Expense[] = await Promise.all(
+        expensesIds.map((id) => this.expenseModel.findByIdAndDelete(id)),
+      );
+      const checkDeletedRecords = deletedRecords.map(
+        (record: Expense, index: number) => {
+          if (!record) return `record id ${records[index].expenseId} not found`;
+          return record;
+        },
+      );
+
+      return {
+        expenses: checkDeletedRecords,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }

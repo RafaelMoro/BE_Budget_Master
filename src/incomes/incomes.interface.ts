@@ -12,6 +12,15 @@ export interface BatchIncomesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Income | string)[];
 }
 
+export interface FindAllIncomesByAccountResponse {
+  incomes: Income[];
+  message: string | null;
+}
+
+export interface DeleteMultipleIncomesResponse {
+  incomes: (Income | string)[];
+}
+
 export interface UpdateIncomeProps {
   changes: UpdateIncomeDto;
   userId: string;
