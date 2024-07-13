@@ -17,24 +17,9 @@ export interface CreateTransferProps {
   userId: string;
 }
 
-export interface FindTransferRecordsByMonthAndYearProps {
-  month: string;
-  year: string;
-  userId: string;
-  transferId: string;
-}
-
 export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     record: Expense | Income;
-  };
-}
-
-export interface FindTransferRecordsResponse
-  extends Omit<GeneralResponse, 'data'> {
-  data: {
-    expense: Expense;
-    income: Income;
   };
 }
 

@@ -20,7 +20,6 @@ import {
   RECORD_UNAUTHORIZED_ERROR,
   UNAUTHORIZED_EXPENSES_ERROR,
   UNAUTHORIZED_INCOMES_ERROR,
-  TRANSFER_RECORDS_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
   TRANSFER_ACCOUNT_ERROR,
   MISSING_TRANSFER_RECORD,
@@ -29,8 +28,6 @@ import {
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
-  FindTransferRecordsByMonthAndYearProps,
-  FindTransferRecordsResponse,
   CreateTransferProps,
   TransferCreated,
 } from '../interface';
@@ -249,51 +246,6 @@ export class RecordsService {
       });
 
       return this.joinIncomesAndExpenses(expenses, incomes);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async findTransferRecordsByMonthAndYear({
-    month,
-    year,
-    userId,
-    transferId,
-  }: FindTransferRecordsByMonthAndYearProps) {
-    try {
-      const regexDate = `${month}.*${year}|${year}.*${month}`;
-      const expenseArray = await this.expenseModel
-        .find({
-          sub: userId,
-          fullDate: { $regex: new RegExp(regexDate, 'i') },
-          transferId,
-        })
-        .populate({ path: 'category', select: 'categoryName icon' })
-        .exec();
-      const incomeArray = await this.incomeModel
-        .find({
-          sub: userId,
-          fullDate: { $regex: new RegExp(regexDate, 'i') },
-          transferId,
-        })
-        .populate({
-          path: 'expensesPaid',
-          select: '_id shortName amountFormatted fullDate formattedTime',
-        })
-        .populate('category', 'categoryName icon')
-        .exec();
-
-      if (!expenseArray[0] || !incomeArray[0]) {
-        throw new BadRequestException(TRANSFER_RECORDS_NOT_FOUND);
-      }
-
-      const [expense] = expenseArray;
-      const [income] = incomeArray;
-      const response: FindTransferRecordsResponse = {
-        ...INITIAL_RESPONSE,
-        data: { expense, income },
-      };
-      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

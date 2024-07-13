@@ -138,7 +138,7 @@ export class ExpensesService {
   }
 
   /**
-   * Method used to search for expenses (only type expense, not transfer) that are related to an income.
+   * Method used to search for expenses (only record type expense) that are related to an income.
    */
   async findOnlyExpensesByMonthAndYear({
     accountId,
