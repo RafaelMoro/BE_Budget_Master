@@ -4,3 +4,4 @@ export const EXPENSE_UNAUTHORIZED_ERROR =
 export const EXPENSE_NOT_FOUND = 'Expense not found.';
 
 export const EXPENSE_CREATED_MESSAGE = 'Expense created';
+export const EXPENSE_DELETED_MESSAGE = 'Expense deleted';

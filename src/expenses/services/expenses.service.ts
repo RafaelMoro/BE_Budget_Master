@@ -11,6 +11,7 @@ import { CategoriesService } from '../../categories/services/categories.service'
 import { CreateExpenseDto, UpdateExpenseDto } from '../expenses.dto';
 import {
   EXPENSE_CREATED_MESSAGE,
+  EXPENSE_DELETED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   TYPE_OF_RECORD_INVALID,
@@ -21,6 +22,7 @@ import { formatDateToString, formatNumberToCurrency } from '../../utils';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
+  RemoveExpenseProps,
   ResponseSingleExpense,
   UpdateExpenseProps,
 } from '../expenses.interface';
@@ -167,6 +169,43 @@ export class ExpensesService {
       const response: BatchExpensesResponse = {
         ...INITIAL_RESPONSE,
         data: checkUpdatedRecords,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async verifyRecordBelongsUser(recordId: string, userId: string) {
+    try {
+      const record = await this.expenseModel.findById(recordId);
+      if (!record) throw new UnauthorizedException(EXPENSE_NOT_FOUND);
+
+      const { userId: recordUserId } = record;
+      if (userId !== recordUserId) {
+        throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeExpense({ payload, userId }: RemoveExpenseProps) {
+    try {
+      const { expenseId } = payload;
+      await this.verifyRecordBelongsUser(expenseId, userId);
+
+      const recordDeleted: Expense = await this.expenseModel.findByIdAndDelete(
+        expenseId,
+      );
+      if (!recordDeleted) throw new BadRequestException(EXPENSE_NOT_FOUND);
+
+      const response: ResponseSingleExpense = {
+        ...INITIAL_RESPONSE,
+        message: EXPENSE_DELETED_MESSAGE,
+        data: {
+          expense: recordDeleted,
+        },
       };
       return response;
     } catch (error) {
