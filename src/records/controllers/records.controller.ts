@@ -3,13 +3,10 @@ import {
   Post,
   Body,
   Get,
-  Put,
   UseGuards,
   Request,
 } from '@nestjs/common';
 
-import { UpdateExpenseDto } from '../../expenses/expenses.dto';
-import { UpdateIncomeDto } from '../../incomes/incomes.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
 import { Param } from '@nestjs/common/decorators';
@@ -40,15 +37,5 @@ export class RecordsController {
       year,
       userId,
     );
-  }
-
-  @Put('/expenses/multiple')
-  updateMultipleExpenses(@Body() payload: UpdateExpenseDto[]) {
-    return this.recordsService.updateMultipleRecords(payload);
-  }
-
-  @Put('/incomes/multiple')
-  updateMultipleIcomes(@Body() payload: UpdateIncomeDto[]) {
-    return this.recordsService.updateMultipleRecords(payload, true);
   }
 }

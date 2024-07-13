@@ -27,14 +27,10 @@ import {
 import {
   JoinRecordsResponse,
   MultipleRecordsResponse,
-  BatchRecordsResponse,
   CreateTransferProps,
   TransferCreated,
 } from '../interface';
-import {
-  CreateExpenseDto,
-  UpdateExpenseDto,
-} from '../../expenses/expenses.dto';
+import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import { CreateIncomeDto, UpdateIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
@@ -295,40 +291,6 @@ export class RecordsService {
       },
     };
     return response;
-  }
-
-  async updateMultipleRecords(
-    changes: UpdateIncomeDto[] | UpdateExpenseDto[],
-    isIncome = false,
-  ) {
-    try {
-      const updatedRecords = await Promise.all(
-        changes.map((change) =>
-          !isIncome
-            ? this.expenseModel.findByIdAndUpdate(
-                change.recordId,
-                { $set: change },
-                { new: true },
-              )
-            : this.incomeModel.findByIdAndUpdate(
-                change.recordId,
-                { $set: change },
-                { new: true },
-              ),
-        ),
-      );
-      const checkUpdatedRecords = updatedRecords.map((record, index) => {
-        if (!record) return `record id ${changes[index].recordId} not found`;
-        return record;
-      });
-      const response: BatchRecordsResponse = {
-        ...INITIAL_RESPONSE,
-        data: checkUpdatedRecords,
-      };
-      return response;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
   }
 
   async verifyRecordBelongsUser(
