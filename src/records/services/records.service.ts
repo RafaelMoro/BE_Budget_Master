@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -16,10 +12,6 @@ import {
   NO_EXPENSES_INCOMES_FOUND,
   NO_INCOMES_FOUND,
   RECORD_CREATED_MESSAGE,
-  RECORD_NOT_FOUND,
-  RECORD_UNAUTHORIZED_ERROR,
-  UNAUTHORIZED_EXPENSES_ERROR,
-  UNAUTHORIZED_INCOMES_ERROR,
   TYPE_OF_RECORD_INVALID,
   TRANSFER_ACCOUNT_ERROR,
   MISSING_TRANSFER_RECORD,
@@ -200,23 +192,6 @@ export class RecordsService {
     }
   }
 
-  verifyExpensesBelongsToUser(expenses: Expense[], userId: string) {
-    if (expenses.length === 0) return expenses;
-    if (expenses[0]?.userId !== userId) {
-      throw new UnauthorizedException(UNAUTHORIZED_EXPENSES_ERROR);
-    }
-
-    return expenses;
-  }
-
-  verifyIncomesBelongsToUser(incomes: Income[], userId: string) {
-    if (incomes.length === 0) return incomes;
-    if (incomes[0]?.userId !== userId) {
-      throw new UnauthorizedException(UNAUTHORIZED_INCOMES_ERROR);
-    }
-    return incomes;
-  }
-
   /**
    * Method used to get all record by month and year.
    */
@@ -291,25 +266,5 @@ export class RecordsService {
       },
     };
     return response;
-  }
-
-  async verifyRecordBelongsUser(
-    recordId: string,
-    userId: string,
-    isIncome: boolean,
-  ) {
-    try {
-      const record = isIncome
-        ? await this.incomeModel.findById(recordId)
-        : await this.expenseModel.findById(recordId);
-      if (!record) throw new UnauthorizedException(RECORD_NOT_FOUND);
-
-      const { userId: recordUserId } = record;
-      if (userId !== recordUserId) {
-        throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
-      }
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
   }
 }
