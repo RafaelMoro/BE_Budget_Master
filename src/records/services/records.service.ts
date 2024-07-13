@@ -22,7 +22,6 @@ import {
   RECORD_UNAUTHORIZED_ERROR,
   UNAUTHORIZED_EXPENSES_ERROR,
   UNAUTHORIZED_INCOMES_ERROR,
-  RECORD_DELETED,
   TRANSFER_RECORDS_NOT_FOUND,
   TYPE_OF_RECORD_INVALID,
   TRANSFER_ACCOUNT_ERROR,
@@ -30,7 +29,6 @@ import {
 } from '../constants';
 import {
   FindRecordsByAccountProps,
-  RemoveRecordProps,
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
@@ -544,45 +542,6 @@ export class RecordsService {
       if (userId !== recordUserId) {
         throw new UnauthorizedException(RECORD_UNAUTHORIZED_ERROR);
       }
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async removeRecord({ payload, userId, isIncome = false }: RemoveRecordProps) {
-    try {
-      const { recordId } = payload;
-      await this.verifyRecordBelongsUser(recordId, userId, isIncome);
-
-      // Return expenses to not paid
-      if (isIncome) {
-        const income = await this.incomeModel.findById(recordId);
-
-        // Check if there are any expenses related to this income
-        if (income?.expensesPaid?.length > 0) {
-          // set expenses as not paid
-          const payload: UpdateExpenseDto[] = income.expensesPaid.map(
-            (expense) => ({
-              recordId: expense._id,
-              isPaid: false,
-              userId,
-            }),
-          );
-          await this.updateMultipleRecords(payload);
-        }
-      }
-
-      const recordDeleted: Expense | Income = !isIncome
-        ? await this.expenseModel.findByIdAndDelete(recordId)
-        : await this.incomeModel.findByIdAndDelete(recordId);
-      if (!recordDeleted) throw new BadRequestException(RECORD_NOT_FOUND);
-
-      const response: GeneralResponse = {
-        ...INITIAL_RESPONSE,
-        message: RECORD_DELETED,
-        data: recordDeleted,
-      };
-      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

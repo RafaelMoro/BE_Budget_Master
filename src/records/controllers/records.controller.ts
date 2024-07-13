@@ -101,22 +101,6 @@ export class RecordsController {
     });
   }
 
-  @Delete('/expenses')
-  removeExpense(@Body() payload: DeleteRecordDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.recordsService.removeRecord({ payload, userId });
-  }
-
-  @Delete('/incomes')
-  removeIncome(@Body() payload: DeleteRecordDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.recordsService.removeRecord({
-      payload,
-      userId,
-      isIncome: true,
-    });
-  }
-
   @Post('/expenses/multiple')
   createMultipleExpenses(@Body() payload: CreateExpenseDto[]) {
     return this.recordsService.createMultipleRecords(payload);

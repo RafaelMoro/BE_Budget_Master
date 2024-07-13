@@ -1,5 +1,4 @@
 import { Expense } from '../expenses/expenses.entity';
-import { DeleteRecordDto } from './dtos/records.dto';
 import { GeneralResponse } from '../response.interface';
 import { Income } from '../incomes/incomes.entity';
 import { CreateIncomeDto } from '../incomes/incomes.dto';
@@ -23,12 +22,6 @@ export interface FindTransferRecordsByMonthAndYearProps {
   year: string;
   userId: string;
   transferId: string;
-}
-
-export interface RemoveRecordProps {
-  payload: DeleteRecordDto;
-  userId: string;
-  isIncome?: boolean;
 }
 
 export interface SingleRecordResponse extends Omit<GeneralResponse, 'data'> {
