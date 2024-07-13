@@ -179,6 +179,14 @@ export class IncomesService {
 
       const updatedRecord: Income = await this.incomeModel
         .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .populate({
+          path: 'expensesPaid',
+          select: '_id shortName amountFormatted fullDate formattedTime',
+        })
+        .populate({
+          path: 'category',
+          select: '_id categoryName icon',
+        })
         .exec();
 
       if (!updatedRecord) throw new BadRequestException(INCOME_NOT_FOUND);

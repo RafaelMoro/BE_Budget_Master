@@ -323,6 +323,10 @@ export class ExpensesService {
 
       const updatedRecord: Expense = await this.expenseModel
         .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .populate({
+          path: 'category',
+          select: '_id categoryName icon',
+        })
         .exec();
 
       if (!updatedRecord) throw new BadRequestException(EXPENSE_NOT_FOUND);
@@ -358,6 +362,7 @@ export class ExpensesService {
         ...INITIAL_RESPONSE,
         data: checkUpdatedRecords,
       };
+      console.log('response', response);
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
