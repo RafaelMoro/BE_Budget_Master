@@ -110,6 +110,17 @@ export class IncomesService {
     }
   }
 
+  async createTransferIncome(data: CreateIncomeDto) {
+    try {
+      const model = new this.incomeModel(data);
+      const modelSaved: Income = await model.save();
+      const { _id: incomeId, account: accountIncome } = modelSaved;
+      return { incomeId, accountIncome };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async updateIncome({
     changes,
     userId,

@@ -83,6 +83,7 @@ export class RecordsService {
         throw new BadRequestException(TRANSFER_ACCOUNT_ERROR);
       }
 
+      // Get category data
       const {
         data: { categories },
       } = await this.categoriesService.findOrCreateByNameAndUserId({
@@ -91,13 +92,15 @@ export class RecordsService {
       });
       const [categoryFoundOrCreated] = categories;
       const { _id: categoryId } = categoryFoundOrCreated;
+
+      // Format data
       const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
       const amountFormatted = formatNumberToCurrency(amount);
       const newDataExpense = {
         ...expense,
         fullDate,
         formattedTime,
-        category: categoryId,
+        category: categoryId.toString(),
         amountFormatted,
         userId,
         typeOfRecord,
@@ -106,18 +109,17 @@ export class RecordsService {
         ...income,
         fullDate,
         formattedTime,
-        category: categoryId,
+        category: categoryId.toString(),
         amountFormatted,
         userId,
         typeOfRecord,
       };
-      const expenseModel = new this.expenseModel(newDataExpense);
-      const incomeModel = new this.incomeModel(newDataIncome);
 
-      const expenseSaved: Expense = await expenseModel.save();
-      const incomeSaved: Income = await incomeModel.save();
-      const { _id: expenseId, account: accountExpense } = expenseSaved;
-      const { _id: incomeId, account: accountIncome } = incomeSaved;
+      // Create expense and income
+      const { expenseId, accountExpense } =
+        await this.expensesService.createTransferExpense(newDataExpense);
+      const { incomeId, accountIncome } =
+        await this.incomesService.createTransferIncome(newDataIncome);
 
       // Add transderRecord data to each document.
       const updatedExpense: UpdateExpenseDto = {
@@ -132,11 +134,9 @@ export class RecordsService {
           account: accountIncome.toString(),
         },
       };
-      const updatedIncome = {
+      const updatedIncome: UpdateIncomeDto = {
         recordId: incomeId.toString(),
         date: income.date,
-        fullDate,
-        formattedTime,
         category: newDataIncome.category.toString(),
         amount: income.amount,
         userId,
@@ -169,7 +169,7 @@ export class RecordsService {
           isPaid: true,
           userId,
         }));
-        await this.updateMultipleRecords(payload);
+        await this.expensesService.updateMultipleExpenses(payload);
       }
 
       let incomePopulated = await this.incomeModel.populate(

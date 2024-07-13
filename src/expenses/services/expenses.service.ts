@@ -88,6 +88,17 @@ export class ExpensesService {
     return response;
   }
 
+  async createTransferExpense(data: CreateExpenseDto) {
+    try {
+      const model = new this.expenseModel(data);
+      const modelSaved: Expense = await model.save();
+      const { _id: expenseId, account: accountExpense } = modelSaved;
+      return { expenseId, accountExpense };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async updateExpense({
     changes,
     userId,
