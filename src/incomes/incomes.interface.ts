@@ -1,6 +1,6 @@
 import { GeneralResponse } from 'src/response.interface';
 import { Income } from './incomes.entity';
-import { UpdateIncomeDto } from './incomes.dto';
+import { DeleteIncomeDto, UpdateIncomeDto } from './incomes.dto';
 
 export interface ResponseSingleIncome extends Omit<GeneralResponse, 'data'> {
   data: {
@@ -17,4 +17,10 @@ export interface UpdateIncomeProps {
   userId: string;
   skipFindCategory?: boolean;
   skipUpdateExpensesPaid?: boolean;
+}
+
+export interface RemoveIncomeProps {
+  payload: DeleteIncomeDto;
+  userId: string;
+  isIncome?: boolean;
 }

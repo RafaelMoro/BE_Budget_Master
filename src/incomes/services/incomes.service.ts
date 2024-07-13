@@ -22,12 +22,14 @@ import { CreateExpense } from '../../expenses/expenses.entity';
 import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import {
   BatchIncomesResponse,
+  RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
 } from '../incomes.interface';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
 import {
   INCOME_CREATED_MESSAGE,
+  INCOME_DELETED_MESSAGE,
   INCOME_NOT_FOUND,
   INCOME_UNAUTHORIZED_ERROR,
 } from '../incomes.constants';
@@ -176,6 +178,58 @@ export class IncomesService {
         ...INITIAL_RESPONSE,
         data: {
           income: updatedRecord,
+        },
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async verifyRecordBelongsUser(recordId: string, userId: string) {
+    try {
+      const record = await this.incomeModel.findById(recordId);
+      if (!record) throw new UnauthorizedException(INCOME_NOT_FOUND);
+
+      const { userId: recordUserId } = record;
+      if (userId !== recordUserId) {
+        throw new UnauthorizedException(INCOME_UNAUTHORIZED_ERROR);
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeIncome({ payload, userId }: RemoveIncomeProps) {
+    try {
+      const { incomeId } = payload;
+      await this.verifyRecordBelongsUser(incomeId, userId);
+
+      const income = await this.incomeModel.findById(incomeId);
+
+      // Check if there are any expenses related to this income
+      if (income?.expensesPaid?.length > 0) {
+        // set expenses as not paid
+        const payload: UpdateExpenseDto[] = income.expensesPaid.map(
+          (expense) => ({
+            recordId: expense._id,
+            isPaid: false,
+            userId,
+          }),
+        );
+        await this.expensesService.updateMultipleExpenses(payload);
+      }
+
+      const recordDeleted: Income = await this.incomeModel.findByIdAndDelete(
+        incomeId,
+      );
+      if (!recordDeleted) throw new BadRequestException(INCOME_NOT_FOUND);
+
+      const response: ResponseSingleIncome = {
+        ...INITIAL_RESPONSE,
+        message: INCOME_DELETED_MESSAGE,
+        data: {
+          income: recordDeleted,
         },
       };
       return response;
