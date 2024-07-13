@@ -12,8 +12,6 @@ import { CreateIncome, Income } from '../../incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
-  EXPENSE_NOT_FOUND,
-  INCOME_NOT_FOUND,
   NO_EXPENSES_FOUND,
   NO_EXPENSES_INCOMES_FOUND,
   NO_INCOMES_FOUND,
@@ -28,7 +26,6 @@ import {
   MISSING_TRANSFER_RECORD,
 } from '../constants';
 import {
-  FindRecordsByAccountProps,
   JoinRecordsResponse,
   MultipleRecordsResponse,
   BatchRecordsResponse,
@@ -205,57 +202,6 @@ export class RecordsService {
           income: incomePopulated,
         },
         error: null,
-      };
-      return response;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  /** Service used for searching incomes or expenses by account. */
-  async findRecordsByAccount({
-    accountId,
-    isIncome = false,
-    userId,
-  }: FindRecordsByAccountProps): Promise<MultipleRecordsResponse> {
-    try {
-      const records = !isIncome
-        ? await this.expenseModel
-            .find({ account: accountId })
-            .populate('category', 'categoryName')
-            .exec()
-        : await this.incomeModel
-            .find({ account: accountId })
-            .populate({
-              path: 'expensesPaid',
-              select: '_id shortName amountFormatted fullDate formattedTime',
-            })
-            .populate('category', 'categoryName')
-            .exec();
-
-      if (isIncome) {
-        this.verifyIncomesBelongsToUser(records as Income[], userId);
-      } else {
-        this.verifyExpensesBelongsToUser(records as Expense[], userId);
-      }
-
-      if (records.length === 0) {
-        // returning a message because this service is used when an account is deleted. If no records are found and an exception is throwed,
-        // it would break the service to delete an account with no records.
-        const message = !isIncome ? EXPENSE_NOT_FOUND : INCOME_NOT_FOUND;
-        const emptyRecordsResponse: MultipleRecordsResponse = {
-          ...INITIAL_RESPONSE,
-          data: null,
-          message,
-        };
-        return emptyRecordsResponse;
-      }
-
-      const response: MultipleRecordsResponse = {
-        ...INITIAL_RESPONSE,
-        data: {
-          records,
-        },
       };
       return response;
     } catch (error) {
