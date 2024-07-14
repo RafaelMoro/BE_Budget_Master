@@ -9,7 +9,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
-import { Budget } from '../../budgets/budgets.entity';
 
 export class IndebtedPeople {
   @IsNotEmpty()
@@ -79,9 +78,6 @@ export class CreateRecordDto {
 
   @IsArray()
   readonly budgets: string[];
-
-  @IsArray()
-  readonly linkedBudgets: Budget[];
 }
 
 export class UpdateRecordDto extends PartialType(CreateRecordDto) {

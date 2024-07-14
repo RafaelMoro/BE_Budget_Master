@@ -4,10 +4,9 @@ import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
 import { ExpensesModule } from '../expenses/expenses.module';
 import { IncomesModule } from '../incomes/incomes.module';
-import { BudgetHistoryModule } from '../budget-history/budget-history.module';
 
 @Module({
-  imports: [CategoriesModule, ExpensesModule, IncomesModule, BudgetHistoryModule],
+  imports: [CategoriesModule, ExpensesModule, IncomesModule],
   controllers: [RecordsController],
   providers: [RecordsService],
   exports: [RecordsService],

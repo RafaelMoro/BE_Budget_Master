@@ -3,7 +3,6 @@ import { Document, Types } from 'mongoose';
 
 import { Account } from '../../accounts/entities/accounts.entity';
 import { Category } from '../../categories/entities/categories.entity';
-import { Budget } from '../../budgets/budgets.entity';
 
 @Schema()
 export class AccountRecord extends Document {
@@ -68,16 +67,6 @@ export class AccountRecord extends Document {
 
   @Prop()
   budgets: string[];
-
-  @Prop({
-    type: [
-      {
-        type: Types.ObjectId,
-        ref: Budget.name,
-      },
-    ],
-  })
-  linkedBudgets: Types.Array<Budget>;
 }
 
 export const RecordsSchema = SchemaFactory.createForClass(AccountRecord);
