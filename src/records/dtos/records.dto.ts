@@ -89,9 +89,3 @@ export class UpdateRecordDto extends PartialType(CreateRecordDto) {
   @IsNotEmpty()
   readonly recordId: string;
 }
-
-export class DeleteRecordDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  readonly recordId: string;
-}

@@ -9,7 +9,8 @@ import {
   ACCOUNT_UPDATED_MESSAGE,
 } from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
-import { EXPENSE_NOT_FOUND, INCOME_NOT_FOUND } from '../../records/constants';
+import { EXPENSES_NOT_FOUND } from '../../expenses/expenses.constants';
+import { INCOMES_NOT_FOUND } from '../../incomes/incomes.constants';
 import {
   AccountResponse,
   DeleteAccountResponse,
@@ -17,18 +18,20 @@ import {
   GetAccountResponse,
 } from '../accounts.interface';
 import { Account } from '../entities/accounts.entity';
-import { RecordsService } from '../../records/services/records.service';
 import {
   CreateAccountDto,
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
+import { IncomesService } from '../../incomes/services/incomes.service';
+import { ExpensesService } from '../../expenses/services/expenses.service';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
-    private recordsService: RecordsService,
+    private incomesService: IncomesService,
+    private expensesService: ExpensesService,
   ) {}
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
@@ -102,50 +105,38 @@ export class AccountsService {
 
       // Check if the account has records.
       const expensesRelatedToAccount =
-        await this.recordsService.findRecordsByAccount({
+        await this.expensesService.findAllExpensesByAccount({
           accountId,
           userId,
         });
       const incomesRelatedToAccount =
-        await this.recordsService.findRecordsByAccount({
+        await this.incomesService.findAllIncomesByAccount({
           accountId,
-          isIncome: true,
           userId,
         });
 
       // If the account has expenses, then delete expenses.
-      if (
-        expensesRelatedToAccount.message !== EXPENSE_NOT_FOUND &&
-        expensesRelatedToAccount.message !== INCOME_NOT_FOUND
-      ) {
+      if (expensesRelatedToAccount.message !== EXPENSES_NOT_FOUND) {
         // Return each record id as object as expected to the service delete multiple records.
-        const expensesIds = expensesRelatedToAccount.data.records.map(
-          (record) => {
-            return { recordId: record._id };
-          },
-        );
-        const { data } = await this.recordsService.deleteMultipleRecords(
+        const expensesIds = expensesRelatedToAccount.expenses.map((expense) => {
+          return { recordId: expense._id.toString() };
+        });
+        const { expenses } = await this.expensesService.deleteMultipleExpenses(
           expensesIds,
         );
-        expenseRecords = data;
+        expenseRecords = expenses;
       }
 
       // If the account has incomes, then delete incomes.
-      if (
-        incomesRelatedToAccount.message !== EXPENSE_NOT_FOUND &&
-        incomesRelatedToAccount.message !== INCOME_NOT_FOUND
-      ) {
+      if (incomesRelatedToAccount.message !== INCOMES_NOT_FOUND) {
         // Return records id as object each as expected to the service delete multiple records.
-        const incomesIds = incomesRelatedToAccount.data.records.map(
-          (record) => {
-            return { recordId: record._id };
-          },
-        );
-        const { data } = await this.recordsService.deleteMultipleRecords(
+        const incomesIds = incomesRelatedToAccount.incomes.map((income) => {
+          return { recordId: income._id.toString() };
+        });
+        const { incomes } = await this.incomesService.deleteMultipleIncomes(
           incomesIds,
-          true,
         );
-        incomesRecords = data;
+        incomesRecords = incomes;
       }
 
       // After deleting records related to this account if found, delete the account.

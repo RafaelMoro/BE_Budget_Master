@@ -1,32 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { RecordsController } from './controllers/records.controller';
-import { CreateExpense, ExpenseSchema } from './entities/expenses.entity';
-import { CreateIncome, IncomeSchema } from './entities/incomes.entity';
-import { AccountRecord, RecordsSchema } from './entities/records.entity';
 import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
+import { ExpensesModule } from '../expenses/expenses.module';
+import { IncomesModule } from '../incomes/incomes.module';
 import { BudgetHistoryModule } from '../budget-history/budget-history.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      {
-        name: AccountRecord.name,
-        schema: RecordsSchema,
-      },
-      {
-        name: CreateExpense.name,
-        schema: ExpenseSchema,
-      },
-      {
-        name: CreateIncome.name,
-        schema: IncomeSchema,
-      },
-    ]),
-    CategoriesModule,
-    BudgetHistoryModule,
-  ],
+  imports: [CategoriesModule, ExpensesModule, IncomesModule, BudgetHistoryModule],
   controllers: [RecordsController],
   providers: [RecordsService],
   exports: [RecordsService],

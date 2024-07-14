@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AccountRecord } from './records.entity';
+import { AccountRecord } from '../records/entities/records.entity';
 import { Types } from 'mongoose';
 
 @Schema()
