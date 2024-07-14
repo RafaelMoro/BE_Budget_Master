@@ -11,6 +11,8 @@ import { MailModule } from './mail/mail.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ExpensesModule } from './expenses/expenses.module';
+import { IncomesModule } from './incomes/incomes.module';
 import config from './config';
 
 @Module({
@@ -41,6 +43,8 @@ import config from './config';
     AccountsModule,
     RecordsModule,
     CategoriesModule,
+    ExpensesModule,
+    IncomesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

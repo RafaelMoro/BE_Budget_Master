@@ -70,7 +70,7 @@ export class CategoriesService {
     }
   }
 
-  async findByNameAndUserId({
+  async findOrCreateByNameAndUserId({
     categoryName,
     userId,
     isCreateLocalCategoriesService = false,
@@ -111,6 +111,25 @@ export class CategoriesService {
     }
   }
 
+  async findOrCreateCategoriesByNameAndUserIdForRecords({
+    categoryName,
+    userId,
+  }: FindByNameAndUserIdProps) {
+    try {
+      const {
+        data: { categories },
+      } = await this.findOrCreateByNameAndUserId({
+        categoryName,
+        userId,
+      });
+      const [categoryFoundOrCreated] = categories;
+      const { _id: categoryId } = categoryFoundOrCreated;
+      return categoryId;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async createOneCategory(payload: CreateCategoriesDto, userId: string) {
     try {
       const completeData = { ...payload, sub: userId };
@@ -135,7 +154,7 @@ export class CategoriesService {
     try {
       const [firstCategory] = ALL_LOCAL_CATEGORIES;
       const { categoryName } = firstCategory;
-      const localCategoryExist = await this.findByNameAndUserId({
+      const localCategoryExist = await this.findOrCreateByNameAndUserId({
         categoryName,
         userId: sub,
         isCreateLocalCategoriesService: true,
