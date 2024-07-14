@@ -34,6 +34,11 @@ export class ExpensesController {
     return this.expensesService.updateExpense({ changes: payload, userId });
   }
 
+  @Put('/multiple')
+  updateMultipleExpense(@Body() payload: UpdateExpenseDto[]) {
+    return this.expensesService.updateMultipleExpenses(payload);
+  }
+
   @Delete()
   removeExpense(@Body() payload: DeleteExpenseDto, @Request() req) {
     const userId = req.user.sub;

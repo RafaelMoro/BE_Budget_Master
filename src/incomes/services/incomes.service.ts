@@ -231,10 +231,10 @@ export class IncomesService {
 
   async removeIncome({ payload, userId }: RemoveIncomeProps) {
     try {
-      const { incomeId } = payload;
-      await this.verifyRecordBelongsUser(incomeId, userId);
+      const { recordId } = payload;
+      await this.verifyRecordBelongsUser(recordId, userId);
 
-      const income = await this.incomeModel.findById(incomeId);
+      const income = await this.incomeModel.findById(recordId);
 
       // Check if there are any expenses related to this income
       if (income?.expensesPaid?.length > 0) {
@@ -250,7 +250,7 @@ export class IncomesService {
       }
 
       const recordDeleted: Income = await this.incomeModel.findByIdAndDelete(
-        incomeId,
+        recordId,
       );
       if (!recordDeleted) throw new BadRequestException(INCOME_NOT_FOUND);
 
@@ -402,13 +402,13 @@ export class IncomesService {
     records: DeleteIncomeDto[],
   ): Promise<DeleteMultipleIncomesResponse> {
     try {
-      const incomesIds = records.map((record) => record.incomeId);
+      const incomesIds = records.map((record) => record.recordId);
       const deletedRecords: Income[] = await Promise.all(
         incomesIds.map((id) => this.incomeModel.findByIdAndDelete(id)),
       );
       const checkDeletedRecords = deletedRecords.map(
         (record: Income, index: number) => {
-          if (!record) return `record id ${records[index].incomeId} not found`;
+          if (!record) return `record id ${records[index].recordId} not found`;
           return record;
         },
       );

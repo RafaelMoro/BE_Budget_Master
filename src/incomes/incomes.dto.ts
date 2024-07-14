@@ -20,5 +20,5 @@ export class UpdateIncomeDto extends PartialType(CreateIncomeDto) {
 export class DeleteIncomeDto {
   @IsMongoId()
   @IsNotEmpty()
-  readonly incomeId: string;
+  readonly recordId: string;
 }

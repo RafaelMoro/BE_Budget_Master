@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -166,7 +165,11 @@ export class ExpensesService {
 
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
-        throw new NotFoundException(EXPENSES_NOT_FOUND);
+        return {
+          ...INITIAL_RESPONSE,
+          message: EXPENSES_NOT_FOUND,
+          data: { expenses },
+        };
       }
 
       const expensesPopulated: Expense[] = await this.expenseModel.populate(
@@ -384,11 +387,11 @@ export class ExpensesService {
 
   async removeExpense({ payload, userId }: RemoveExpenseProps) {
     try {
-      const { expenseId } = payload;
-      await this.verifyRecordBelongsUser(expenseId, userId);
+      const { recordId } = payload;
+      await this.verifyRecordBelongsUser(recordId, userId);
 
       const recordDeleted: Expense = await this.expenseModel.findByIdAndDelete(
-        expenseId,
+        recordId,
       );
       if (!recordDeleted) throw new BadRequestException(EXPENSE_NOT_FOUND);
 
@@ -413,13 +416,13 @@ export class ExpensesService {
     records: DeleteExpenseDto[],
   ): Promise<DeleteMultipleExpensesResponse> {
     try {
-      const expensesIds = records.map((record) => record.expenseId);
+      const expensesIds = records.map((record) => record.recordId);
       const deletedRecords: Expense[] = await Promise.all(
         expensesIds.map((id) => this.expenseModel.findByIdAndDelete(id)),
       );
       const checkDeletedRecords = deletedRecords.map(
         (record: Expense, index: number) => {
-          if (!record) return `record id ${records[index].expenseId} not found`;
+          if (!record) return `record id ${records[index].recordId} not found`;
           return record;
         },
       );
