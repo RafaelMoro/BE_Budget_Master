@@ -166,7 +166,11 @@ export class ExpensesService {
 
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
-        throw new NotFoundException(EXPENSES_NOT_FOUND);
+        return {
+          ...INITIAL_RESPONSE,
+          message: EXPENSES_NOT_FOUND,
+          data: { expenses },
+        };
       }
 
       const expensesPopulated: Expense[] = await this.expenseModel.populate(
