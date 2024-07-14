@@ -1,3 +1,9 @@
+## v0.8.1 (2024-07-14)
+
+### Pull Requests
+[#27](https://github.com/RafaelMoro/BE_Budget_Master/pull/27) | Add fixes after refactor of records
+
+
 ## v0.8.0 (2024-07-14)
 
 ### Pull Requests
