@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty, IsArray } from 'class-validator';
-import { CreateRecordDto } from './records.dto';
+import { CreateRecordDto } from '../records/dtos/records.dto';
 import { PartialType } from '@nestjs/swagger';
-import { CreateExpense } from '../entities/expenses.entity';
+import { CreateExpense } from '../expenses/expenses.entity';
 
 export class CreateIncomeDto extends CreateRecordDto {
   @IsArray()
@@ -15,4 +15,10 @@ export class UpdateIncomeDto extends PartialType(CreateIncomeDto) {
 
   @IsMongoId()
   readonly userId: string;
+}
+
+export class DeleteIncomeDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly recordId: string;
 }
