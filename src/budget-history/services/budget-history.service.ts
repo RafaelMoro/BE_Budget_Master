@@ -266,7 +266,7 @@ export class BudgetHistoryService {
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
-        message: 'Record added to budget history',
+        message: 'Record removed from budget history',
         data: {
           budgetHistory: updateBudgetHistoryModel,
         },
