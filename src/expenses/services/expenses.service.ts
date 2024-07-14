@@ -41,13 +41,15 @@ import {
   MISSING_CATEGORY,
   MISSING_DATE,
 } from '../../records/constants';
-import { getMonthNumber } from 'src/utils/getMonthNumber';
+import { getMonthNumber } from '../../utils/getMonthNumber';
+import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 
 @Injectable()
 export class ExpensesService {
   constructor(
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     private categoriesService: CategoriesService,
+    private budgetHistoryService: BudgetHistoryService,
   ) {}
 
   async createExpense(data: CreateExpenseDto, userId: string) {
@@ -90,6 +92,29 @@ export class ExpensesService {
           select: '_id categoryName icon',
         },
       );
+      // modelPopulated = await this.expenseModel.populate(modelPopulated, {
+      //   path: 'linkedBudgets',
+      // });
+
+      if (
+        modelPopulated.linkedBudgets?.length > 0 &&
+        typeOfRecord === 'expense'
+      ) {
+        for await (const budget of modelPopulated.linkedBudgets) {
+          await this.budgetHistoryService.addRecordToBudgetHistory({
+            budgetId: budget._id,
+            sub: userId,
+            newRecord: {
+              recordId: modelPopulated._id.toString(),
+              recordName: modelPopulated.shortName,
+              recordDate: date,
+              recordAmount: modelPopulated.amount,
+              budgetCurrentAmount: budget.currentAmount,
+              budgetUpdatedAmount: budget.currentAmount + modelPopulated.amount,
+            },
+          });
+        }
+      }
 
       const response: ResponseSingleExpense = {
         version: VERSION_RESPONSE,
@@ -172,13 +197,16 @@ export class ExpensesService {
         };
       }
 
-      const expensesPopulated: Expense[] = await this.expenseModel.populate(
+      let expensesPopulated: Expense[] = await this.expenseModel.populate(
         expenses,
         {
           path: 'category',
           select: '_id categoryName icon',
         },
       );
+      expensesPopulated = await this.expenseModel.populate(expensesPopulated, {
+        path: 'linkedBudgets',
+      });
 
       const response: ResponseMultipleExpenses = {
         ...INITIAL_RESPONSE,
