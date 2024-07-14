@@ -1,4 +1,6 @@
 export const TYPE_OF_RECORD_INVALID = 'Invalid type of record for expense';
+export const TRANSFER_RECORD_LINKED_BUDGET_ERROR =
+  'Transfer record cannot be linked to budget';
 export const EXPENSE_UNAUTHORIZED_ERROR =
   'This expense does not belongs to the user';
 export const EXPENSE_NOT_FOUND = 'Expense not found.';

@@ -19,6 +19,7 @@ import {
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   EXPENSES_NOT_FOUND,
+  TRANSFER_RECORD_LINKED_BUDGET_ERROR,
   TYPE_OF_RECORD_INVALID,
   UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
@@ -54,8 +55,12 @@ export class ExpensesService {
 
   async createExpense(data: CreateExpenseDto, userId: string) {
     try {
-      const { category, amount, typeOfRecord, date } = data;
+      const { category, amount, typeOfRecord, linkedBudgets, date } = data;
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+      if (linkedBudgets?.length > 0 && typeOfRecord === 'transfer') {
+        throw new BadRequestException(TRANSFER_RECORD_LINKED_BUDGET_ERROR);
+      }
 
       if (
         isTypeOfRecord(typeOfRecord) === false ||
