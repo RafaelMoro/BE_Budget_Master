@@ -85,16 +85,16 @@ export class ExpensesService {
 
       const model = new this.expenseModel(newData);
       const modelSaved: Expense = await model.save();
-      const modelPopulated: Expense = await this.expenseModel.populate(
+      let modelPopulated: Expense = await this.expenseModel.populate(
         modelSaved,
         {
           path: 'category',
           select: '_id categoryName icon',
         },
       );
-      // modelPopulated = await this.expenseModel.populate(modelPopulated, {
-      //   path: 'linkedBudgets',
-      // });
+      modelPopulated = await this.expenseModel.populate(modelPopulated, {
+        path: 'linkedBudgets',
+      });
 
       if (
         modelPopulated.linkedBudgets?.length > 0 &&
