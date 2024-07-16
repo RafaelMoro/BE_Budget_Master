@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-import { BudgetHistory } from '../budget-history.entity';
+import { BudgetHistoryModel } from '../budget-history.entity';
 import {
   CreateBudgetHistoryDto,
   DeleteBudgetHistoryDto,
@@ -31,8 +31,8 @@ import {
 @Injectable()
 export class BudgetHistoryService {
   constructor(
-    @InjectModel(BudgetHistory.name)
-    private budgetHistoryModel: Model<BudgetHistory>,
+    @InjectModel(BudgetHistoryModel.name)
+    private budgetHistoryModel: Model<BudgetHistoryModel>,
   ) {}
 
   async createBudgtHistory({

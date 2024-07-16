@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Budget } from '../budgets/budgets.entity';
 
 @Schema()
-export class BudgetHistory extends Document {
+export class BudgetHistoryModel extends Document {
   @Prop({ type: Types.ObjectId, ref: Budget.name, required: true })
   budget: Budget | Types.ObjectId;
 
@@ -25,4 +25,5 @@ export class BudgetHistory extends Document {
   records: Types.Array<Record<'string | date | number', any>>;
 }
 
-export const BudgetHistorySchema = SchemaFactory.createForClass(BudgetHistory);
+export const BudgetHistorySchema =
+  SchemaFactory.createForClass(BudgetHistoryModel);
