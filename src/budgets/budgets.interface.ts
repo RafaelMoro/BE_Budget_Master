@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
 import { Budget } from './budgets.entity';
-import { BudgetHistoryResponse } from '../budget-history/budget-history.interface';
+import { BudgetHistory } from '../budget-history/budget-history.interface';
 
 export interface BudgetsResponse extends Budget {
   _id: Types.ObjectId;
@@ -16,14 +16,14 @@ export interface SingleBudgetResponse extends Omit<GeneralResponse, 'data'> {
 export interface RemoveBudgetResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     budget: BudgetsResponse;
-    budgetHistoryDeleted: BudgetHistoryResponse;
+    budgetHistoryDeleted: BudgetHistory;
   };
 }
 
 export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     budget: BudgetsResponse;
-    budgetHistory: BudgetHistoryResponse;
+    budgetHistory: BudgetHistory;
   };
 }
 

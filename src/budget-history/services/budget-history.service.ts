@@ -15,7 +15,7 @@ import {
 } from '../budget-history.dto';
 import {
   AddRecordToBudgetHistoryProps,
-  BudgetHistoryResponse,
+  BudgetHistory,
   GeneralBudgetHistoryResponse,
   RemoveBudgetHistoryByBudgetIdResponse,
   RemoveRecordFromBudgetHistoryProps,
@@ -45,7 +45,7 @@ export class BudgetHistoryService {
     try {
       const payloadWithSub = { ...payload, sub };
       const newBudget = new this.budgetHistoryModel(payloadWithSub);
-      const model: BudgetHistoryResponse = await newBudget.save();
+      const model: BudgetHistory = await newBudget.save();
       const response: SingleBudgetHistoryResponse = {
         version: VERSION_RESPONSE,
         success: true,
@@ -128,7 +128,7 @@ export class BudgetHistoryService {
   }) {
     try {
       const { budgetHistoryId } = payload;
-      const budgetHistoryDeleted: BudgetHistoryResponse =
+      const budgetHistoryDeleted: BudgetHistory =
         await this.budgetHistoryModel.findOneAndDelete({
           _id: budgetHistoryId,
           sub,
@@ -157,7 +157,7 @@ export class BudgetHistoryService {
     sub: string,
   ): Promise<RemoveBudgetHistoryByBudgetIdResponse> {
     try {
-      const budgetHistoryDeleted: BudgetHistoryResponse =
+      const budgetHistoryDeleted: BudgetHistory =
         await this.budgetHistoryModel.findOneAndDelete({
           budget: new Types.ObjectId(budgetId),
           sub,
@@ -189,14 +189,13 @@ export class BudgetHistoryService {
       // Excluding budget id from the changes
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { budgetHistoryId, budget, ...restChanges } = changes;
-      const updateBudgetHistory: BudgetHistoryResponse =
-        await this.budgetHistoryModel
-          .findOneAndUpdate(
-            { _id: budgetHistoryId, sub },
-            { $set: restChanges },
-            { new: true },
-          )
-          .exec();
+      const updateBudgetHistory: BudgetHistory = await this.budgetHistoryModel
+        .findOneAndUpdate(
+          { _id: budgetHistoryId, sub },
+          { $set: restChanges },
+          { new: true },
+        )
+        .exec();
       if (!updateBudgetHistory)
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
       const response: SingleBudgetHistoryResponse = {
