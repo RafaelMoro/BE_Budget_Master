@@ -13,6 +13,13 @@ export interface SingleBudgetResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
+export interface RemoveBudgetResponse extends Omit<GeneralResponse, 'data'> {
+  data: {
+    budget: BudgetsResponse;
+    budgetHistoryDeleted: BudgetHistoryResponse;
+  };
+}
+
 export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     budget: BudgetsResponse;

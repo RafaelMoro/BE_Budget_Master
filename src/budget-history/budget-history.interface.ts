@@ -21,6 +21,11 @@ export interface GeneralBudgetHistoryResponse
   };
 }
 
+export interface RemoveBudgetHistoryByBudgetIdResponse {
+  budgetHistory: BudgetHistoryResponse;
+  message: string;
+}
+
 export interface AddRecordToBudgetHistoryProps {
   newRecord: RecordsHistory;
   sub: string;

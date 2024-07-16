@@ -16,6 +16,7 @@ import {
   BudgetsResponse,
   CreateBudgetResponse,
   GeneralBudgetsResponse,
+  RemoveBudgetResponse,
   SingleBudgetResponse,
 } from '../budgets.interface';
 import { VERSION_RESPONSE } from 'src/constants';
@@ -26,6 +27,7 @@ import {
 } from '../budgets.constants';
 import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 import { CreateBudgetHistoryDto } from '../../budget-history/budget-history.dto';
+import { BUDGET_HISTORY_NOT_FOUND_ERROR } from 'src/budget-history/budget-history.constants';
 
 @Injectable()
 export class BudgetsService {
@@ -137,12 +139,25 @@ export class BudgetsService {
         await this.budgetModel.findOneAndDelete({ _id: budgetId, sub });
       if (!budgetDeleted) throw new NotFoundException(BUDGET_NOT_FOUND_ERROR);
 
-      const response: SingleBudgetResponse = {
+      // Delete budget history
+      const budgetHistoryDeleteResponse =
+        await this.budgetHistoryService.removeBudgetHistoryByBudgetId(
+          budgetId,
+          sub,
+        );
+      if (
+        budgetHistoryDeleteResponse.message === BUDGET_HISTORY_NOT_FOUND_ERROR
+      ) {
+        throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
+      }
+
+      const response: RemoveBudgetResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: BUDGET_DELETED_MESSAGE,
         data: {
           budget: budgetDeleted,
+          budgetHistoryDeleted: budgetHistoryDeleteResponse.budgetHistory,
         },
         error: null,
       };

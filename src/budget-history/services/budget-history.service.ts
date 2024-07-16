@@ -17,6 +17,7 @@ import {
   AddRecordToBudgetHistoryProps,
   BudgetHistoryResponse,
   GeneralBudgetHistoryResponse,
+  RemoveBudgetHistoryByBudgetIdResponse,
   RemoveRecordFromBudgetHistoryProps,
   SingleBudgetHistoryResponse,
 } from '../budget-history.interface';
@@ -147,6 +148,32 @@ export class BudgetHistoryService {
       return response;
     } catch (error) {
       if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeBudgetHistoryByBudgetId(
+    budgetId: string,
+    sub: string,
+  ): Promise<RemoveBudgetHistoryByBudgetIdResponse> {
+    try {
+      const budgetHistoryDeleted: BudgetHistoryResponse =
+        await this.budgetHistoryModel.findOneAndDelete({
+          budget: new Types.ObjectId(budgetId),
+          sub,
+        });
+      if (!budgetHistoryDeleted) {
+        return {
+          message: BUDGET_HISTORY_NOT_FOUND_ERROR,
+          budgetHistory: null,
+        };
+      }
+
+      return {
+        message: null,
+        budgetHistory: budgetHistoryDeleted,
+      };
+    } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
