@@ -19,6 +19,7 @@ import {
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   EXPENSES_NOT_FOUND,
+  MAXIMUM_BUDGETS_LIMIT_ERROR,
   TRANSFER_RECORD_LINKED_BUDGET_ERROR,
   TYPE_OF_RECORD_INVALID,
   UNAUTHORIZED_EXPENSES_ERROR,
@@ -57,19 +58,10 @@ export class ExpensesService {
 
   async createExpense(data: CreateExpenseDto, userId: string) {
     try {
-      const { category, amount, typeOfRecord, linkedBudgets, date } = data;
+      const { category, amount, typeOfRecord, date } = data;
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
-      if (linkedBudgets?.length > 0 && typeOfRecord === 'transfer') {
-        throw new BadRequestException(TRANSFER_RECORD_LINKED_BUDGET_ERROR);
-      }
-
-      if (
-        isTypeOfRecord(typeOfRecord) === false ||
-        typeOfRecord !== 'expense'
-      ) {
-        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
+      this.validateCreateExpenseData(data);
 
       const categoryId =
         await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
@@ -144,6 +136,24 @@ export class ExpensesService {
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  validateCreateExpenseData(data: CreateExpenseDto) {
+    const { typeOfRecord, linkedBudgets } = data;
+
+    // Validate that records type transfer cannot have linked budgets
+    if (linkedBudgets?.length > 0 && typeOfRecord === 'transfer') {
+      throw new BadRequestException(TRANSFER_RECORD_LINKED_BUDGET_ERROR);
+    }
+
+    // Validate the type of record should be expense or transfer
+    if (isTypeOfRecord(typeOfRecord) === false || typeOfRecord !== 'expense') {
+      throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+    }
+
+    if (linkedBudgets.length > 3) {
+      throw new BadRequestException(MAXIMUM_BUDGETS_LIMIT_ERROR);
     }
   }
 

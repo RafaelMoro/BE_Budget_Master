@@ -5,6 +5,8 @@ export const EXPENSE_UNAUTHORIZED_ERROR =
   'This expense does not belongs to the user';
 export const EXPENSE_NOT_FOUND = 'Expense not found.';
 export const EXPENSES_NOT_FOUND = 'Expenses not found.';
+export const MAXIMUM_BUDGETS_LIMIT_ERROR =
+  'The maximum number of budgets are 3';
 
 export const EXPENSE_CREATED_MESSAGE = 'Expense created';
 export const EXPENSE_DELETED_MESSAGE = 'Expense deleted';
