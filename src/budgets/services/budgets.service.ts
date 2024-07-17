@@ -219,22 +219,24 @@ export class BudgetsService {
   }): Promise<UpdateAmountBudgetResponse> {
     try {
       const { budgetId } = changes;
-      const updateBudget: Budget = await this.budgetModel
-        .findOneAndUpdate(
-          { _id: budgetId, sub },
-          { $set: changes },
-          { new: true },
-        )
+      const budget: Budget = await this.budgetModel
+        .findOne({ _id: budgetId, sub })
         .exec();
-      if (!updateBudget) {
+      if (!budget) {
         return {
-          budget: updateBudget,
+          budget: budget,
           message: BUDGET_NOT_FOUND_ERROR,
         };
       }
+      const { currentAmount } = budget;
+      const updatedAmount = currentAmount + changes.amountRecord;
+      const newChanges = { currentAmount: updatedAmount };
+      const updatedBudget = await this.budgetModel
+        .findByIdAndUpdate(budget._id, { $set: newChanges }, { new: true })
+        .exec();
 
       return {
-        budget: updateBudget,
+        budget: updatedBudget,
         message: null,
       };
     } catch (error) {

@@ -71,7 +71,7 @@ export class UpdateAmountBudgetDto {
 
   @IsNumber()
   @IsNotEmpty()
-  readonly currentAmount: number;
+  readonly amountRecord: number;
 }
 
 export class DeleteBudgetDto {
