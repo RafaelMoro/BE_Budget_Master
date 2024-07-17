@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Budget } from '../budgets/budgets.entity';
+import { BudgetModel } from '../budgets/budgets.entity';
 
 @Schema()
 export class BudgetHistoryModel extends Document {
-  @Prop({ type: Types.ObjectId, ref: Budget.name, required: true })
-  budget: Budget | Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: BudgetModel.name, required: true })
+  budget: BudgetModel | Types.ObjectId;
 
   @Prop({ required: true })
   sub: string;

@@ -2,7 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema()
-export class Budget extends Document {
+export class BudgetModel extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -37,4 +37,4 @@ export class Budget extends Document {
   nestResetDate: Date;
 }
 
-export const BudgetSchema = SchemaFactory.createForClass(Budget);
+export const BudgetSchema = SchemaFactory.createForClass(BudgetModel);

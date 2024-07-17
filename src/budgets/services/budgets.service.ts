@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Budget } from '../budgets.entity';
+import { BudgetModel } from '../budgets.entity';
 import { Model } from 'mongoose';
 
 import {
@@ -13,7 +13,7 @@ import {
   UpdateBudgetDto,
 } from '../budgets.dto';
 import {
-  BudgetsResponse,
+  Budget,
   CreateBudgetResponse,
   GeneralBudgetsResponse,
   RemoveBudgetResponse,
@@ -32,7 +32,7 @@ import { BUDGET_HISTORY_NOT_FOUND_ERROR } from 'src/budget-history/budget-histor
 @Injectable()
 export class BudgetsService {
   constructor(
-    @InjectModel(Budget.name) private budgetModel: Model<Budget>,
+    @InjectModel(BudgetModel.name) private budgetModel: Model<BudgetModel>,
     private budgetHistoryService: BudgetHistoryService,
   ) {}
 
@@ -46,7 +46,7 @@ export class BudgetsService {
     try {
       const updatedPayload = { ...payload, sub };
       const newBudget = new this.budgetModel(updatedPayload);
-      const model: BudgetsResponse = await newBudget.save();
+      const model: Budget = await newBudget.save();
 
       // Create budget history
       const payloadBudgetHistory: CreateBudgetHistoryDto = {
@@ -135,7 +135,7 @@ export class BudgetsService {
   }) {
     try {
       const { budgetId } = payload;
-      const budgetDeleted: BudgetsResponse =
+      const budgetDeleted: Budget =
         await this.budgetModel.findOneAndDelete({ _id: budgetId, sub });
       if (!budgetDeleted) throw new NotFoundException(BUDGET_NOT_FOUND_ERROR);
 
@@ -179,7 +179,7 @@ export class BudgetsService {
       // Excluding budget id from the changes
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { budgetId } = changes;
-      const updateBudget: BudgetsResponse = await this.budgetModel
+      const updateBudget: Budget = await this.budgetModel
         .findOneAndUpdate(
           { _id: budgetId, sub },
           { $set: changes },

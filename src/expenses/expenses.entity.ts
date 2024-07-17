@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AccountRecord } from '../records/entities/records.entity';
 import { Types } from 'mongoose';
-import { Budget } from '../budgets/budgets.entity';
+import { BudgetModel } from '../budgets/budgets.entity';
 
 @Schema()
 export class CreateExpense extends AccountRecord {
@@ -12,11 +12,11 @@ export class CreateExpense extends AccountRecord {
     type: [
       {
         type: Types.ObjectId,
-        ref: Budget.name,
+        ref: BudgetModel.name,
       },
     ],
   })
-  linkedBudgets: Types.Array<Budget>;
+  linkedBudgets: Types.Array<BudgetModel>;
 }
 
 export interface Expense extends CreateExpense {

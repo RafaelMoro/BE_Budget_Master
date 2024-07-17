@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { BudgetsController } from './controllers/budgets.controller';
 import { BudgetsService } from './services/budgets.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Budget, BudgetSchema } from './budgets.entity';
+import { BudgetModel, BudgetSchema } from './budgets.entity';
 import { BudgetHistoryModule } from '../budget-history/budget-history.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Budget.name,
+        name: BudgetModel.name,
         schema: BudgetSchema,
       },
     ]),
