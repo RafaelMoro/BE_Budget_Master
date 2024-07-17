@@ -43,7 +43,7 @@ export class BudgetsController {
   @Delete()
   removeBudget(@Body() payload: DeleteBudgetDto, @Request() req) {
     const sub = req.user.sub;
-    return this.budgetServices.removeBudgetHistory({ payload, sub });
+    return this.budgetServices.removeBudget({ payload, sub });
   }
 
   @Put()
