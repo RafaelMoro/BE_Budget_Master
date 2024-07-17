@@ -3,6 +3,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Expense } from '../../expenses/expenses.entity';
 import { Income } from '../../incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
+import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
   NO_EXPENSES_FOUND,

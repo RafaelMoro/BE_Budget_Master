@@ -19,6 +19,8 @@ import {
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   EXPENSES_NOT_FOUND,
+  MAXIMUM_BUDGETS_LIMIT_ERROR,
+  TRANSFER_RECORD_LINKED_BUDGET_ERROR,
   TYPE_OF_RECORD_INVALID,
   UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
@@ -41,13 +43,17 @@ import {
   MISSING_CATEGORY,
   MISSING_DATE,
 } from '../../records/constants';
-import { getMonthNumber } from 'src/utils/getMonthNumber';
+import { getMonthNumber } from '../../utils/getMonthNumber';
+import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
+import { BudgetsService } from '../../budgets/services/budgets.service';
 
 @Injectable()
 export class ExpensesService {
   constructor(
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     private categoriesService: CategoriesService,
+    private budgetHistoryService: BudgetHistoryService,
+    private budgetService: BudgetsService,
   ) {}
 
   async createExpense(data: CreateExpenseDto, userId: string) {
@@ -55,12 +61,7 @@ export class ExpensesService {
       const { category, amount, typeOfRecord, date } = data;
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
-      if (
-        isTypeOfRecord(typeOfRecord) === false ||
-        typeOfRecord !== 'expense'
-      ) {
-        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
+      this.validateCreateExpenseData(data);
 
       const categoryId =
         await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
@@ -83,13 +84,45 @@ export class ExpensesService {
 
       const model = new this.expenseModel(newData);
       const modelSaved: Expense = await model.save();
-      const modelPopulated: Expense = await this.expenseModel.populate(
+      let modelPopulated: Expense = await this.expenseModel.populate(
         modelSaved,
         {
           path: 'category',
           select: '_id categoryName icon',
         },
       );
+      modelPopulated = await this.expenseModel.populate(modelPopulated, {
+        path: 'linkedBudgets',
+      });
+
+      // Add record to budget history and modify budget current amount
+      if (
+        modelPopulated.linkedBudgets?.length > 0 &&
+        typeOfRecord === 'expense'
+      ) {
+        for await (const budget of modelPopulated.linkedBudgets) {
+          await this.budgetService.updateBudgetAmount({
+            changes: {
+              budgetId: budget._id,
+              amountRecord: data.amount,
+            },
+            sub: userId,
+          });
+
+          await this.budgetHistoryService.addRecordToBudgetHistory({
+            budgetId: budget._id,
+            sub: userId,
+            newRecord: {
+              recordId: modelPopulated._id.toString(),
+              recordName: modelPopulated.shortName,
+              recordDate: date,
+              recordAmount: modelPopulated.amount,
+              budgetCurrentAmount: budget.currentAmount,
+              budgetUpdatedAmount: budget.currentAmount + modelPopulated.amount,
+            },
+          });
+        }
+      }
 
       const response: ResponseSingleExpense = {
         version: VERSION_RESPONSE,
@@ -103,6 +136,24 @@ export class ExpensesService {
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  validateCreateExpenseData(data: CreateExpenseDto) {
+    const { typeOfRecord, linkedBudgets } = data;
+
+    // Validate that records type transfer cannot have linked budgets
+    if (linkedBudgets?.length > 0 && typeOfRecord === 'transfer') {
+      throw new BadRequestException(TRANSFER_RECORD_LINKED_BUDGET_ERROR);
+    }
+
+    // Validate the type of record should be expense or transfer
+    if (isTypeOfRecord(typeOfRecord) === false || typeOfRecord !== 'expense') {
+      throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+    }
+
+    if (linkedBudgets.length > 3) {
+      throw new BadRequestException(MAXIMUM_BUDGETS_LIMIT_ERROR);
     }
   }
 
@@ -172,13 +223,16 @@ export class ExpensesService {
         };
       }
 
-      const expensesPopulated: Expense[] = await this.expenseModel.populate(
+      let expensesPopulated: Expense[] = await this.expenseModel.populate(
         expenses,
         {
           path: 'category',
           select: '_id categoryName icon',
         },
       );
+      expensesPopulated = await this.expenseModel.populate(expensesPopulated, {
+        path: 'linkedBudgets',
+      });
 
       const response: ResponseMultipleExpenses = {
         ...INITIAL_RESPONSE,
