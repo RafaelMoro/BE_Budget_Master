@@ -64,6 +64,16 @@ export class UpdateBudgetDto extends PartialType(CreateBudgetsDto) {
   readonly budgetId: Types.ObjectId;
 }
 
+export class UpdateAmountBudgetDto {
+  @IsMongoId()
+  @IsNotEmpty()
+  readonly budgetId: Types.ObjectId;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly currentAmount: number;
+}
+
 export class DeleteBudgetDto {
   @IsMongoId()
   @IsNotEmpty()

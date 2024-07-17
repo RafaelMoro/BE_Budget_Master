@@ -27,6 +27,11 @@ export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
+export interface UpdateAmountBudgetResponse {
+  budget: Budget;
+  message: string | null;
+}
+
 export interface GeneralBudgetsResponse extends Omit<GeneralResponse, 'data'> {
   data: {
     budgets: Budget[];

@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import {
   CreateBudgetsDto,
   DeleteBudgetDto,
+  UpdateAmountBudgetDto,
   UpdateBudgetDto,
 } from '../budgets.dto';
 import {
@@ -18,6 +19,7 @@ import {
   GeneralBudgetsResponse,
   RemoveBudgetResponse,
   SingleBudgetResponse,
+  UpdateAmountBudgetResponse,
 } from '../budgets.interface';
 import { VERSION_RESPONSE } from 'src/constants';
 import {
@@ -199,6 +201,42 @@ export class BudgetsService {
         error: null,
       };
       return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method used to update current amount of the budget in expense service
+   */
+  async updateBudgetAmount({
+    changes,
+    sub,
+  }: {
+    changes: UpdateAmountBudgetDto;
+    sub: string;
+  }): Promise<UpdateAmountBudgetResponse> {
+    try {
+      const { budgetId } = changes;
+      const updateBudget: Budget = await this.budgetModel
+        .findOneAndUpdate(
+          { _id: budgetId, sub },
+          { $set: changes },
+          { new: true },
+        )
+        .exec();
+      if (!updateBudget) {
+        return {
+          budget: updateBudget,
+          message: BUDGET_NOT_FOUND_ERROR,
+        };
+      }
+
+      return {
+        budget: updateBudget,
+        message: null,
+      };
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);

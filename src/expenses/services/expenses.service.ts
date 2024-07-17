@@ -101,6 +101,7 @@ export class ExpensesService {
         path: 'linkedBudgets',
       });
 
+      // Add record to budget history
       if (
         modelPopulated.linkedBudgets?.length > 0 &&
         typeOfRecord === 'expense'
