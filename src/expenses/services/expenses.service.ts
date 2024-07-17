@@ -44,6 +44,7 @@ import {
 } from '../../records/constants';
 import { getMonthNumber } from '../../utils/getMonthNumber';
 import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
+import { BudgetsService } from '../../budgets/services/budgets.service';
 
 @Injectable()
 export class ExpensesService {
@@ -51,6 +52,7 @@ export class ExpensesService {
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     private categoriesService: CategoriesService,
     private budgetHistoryService: BudgetHistoryService,
+    private budgetService: BudgetsService,
   ) {}
 
   async createExpense(data: CreateExpenseDto, userId: string) {
@@ -101,12 +103,20 @@ export class ExpensesService {
         path: 'linkedBudgets',
       });
 
-      // Add record to budget history
+      // Add record to budget history and modify budget current amount
       if (
         modelPopulated.linkedBudgets?.length > 0 &&
         typeOfRecord === 'expense'
       ) {
         for await (const budget of modelPopulated.linkedBudgets) {
+          await this.budgetService.updateBudgetAmount({
+            changes: {
+              budgetId: budget._id,
+              amountRecord: data.amount,
+            },
+            sub: userId,
+          });
+
           await this.budgetHistoryService.addRecordToBudgetHistory({
             budgetId: budget._id,
             sub: userId,

@@ -17,5 +17,6 @@ import { BudgetHistoryModule } from '../budget-history/budget-history.module';
   ],
   controllers: [BudgetsController],
   providers: [BudgetsService],
+  exports: [BudgetsService],
 })
 export class BudgetsModule {}

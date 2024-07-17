@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CreateExpense, ExpenseSchema } from './expenses.entity';
 import { CategoriesModule } from '../categories/categories.module';
 import { BudgetHistoryModule } from '../budget-history/budget-history.module';
+import { BudgetsModule } from '../budgets/budgets.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BudgetHistoryModule } from '../budget-history/budget-history.module';
     ]),
     CategoriesModule,
     BudgetHistoryModule,
+    BudgetsModule,
   ],
   controllers: [ExpensesController],
   providers: [ExpensesService],
