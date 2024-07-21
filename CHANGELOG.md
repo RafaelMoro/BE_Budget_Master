@@ -1,3 +1,9 @@
+## v0.9.1 (2024-07-21)
+
+### Pull Requests
+[#29](https://github.com/RafaelMoro/BE_Budget_Master/pull/29) | Return response on get budgets and get single budget
+
+
 ## v0.9.0 (2024-07-17)
 
 ### Pull Requests
