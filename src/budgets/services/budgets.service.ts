@@ -26,6 +26,7 @@ import {
   BUDGET_CREATED_MESSAGE,
   BUDGET_DELETED_MESSAGE,
   BUDGET_NOT_FOUND_ERROR,
+  BUDGETS_NOT_FOUND_ERROR,
 } from '../budgets.constants';
 import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 import { CreateBudgetHistoryDto } from '../../budget-history/budget-history.dto';
@@ -82,18 +83,26 @@ export class BudgetsService {
 
   async getBudgets(sub: string) {
     try {
-      const budgets = await this.budgetModel.find({ sub }, { sub: 0 }).exec();
-      if (budgets.length === 0) {
-        throw new NotFoundException('No budgets found');
-      }
-      const response: GeneralBudgetsResponse = {
+      const initialResponse: GeneralBudgetsResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
+        data: null,
+        error: null,
+      };
+      const budgets = await this.budgetModel.find({ sub }, { sub: 0 }).exec();
+      if (budgets.length === 0) {
+        return {
+          ...initialResponse,
+          message: BUDGETS_NOT_FOUND_ERROR,
+          data: null,
+        };
+      }
+      const response: GeneralBudgetsResponse = {
+        ...initialResponse,
         data: {
           budgets,
         },
-        error: null,
       };
       return response;
     } catch (error) {
@@ -104,22 +113,32 @@ export class BudgetsService {
 
   async getSingleBudget({ budgetId, sub }: { budgetId: string; sub: string }) {
     try {
-      const budgets = await this.budgetModel
-        .find({ _id: budgetId, sub })
-        .exec();
-      if (budgets.length === 0) {
-        throw new NotFoundException('Budget not found');
-      }
-
-      const [singleBudget] = budgets;
-      const response: SingleBudgetResponse = {
+      const initialResponse: SingleBudgetResponse = {
         version: VERSION_RESPONSE,
         success: true,
         message: null,
         data: {
-          budget: singleBudget,
+          budget: null,
         },
         error: null,
+      };
+      const budgets = await this.budgetModel
+        .find({ _id: budgetId, sub })
+        .exec();
+      if (budgets.length === 0) {
+        return {
+          ...initialResponse,
+          message: BUDGET_NOT_FOUND_ERROR,
+          data: null,
+        };
+      }
+
+      const [singleBudget] = budgets;
+      const response: SingleBudgetResponse = {
+        ...initialResponse,
+        data: {
+          budget: singleBudget,
+        },
       };
       return response;
     } catch (error) {
