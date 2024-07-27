@@ -76,8 +76,20 @@ export class AccountsActionsService {
     }
   }
 
-  async updateAccount({ changes }: { changes: UpdateAccountDto }) {
+  async updateAccount({
+    changes,
+    userId,
+  }: {
+    changes: UpdateAccountDto;
+    userId: string;
+  }) {
     try {
+      // Validate account belongs to user
+      await this.accountsService.validateAccountBelongsUser({
+        accountId: changes.accountId,
+        userId,
+      });
+
       const updatedAccount = await this.accountsService.update(changes);
       const response: GeneralAccountResponse = {
         version: VERSION_RESPONSE,

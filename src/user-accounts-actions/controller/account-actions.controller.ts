@@ -37,8 +37,12 @@ export class UserAccountsActionsController {
   }
 
   @Put()
-  update(@Body() payload: UpdateAccountDto) {
-    return this.userAccountActionsService.updateAccount({ changes: payload });
+  update(@Body() payload: UpdateAccountDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.userAccountActionsService.updateAccount({
+      changes: payload,
+      userId,
+    });
   }
 
   @Delete()
