@@ -24,14 +24,14 @@ import {
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
 import { IncomesService } from '../../incomes/services/incomes.service';
-import { ExpensesService } from '../../expenses/services/expenses.service';
+import { RecordsService } from 'src/records/services/records.service';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
     private incomesService: IncomesService,
-    private expensesService: ExpensesService,
+    private recordsService: RecordsService,
   ) {}
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
@@ -105,7 +105,7 @@ export class AccountsService {
 
       // Check if the account has records.
       const expensesRelatedToAccount =
-        await this.expensesService.findAllExpensesByAccount({
+        await this.recordsService.findAllExpensesByAccount({
           accountId,
           userId,
         });
@@ -121,9 +121,9 @@ export class AccountsService {
         const expensesIds = expensesRelatedToAccount.expenses.map((expense) => {
           return { recordId: expense._id.toString() };
         });
-        const { expenses } = await this.expensesService.deleteMultipleExpenses(
-          expensesIds,
-        );
+        const { expenses } = await this.recordsService.deleteMultipleExpenses({
+          expenses: expensesIds,
+        });
         expenseRecords = expenses;
       }
 
