@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserAccountsActionsController } from './user-accounts-actions.controller';
+import { UserAccountsActionsController } from './account-actions.controller';
 
 describe('UserAccountsActionsController', () => {
   let controller: UserAccountsActionsController;
