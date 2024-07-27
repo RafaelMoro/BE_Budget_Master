@@ -43,16 +43,12 @@ import {
   MISSING_DATE,
 } from '../../records/constants';
 import { getMonthNumber } from '../../utils/getMonthNumber';
-import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
-import { BudgetsService } from '../../budgets/services/budgets.service';
 
 @Injectable()
 export class ExpensesService {
   constructor(
     @InjectModel(CreateExpense.name) private expenseModel: Model<CreateExpense>,
     private categoriesService: CategoriesService,
-    private budgetHistoryService: BudgetHistoryService,
-    private budgetService: BudgetsService,
   ) {}
 
   async findExpenseById(expenseId: string) {

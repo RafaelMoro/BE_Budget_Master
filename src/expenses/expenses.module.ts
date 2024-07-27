@@ -4,8 +4,6 @@ import { ExpensesService } from './services/expenses.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CreateExpense, ExpenseSchema } from './expenses.entity';
 import { CategoriesModule } from '../categories/categories.module';
-import { BudgetHistoryModule } from '../budget-history/budget-history.module';
-import { BudgetsModule } from '../budgets/budgets.module';
 
 @Module({
   imports: [
@@ -16,8 +14,6 @@ import { BudgetsModule } from '../budgets/budgets.module';
       },
     ]),
     CategoriesModule,
-    BudgetHistoryModule,
-    BudgetsModule,
   ],
   controllers: [ExpensesController],
   providers: [ExpensesService],
