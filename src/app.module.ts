@@ -16,6 +16,7 @@ import { IncomesModule } from './incomes/incomes.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { BudgetHistoryModule } from './budget-history/budget-history.module';
 import { UserActionsModule } from './domain/user-accounts-actions/user-actions.module';
+import { ExpensesActionsModule } from './domain/expenses-actions/expenses-actions.module';
 import config from './config';
 
 @Module({
@@ -51,6 +52,7 @@ import config from './config';
     BudgetsModule,
     BudgetHistoryModule,
     UserActionsModule,
+    ExpensesActionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
