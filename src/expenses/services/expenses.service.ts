@@ -67,33 +67,9 @@ export class ExpensesService {
     }
   }
 
-  async createExpense(data: CreateExpenseDto, userId: string) {
+  async createExpense(data: CreateExpenseDto) {
     try {
-      const { category, amount, typeOfRecord, date } = data;
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-
-      this.validateCreateExpenseData(data);
-
-      const categoryId =
-        await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-          {
-            categoryName: category,
-            userId,
-          },
-        );
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newData = {
-        ...data,
-        fullDate,
-        formattedTime,
-        category: categoryId,
-        amountFormatted,
-        userId,
-        typeOfRecord,
-      };
-
-      const model = new this.expenseModel(newData);
+      const model = new this.expenseModel(data);
       const modelSaved: Expense = await model.save();
       let modelPopulated: Expense = await this.expenseModel.populate(
         modelSaved,
@@ -106,45 +82,7 @@ export class ExpensesService {
         path: 'linkedBudgets',
       });
 
-      // Add record to budget history and modify budget current amount
-      if (
-        modelPopulated.linkedBudgets?.length > 0 &&
-        typeOfRecord === 'expense'
-      ) {
-        for await (const budget of modelPopulated.linkedBudgets) {
-          await this.budgetService.updateBudgetAmount({
-            changes: {
-              budgetId: budget._id,
-              amountRecord: data.amount,
-            },
-            sub: userId,
-          });
-
-          await this.budgetHistoryService.addRecordToBudgetHistory({
-            budgetId: budget._id,
-            sub: userId,
-            newRecord: {
-              recordId: modelPopulated._id.toString(),
-              recordName: modelPopulated.shortName,
-              recordDate: date,
-              recordAmount: modelPopulated.amount,
-              budgetCurrentAmount: budget.currentAmount,
-              budgetUpdatedAmount: budget.currentAmount + modelPopulated.amount,
-            },
-          });
-        }
-      }
-
-      const response: ResponseSingleExpense = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: EXPENSE_CREATED_MESSAGE,
-        data: {
-          expense: modelPopulated,
-        },
-        error: null,
-      };
-      return response;
+      return modelPopulated;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
