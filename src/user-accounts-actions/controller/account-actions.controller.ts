@@ -14,7 +14,7 @@ import {
   DeleteAccountDto,
   UpdateAccountDto,
 } from '../../accounts/dtos/accounts.dto';
-import { AccountsActionsService } from '../services/Accounts/accounts.-actions.service';
+import { AccountsActionsService } from '../services/accounts.-actions.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('account-actions')
