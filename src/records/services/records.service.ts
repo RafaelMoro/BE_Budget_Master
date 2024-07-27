@@ -20,7 +20,10 @@ import {
   CreateTransferProps,
   TransferCreated,
 } from '../interface';
-import { UpdateExpenseDto } from '../../expenses/expenses.dto';
+import {
+  DeleteExpenseDto,
+  UpdateExpenseDto,
+} from '../../expenses/expenses.dto';
 import { UpdateIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
@@ -246,5 +249,20 @@ export class RecordsService {
       },
     };
     return response;
+  }
+
+  // Service to see if the account has any records.
+  findAllExpensesByAccount({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }) {
+    return this.expensesService.findAllExpensesByAccount({ accountId, userId });
+  }
+
+  deleteMultipleExpenses({ expenses }: { expenses: DeleteExpenseDto[] }) {
+    return this.expensesService.deleteMultipleExpenses(expenses);
   }
 }
