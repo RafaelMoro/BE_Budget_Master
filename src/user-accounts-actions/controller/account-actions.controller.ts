@@ -6,11 +6,13 @@ import {
   Request,
   Post,
   Get,
+  Put,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
   CreateAccountDto,
   DeleteAccountDto,
+  UpdateAccountDto,
 } from '../../accounts/dtos/accounts.dto';
 import { AccountsActionsService } from '../services/Accounts/accounts.-actions.service';
 
@@ -32,6 +34,11 @@ export class UserAccountsActionsController {
       data: payload,
       userId,
     });
+  }
+
+  @Put()
+  update(@Body() payload: UpdateAccountDto) {
+    return this.userAccountActionsService.updateAccount({ changes: payload });
   }
 
   @Delete()

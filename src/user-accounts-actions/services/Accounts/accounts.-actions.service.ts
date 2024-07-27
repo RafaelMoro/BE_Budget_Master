@@ -6,10 +6,12 @@ import { INCOMES_NOT_FOUND } from '../../../incomes/incomes.constants';
 import {
   CreateAccountDto,
   DeleteAccountDto,
+  UpdateAccountDto,
 } from '../../../accounts/dtos/accounts.dto';
 import {
   ACCOUNT_CREATED_MESSAGE,
   ACCOUNT_DELETED_MESSAGE,
+  ACCOUNT_UPDATED_MESSAGE,
 } from '../../../accounts/constants';
 import { VERSION_RESPONSE } from '../../../constants';
 import {
@@ -65,6 +67,24 @@ export class AccountsActionsService {
         message: null,
         data: {
           accounts,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateAccount({ changes }: { changes: UpdateAccountDto }) {
+    try {
+      const updatedAccount = await this.accountsService.update(changes);
+      const response: GeneralAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: ACCOUNT_UPDATED_MESSAGE,
+        data: {
+          account: updatedAccount,
         },
         error: null,
       };

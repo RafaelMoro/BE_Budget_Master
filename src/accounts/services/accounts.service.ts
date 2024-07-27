@@ -2,13 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { ACCOUNT_NOT_FOUND, ACCOUNT_UPDATED_MESSAGE } from '../constants';
-import { VERSION_RESPONSE } from '../../constants';
-import {
-  AccountModel,
-  GeneralAccountResponse,
-  GetAccountResponse,
-} from '../accounts.interface';
+import { ACCOUNT_NOT_FOUND } from '../constants';
+import { AccountModel } from '../accounts.interface';
 import { Account as AccountEntity } from '../entities/accounts.entity';
 import {
   CreateAccountDto,
@@ -60,16 +55,8 @@ export class AccountsService {
         .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();
       if (!updatedAccount) throw new BadRequestException('Account not found');
-      const response: GeneralAccountResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: ACCOUNT_UPDATED_MESSAGE,
-        data: {
-          account: updatedAccount,
-        },
-        error: null,
-      };
-      return response;
+
+      return updatedAccount;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
