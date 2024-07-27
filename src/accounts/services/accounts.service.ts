@@ -19,13 +19,11 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
-import { RecordsService } from 'src/records/services/records.service';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
-    private recordsService: RecordsService,
   ) {}
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
