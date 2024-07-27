@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Account as AccountEntity } from '../../accounts/entities/accounts.entity';
+import { Account as AccountEntity } from '../../repositories/accounts/entities/accounts.entity';
 import { Category } from '../../categories/entities/categories.entity';
 
 @Schema()

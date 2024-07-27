@@ -8,14 +8,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { MailModule } from './mail/mail.module';
-import { AccountsModule } from './accounts/accounts.module';
+import { AccountsModule } from './repositories/accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { IncomesModule } from './incomes/incomes.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { BudgetHistoryModule } from './budget-history/budget-history.module';
-import { UserActionsModule } from './user-accounts-actions/user-actions.module';
+import { UserActionsModule } from './domain/user-accounts-actions/user-actions.module';
 import config from './config';
 
 @Module({

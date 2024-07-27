@@ -8,12 +8,12 @@ import {
   Get,
   Put,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import {
   CreateAccountDto,
   DeleteAccountDto,
   UpdateAccountDto,
-} from '../../accounts/dtos/accounts.dto';
+} from '../../../repositories/accounts/dtos/accounts.dto';
 import { AccountsActionsService } from '../services/accounts.-actions.service';
 
 @UseGuards(JwtAuthGuard)
