@@ -73,6 +73,17 @@ export class AccountsService {
     }
   }
 
+  async findById(accountId: string) {
+    try {
+      const account: AccountResponse = await this.accountModel.findById(
+        accountId,
+      );
+      return account;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
@@ -90,6 +101,60 @@ export class AccountsService {
         error: null,
       };
       return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async modifyAccountBalanceOnExpense({
+    newAmount,
+    previousAmount,
+    accountId,
+  }: {
+    newAmount: number;
+    previousAmount: number;
+    accountId: string;
+  }) {
+    try {
+      const account = await this.findById(accountId);
+      if (!account) throw new BadRequestException('Account not found');
+
+      const { amount: currentAmount } = account;
+      const amountResultExpense = currentAmount + previousAmount - newAmount;
+
+      const changes: UpdateAccountDto = {
+        accountId,
+        amount: amountResultExpense,
+      };
+      const updatedAccount = await this.update(changes);
+      return updatedAccount;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async modifyAccountBalanceOnIncome({
+    newAmount,
+    previousAmount,
+    accountId,
+  }: {
+    newAmount: number;
+    previousAmount: number;
+    accountId: string;
+  }) {
+    try {
+      const account = await this.findById(accountId);
+      if (!account) throw new BadRequestException('Account not found');
+
+      const { amount: currentAmount } = account;
+      const amountResultIncome = currentAmount - previousAmount + newAmount;
+
+      const changes: UpdateAccountDto = {
+        accountId,
+        amount: amountResultIncome,
+      };
+      const updatedAccount = await this.update(changes);
+      return updatedAccount;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
