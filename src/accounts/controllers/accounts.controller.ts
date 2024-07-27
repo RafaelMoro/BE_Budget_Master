@@ -5,15 +5,10 @@ import {
   Get,
   UseGuards,
   Put,
-  Delete,
   Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import {
-  CreateAccountDto,
-  UpdateAccountDto,
-  DeleteAccountDto,
-} from '../dtos/accounts.dto';
+import { CreateAccountDto, UpdateAccountDto } from '../dtos/accounts.dto';
 import { AccountsService } from '../services/accounts.service';
 
 @UseGuards(JwtAuthGuard)
@@ -36,11 +31,5 @@ export class AccountsController {
   @Put()
   update(@Body() payload: UpdateAccountDto) {
     return this.accountsService.update(payload);
-  }
-
-  @Delete()
-  remove(@Body() payload: DeleteAccountDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.accountsService.remove(payload, userId);
   }
 }

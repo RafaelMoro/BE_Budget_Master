@@ -4,16 +4,12 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import {
   ACCOUNT_CREATED_MESSAGE,
-  ACCOUNT_DELETED_MESSAGE,
   ACCOUNT_NOT_FOUND,
   ACCOUNT_UPDATED_MESSAGE,
 } from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
-import { EXPENSES_NOT_FOUND } from '../../expenses/expenses.constants';
-import { INCOMES_NOT_FOUND } from '../../incomes/incomes.constants';
 import {
   AccountResponse,
-  DeleteAccountResponse,
   GeneralAccountResponse,
   GetAccountResponse,
 } from '../accounts.interface';
@@ -160,65 +156,16 @@ export class AccountsService {
     }
   }
 
-  async remove(payload: DeleteAccountDto, userId: string) {
+  async remove(payload: DeleteAccountDto) {
     try {
-      let expenseRecords = null;
-      let incomesRecords = null;
       const { accountId } = payload;
-
-      // Check if the account has records.
-      const expensesRelatedToAccount =
-        await this.recordsService.findAllExpensesByAccount({
-          accountId,
-          userId,
-        });
-      const incomesRelatedToAccount =
-        await this.recordsService.findAllIncomesByAccount({
-          accountId,
-          userId,
-        });
-
-      // If the account has expenses, then delete expenses.
-      if (expensesRelatedToAccount.message !== EXPENSES_NOT_FOUND) {
-        // Return each record id as object as expected to the service delete multiple records.
-        const expensesIds = expensesRelatedToAccount.expenses.map((expense) => {
-          return { recordId: expense._id.toString() };
-        });
-        const { expenses } = await this.recordsService.deleteMultipleExpenses({
-          expenses: expensesIds,
-        });
-        expenseRecords = expenses;
-      }
-
-      // If the account has incomes, then delete incomes.
-      if (incomesRelatedToAccount.message !== INCOMES_NOT_FOUND) {
-        // Return records id as object each as expected to the service delete multiple records.
-        const incomesIds = incomesRelatedToAccount.incomes.map((income) => {
-          return { recordId: income._id.toString() };
-        });
-        const { incomes } = await this.recordsService.deleteMultipleIncomes({
-          incomes: incomesIds,
-        });
-        incomesRecords = incomes;
-      }
 
       // After deleting records related to this account if found, delete the account.
       const accountDeleted: AccountResponse =
         await this.accountModel.findByIdAndDelete(accountId);
       if (!accountDeleted) throw new BadRequestException(ACCOUNT_NOT_FOUND);
 
-      const response: DeleteAccountResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: ACCOUNT_DELETED_MESSAGE,
-        data: {
-          accountDeleted,
-          numberExpensesDeleted: expenseRecords?.length ?? 0,
-          numberIncomesDeleted: incomesRecords?.length ?? 0,
-        },
-        error: null,
-      };
-      return response;
+      return accountDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
