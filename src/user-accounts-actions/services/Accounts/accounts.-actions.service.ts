@@ -106,6 +106,12 @@ export class AccountsActionsService {
       let incomesRecords = null;
       const { accountId } = payload;
 
+      // Validate account belongs to user
+      await this.accountsService.validateAccountBelongsUser({
+        accountId,
+        userId,
+      });
+
       // Check if the account has records.
       const expensesRelatedToAccount =
         await this.recordsService.findAllExpensesByAccount({
@@ -158,6 +164,7 @@ export class AccountsActionsService {
 
       return response;
     } catch (error) {
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

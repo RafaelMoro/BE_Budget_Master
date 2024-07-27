@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -16,6 +20,26 @@ export class AccountsService {
   constructor(
     @InjectModel(AccountEntity.name) private accountModel: Model<AccountEntity>,
   ) {}
+
+  async validateAccountBelongsUser({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }) {
+    try {
+      const account = await this.findById(accountId);
+      if (!account) throw new BadRequestException(ACCOUNT_NOT_FOUND);
+
+      if (String(account.sub) !== userId) {
+        throw new UnauthorizedException('Account does not belong to the user');
+      }
+    } catch (error) {
+      if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
