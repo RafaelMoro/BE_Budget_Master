@@ -14,7 +14,6 @@ import {
   UpdateExpenseDto,
 } from '../expenses.dto';
 import {
-  EXPENSE_CREATED_MESSAGE,
   EXPENSE_DELETED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
@@ -27,7 +26,7 @@ import {
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../utils';
-import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
+import { INITIAL_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
   DeleteMultipleExpensesResponse,
