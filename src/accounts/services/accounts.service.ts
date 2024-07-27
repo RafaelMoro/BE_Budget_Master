@@ -2,11 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import {
-  ACCOUNT_CREATED_MESSAGE,
-  ACCOUNT_NOT_FOUND,
-  ACCOUNT_UPDATED_MESSAGE,
-} from '../constants';
+import { ACCOUNT_NOT_FOUND, ACCOUNT_UPDATED_MESSAGE } from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
 import {
   AccountModel,
@@ -31,16 +27,7 @@ export class AccountsService {
       const completeData = { ...data, sub: userId };
       const newModel = new this.accountModel(completeData);
       const model: AccountModel = await newModel.save();
-      const response: GeneralAccountResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: ACCOUNT_CREATED_MESSAGE,
-        data: {
-          account: model,
-        },
-        error: null,
-      };
-      return response;
+      return model;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

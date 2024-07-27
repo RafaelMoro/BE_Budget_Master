@@ -3,10 +3,19 @@ import { AccountsService } from '../../../accounts/services/accounts.service';
 import { RecordsService } from '../../../records/services/records.service';
 import { EXPENSES_NOT_FOUND } from '../../../expenses/expenses.constants';
 import { INCOMES_NOT_FOUND } from '../../../incomes/incomes.constants';
-import { DeleteAccountDto } from '../../../accounts/dtos/accounts.dto';
-import { ACCOUNT_DELETED_MESSAGE } from '../../../accounts/constants';
+import {
+  CreateAccountDto,
+  DeleteAccountDto,
+} from '../../../accounts/dtos/accounts.dto';
+import {
+  ACCOUNT_CREATED_MESSAGE,
+  ACCOUNT_DELETED_MESSAGE,
+} from '../../../accounts/constants';
 import { VERSION_RESPONSE } from '../../../constants';
-import { DeleteAccountResponse } from '../../../accounts/accounts.interface';
+import {
+  DeleteAccountResponse,
+  GeneralAccountResponse,
+} from '../../../accounts/accounts.interface';
 
 @Injectable()
 export class AccountsActionsService {
@@ -14,6 +23,29 @@ export class AccountsActionsService {
     private accountsService: AccountsService,
     private recordsService: RecordsService,
   ) {}
+
+  async createAccount({
+    data,
+    userId,
+  }: {
+    data: CreateAccountDto;
+    userId: string;
+  }) {
+    const accountCreated = await this.accountsService.createOneAccount(
+      data,
+      userId,
+    );
+    const response: GeneralAccountResponse = {
+      version: VERSION_RESPONSE,
+      success: true,
+      message: ACCOUNT_CREATED_MESSAGE,
+      data: {
+        account: accountCreated,
+      },
+      error: null,
+    };
+    return response;
+  }
 
   async deleteAccount({
     payload,
