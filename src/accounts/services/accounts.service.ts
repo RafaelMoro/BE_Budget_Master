@@ -9,11 +9,11 @@ import {
 } from '../constants';
 import { VERSION_RESPONSE } from '../../constants';
 import {
-  AccountResponse,
+  AccountModel,
   GeneralAccountResponse,
   GetAccountResponse,
 } from '../accounts.interface';
-import { Account } from '../entities/accounts.entity';
+import { Account as AccountEntity } from '../entities/accounts.entity';
 import {
   CreateAccountDto,
   UpdateAccountDto,
@@ -23,14 +23,14 @@ import {
 @Injectable()
 export class AccountsService {
   constructor(
-    @InjectModel(Account.name) private accountModel: Model<Account>,
+    @InjectModel(AccountEntity.name) private accountModel: Model<AccountEntity>,
   ) {}
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
       const completeData = { ...data, sub: userId };
       const newModel = new this.accountModel(completeData);
-      const model: AccountResponse = await newModel.save();
+      const model: AccountModel = await newModel.save();
       const response: GeneralAccountResponse = {
         version: VERSION_RESPONSE,
         success: true,
@@ -48,7 +48,7 @@ export class AccountsService {
 
   async findByUser(sub: string) {
     try {
-      const accounts: AccountResponse[] = await this.accountModel
+      const accounts: AccountModel[] = await this.accountModel
         .find({ sub: sub })
         .exec();
 
@@ -69,9 +69,7 @@ export class AccountsService {
 
   async findById(accountId: string) {
     try {
-      const account: AccountResponse = await this.accountModel.findById(
-        accountId,
-      );
+      const account: AccountModel = await this.accountModel.findById(accountId);
       return account;
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -81,7 +79,7 @@ export class AccountsService {
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
-      const updatedAccount: AccountResponse = await this.accountModel
+      const updatedAccount: AccountModel = await this.accountModel
         .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();
       if (!updatedAccount) throw new BadRequestException('Account not found');
@@ -159,7 +157,7 @@ export class AccountsService {
       const { accountId } = payload;
 
       // After deleting records related to this account if found, delete the account.
-      const accountDeleted: AccountResponse =
+      const accountDeleted: AccountModel =
         await this.accountModel.findByIdAndDelete(accountId);
       if (!accountDeleted) throw new BadRequestException(ACCOUNT_NOT_FOUND);
 

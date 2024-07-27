@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Account } from '../../accounts/entities/accounts.entity';
+import { Account as AccountEntity } from '../../accounts/entities/accounts.entity';
 import { Category } from '../../categories/entities/categories.entity';
 
 @Schema()
@@ -62,8 +62,8 @@ export class AccountRecord extends Document {
   )
   transferRecord: Record<string, any>;
 
-  @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
-  account: Account | Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: AccountEntity.name, required: true })
+  account: AccountEntity | Types.ObjectId;
 
   @Prop()
   budgets: string[];

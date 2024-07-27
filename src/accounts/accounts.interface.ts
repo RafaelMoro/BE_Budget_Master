@@ -1,25 +1,25 @@
 import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
-import { Account } from './entities/accounts.entity';
+import { Account as AccountEntity } from './entities/accounts.entity';
 
-export interface AccountResponse extends Account {
+export interface AccountModel extends AccountEntity {
   _id: Types.ObjectId;
 }
 
 export interface GeneralAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: {
-    account: AccountResponse;
+    account: AccountModel;
   };
 }
 
 export interface GetAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: {
-    accounts: AccountResponse[];
+    accounts: AccountModel[];
   };
 }
 
 interface DeleteAccountResponseData {
-  accountDeleted: AccountResponse;
+  accountDeleted: AccountModel;
   numberExpensesDeleted: number;
   numberIncomesDeleted: number;
 }

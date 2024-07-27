@@ -2,14 +2,17 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AccountsController } from './controllers/accounts.controller';
-import { Account, AccountsSchema } from './entities/accounts.entity';
+import {
+  Account as AccountEntity,
+  AccountsSchema,
+} from './entities/accounts.entity';
 import { AccountsService } from './services/accounts.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Account.name,
+        name: AccountEntity.name,
         schema: AccountsSchema,
       },
     ]),
