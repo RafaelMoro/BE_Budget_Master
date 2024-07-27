@@ -38,17 +38,7 @@ export class AccountsService {
       const accounts: AccountModel[] = await this.accountModel
         .find({ sub: sub })
         .exec();
-
-      const response: GetAccountResponse = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: null,
-        data: {
-          accounts,
-        },
-        error: null,
-      };
-      return response;
+      return accounts;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

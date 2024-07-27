@@ -5,6 +5,7 @@ import {
   UseGuards,
   Request,
   Post,
+  Get,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
@@ -17,6 +18,12 @@ import { AccountsActionsService } from '../services/Accounts/accounts.-actions.s
 @Controller('account-actions')
 export class UserAccountsActionsController {
   constructor(private userAccountActionsService: AccountsActionsService) {}
+
+  @Get()
+  findByUser(@Request() req) {
+    const userId = req.user.sub;
+    return this.userAccountActionsService.findByUser({ userId });
+  }
 
   @Post()
   createAccount(@Body() payload: CreateAccountDto, @Request() req) {

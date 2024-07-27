@@ -15,6 +15,7 @@ import { VERSION_RESPONSE } from '../../../constants';
 import {
   DeleteAccountResponse,
   GeneralAccountResponse,
+  GetAccountResponse,
 } from '../../../accounts/accounts.interface';
 
 @Injectable()
@@ -31,20 +32,46 @@ export class AccountsActionsService {
     data: CreateAccountDto;
     userId: string;
   }) {
-    const accountCreated = await this.accountsService.createOneAccount(
-      data,
-      userId,
-    );
-    const response: GeneralAccountResponse = {
-      version: VERSION_RESPONSE,
-      success: true,
-      message: ACCOUNT_CREATED_MESSAGE,
-      data: {
-        account: accountCreated,
-      },
-      error: null,
-    };
-    return response;
+    try {
+      const accountCreated = await this.accountsService.createOneAccount(
+        data,
+        userId,
+      );
+      const response: GeneralAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: ACCOUNT_CREATED_MESSAGE,
+        data: {
+          account: accountCreated,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async findByUser({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<GetAccountResponse> {
+    try {
+      const accounts = await this.accountsService.findByUser(userId);
+      const response: GetAccountResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        data: {
+          accounts,
+        },
+        error: null,
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async deleteAccount({
