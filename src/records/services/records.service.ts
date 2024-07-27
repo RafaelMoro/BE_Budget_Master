@@ -24,7 +24,7 @@ import {
   DeleteExpenseDto,
   UpdateExpenseDto,
 } from '../../expenses/expenses.dto';
-import { UpdateIncomeDto } from '../../incomes/incomes.dto';
+import { DeleteIncomeDto, UpdateIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
@@ -251,7 +251,9 @@ export class RecordsService {
     return response;
   }
 
-  // Service to see if the account has any records.
+  /**
+   * Service to see if the account has any expenses before deleting account in account service
+   */
   findAllExpensesByAccount({
     accountId,
     userId,
@@ -262,7 +264,30 @@ export class RecordsService {
     return this.expensesService.findAllExpensesByAccount({ accountId, userId });
   }
 
+  /**
+   * Service to see if the account has any incomes before deleting account in account service
+   */
+  findAllIncomesByAccount({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }) {
+    return this.incomesService.findAllIncomesByAccount({ accountId, userId });
+  }
+
+  /**
+   * Service to delete the expenses related to an account to be deleted
+   */
   deleteMultipleExpenses({ expenses }: { expenses: DeleteExpenseDto[] }) {
     return this.expensesService.deleteMultipleExpenses(expenses);
+  }
+
+  /**
+   * Service to delete the incomes related to an account to be deleted
+   */
+  deleteMultipleIncomes({ incomes }: { incomes: DeleteIncomeDto[] }) {
+    return this.incomesService.deleteMultipleIncomes(incomes);
   }
 }
