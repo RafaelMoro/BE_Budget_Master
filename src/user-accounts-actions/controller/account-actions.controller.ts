@@ -14,11 +14,11 @@ import {
 import { AccountsActionsService } from '../services/Accounts/accounts.-actions.service';
 
 @UseGuards(JwtAuthGuard)
-@Controller('accounts-actions')
+@Controller('account-actions')
 export class UserAccountsActionsController {
   constructor(private userAccountActionsService: AccountsActionsService) {}
 
-  @Post('create-account')
+  @Post()
   createAccount(@Body() payload: CreateAccountDto, @Request() req) {
     const userId = req.user.sub;
     return this.userAccountActionsService.createAccount({
@@ -27,7 +27,7 @@ export class UserAccountsActionsController {
     });
   }
 
-  @Delete('delete-account')
+  @Delete()
   remove(@Body() payload: DeleteAccountDto, @Request() req) {
     const userId = req.user.sub;
     return this.userAccountActionsService.deleteAccount({ payload, userId });
