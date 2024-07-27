@@ -56,6 +56,17 @@ export class ExpensesService {
     private budgetService: BudgetsService,
   ) {}
 
+  async findExpenseById(expenseId: string) {
+    try {
+      const expense: Expense = await this.expenseModel
+        .findById(expenseId)
+        .exec();
+      return expense;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async createExpense(data: CreateExpenseDto, userId: string) {
     try {
       const { category, amount, typeOfRecord, date } = data;
@@ -347,6 +358,7 @@ export class ExpensesService {
         userId: userIdChanges,
       } = changes;
 
+      /** Validation */
       // Verify that the record belongs to the user
       if (userId !== userIdChanges) {
         throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
@@ -355,9 +367,11 @@ export class ExpensesService {
       if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
       if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
 
+      /** Format data and prepare it to modify it in db */
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
       let categoryId = category;
+      // Used in create transfer in records service
       if (!skipFindCategory) {
         const categoryIdFetched =
           await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
@@ -378,6 +392,12 @@ export class ExpensesService {
         amountFormatted,
       };
 
+      const oldExpense = await this.findExpenseById(recordId);
+      const hasChangedAmount = changes.amount !== oldExpense.amount;
+
+      // Update amount account
+
+      /** Update record in DB */
       const updatedRecord: Expense = await this.expenseModel
         .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
         .populate({
@@ -388,6 +408,7 @@ export class ExpensesService {
 
       if (!updatedRecord) throw new BadRequestException(EXPENSE_NOT_FOUND);
 
+      /** Return response */
       const response: ResponseSingleExpense = {
         ...INITIAL_RESPONSE,
         data: {
