@@ -12,4 +12,4 @@ import { AccountsActionsService } from './services/Accounts/accounts.-actions.se
   providers: [UserAccountsActionsService, AccountsActionsService],
   controllers: [UserAccountsActionsController],
 })
-export class UserAccountsActionsModule {}
+export class UserActionsModule {}
