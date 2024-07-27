@@ -5,7 +5,6 @@ import { RecordsModule } from '../records/records.module';
 import { AccountsController } from './controllers/accounts.controller';
 import { Account, AccountsSchema } from './entities/accounts.entity';
 import { AccountsService } from './services/accounts.service';
-import { IncomesModule } from 'src/incomes/incomes.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { IncomesModule } from 'src/incomes/incomes.module';
       },
     ]),
     RecordsModule,
-    IncomesModule,
   ],
   controllers: [AccountsController],
   providers: [AccountsService],

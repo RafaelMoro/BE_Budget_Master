@@ -23,14 +23,12 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
-import { IncomesService } from '../../incomes/services/incomes.service';
 import { RecordsService } from 'src/records/services/records.service';
 
 @Injectable()
 export class AccountsService {
   constructor(
     @InjectModel(Account.name) private accountModel: Model<Account>,
-    private incomesService: IncomesService,
     private recordsService: RecordsService,
   ) {}
 
@@ -110,7 +108,7 @@ export class AccountsService {
           userId,
         });
       const incomesRelatedToAccount =
-        await this.incomesService.findAllIncomesByAccount({
+        await this.recordsService.findAllIncomesByAccount({
           accountId,
           userId,
         });
@@ -133,9 +131,9 @@ export class AccountsService {
         const incomesIds = incomesRelatedToAccount.incomes.map((income) => {
           return { recordId: income._id.toString() };
         });
-        const { incomes } = await this.incomesService.deleteMultipleIncomes(
-          incomesIds,
-        );
+        const { incomes } = await this.recordsService.deleteMultipleIncomes({
+          incomes: incomesIds,
+        });
         incomesRecords = incomes;
       }
 
