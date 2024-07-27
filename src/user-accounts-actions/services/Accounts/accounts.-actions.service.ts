@@ -9,7 +9,7 @@ import { VERSION_RESPONSE } from '../../../constants';
 import { DeleteAccountResponse } from '../../../accounts/accounts.interface';
 
 @Injectable()
-export class AccountsUserAccountsActionsService {
+export class AccountsActionsService {
   constructor(
     private accountsService: AccountsService,
     private recordsService: RecordsService,
