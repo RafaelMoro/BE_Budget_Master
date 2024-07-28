@@ -122,7 +122,7 @@ export class ExpensesActionsService {
       const response: ResponseSingleExpense = {
         version: VERSION_RESPONSE,
         success: true,
-        messages,
+        message: messages,
         data: {
           expense: expense,
         },
@@ -265,7 +265,14 @@ export class ExpensesActionsService {
             sub: userId,
             expenseOperation: 'removeExpense',
           });
-          messages.push(`Remove budget ${budgetId}`);
+          messages.push(`Removed budget: ${budgetId}`);
+
+          await this.budgetHistoryService.removeRecordFromBudgetHistory({
+            budgetId: new Types.ObjectId(budgetId),
+            sub: userId,
+            recordToBeDeleted: recordId,
+          });
+          messages.push(`Deleted from budget history: ${budgetId}`);
         }
       }
 
@@ -282,7 +289,7 @@ export class ExpensesActionsService {
               sub: userId,
               expenseOperation: 'addExpense',
             });
-          messages.push(`Added budget ${budgetId}`);
+          messages.push(`Budget added: ${budgetId}`);
 
           await this.budgetHistoryService.addRecordToBudgetHistory({
             budgetId: new Types.ObjectId(budgetId),
@@ -296,7 +303,7 @@ export class ExpensesActionsService {
               budgetUpdatedAmount: updatedBudget.currentAmount,
             },
           });
-          messages.push(`Added into budget history ${budgetId}`);
+          messages.push(`Added into budget history: ${budgetId}`);
         }
       }
 
@@ -322,7 +329,7 @@ export class ExpensesActionsService {
         data: {
           expense: updatedRecord,
         },
-        messages,
+        message: messages,
       };
       return response;
     } catch (error) {

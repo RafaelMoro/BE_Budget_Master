@@ -49,12 +49,12 @@ export class BudgetHistoryController {
     @Body() payload: RemoveRecordFromBudgetHistoryDto,
     @Request() req,
   ) {
-    const { budgetHistoryId, record } = payload;
+    const { budgetId, record } = payload;
     const sub = req.user.sub;
     return this.budgetHistoryService.removeRecordFromBudgetHistory({
       recordToBeDeleted: record,
       sub,
-      budgetHistoryId,
+      budgetId,
     });
   }
 

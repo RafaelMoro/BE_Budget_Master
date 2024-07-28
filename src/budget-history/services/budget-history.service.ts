@@ -261,11 +261,11 @@ export class BudgetHistoryService {
   async removeRecordFromBudgetHistory({
     recordToBeDeleted,
     sub,
-    budgetHistoryId,
+    budgetId,
   }: RemoveRecordFromBudgetHistoryProps) {
     try {
       const budgetsHistory = await this.budgetHistoryModel
-        .find({ _id: budgetHistoryId, sub })
+        .find({ budget: new Types.ObjectId(budgetId), sub })
         .exec();
       if (budgetsHistory.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
@@ -285,7 +285,7 @@ export class BudgetHistoryService {
 
       const updateBudgetHistoryModel =
         await this.budgetHistoryModel.findByIdAndUpdate(
-          budgetHistoryId,
+          budgetsHistory,
           { $set: updatedBudgetHistory },
           { new: true },
         );

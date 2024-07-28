@@ -318,7 +318,7 @@ export class ExpensesService {
 
       const response: ResponseSingleExpense = {
         ...INITIAL_RESPONSE,
-        messages,
+        message: messages,
         data: {
           expense: recordDeleted,
         },

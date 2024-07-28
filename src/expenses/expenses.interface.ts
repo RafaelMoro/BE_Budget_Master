@@ -7,7 +7,7 @@ export interface ResponseSingleExpense
   data: {
     expense: Expense;
   };
-  messages: string[];
+  message: string[];
 }
 
 export interface ResponseMultipleExpenses
