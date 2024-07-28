@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CategoriesService } from '../../../categories/services/categories.service';
@@ -12,6 +13,7 @@ import { ExpensesService } from '../../../expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
   EXPENSE_CREATED_MESSAGE,
+  EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
   TRANSFER_RECORD_LINKED_BUDGET_ERROR,
@@ -194,42 +196,32 @@ export class ExpensesActionsService {
     if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
   }
 
-  async updateExpense({
-    changes,
-    userIdGotten,
-    skipFindCategory = false,
-  }: UpdateExpenseProps) {
+  async updateExpense({ changes, userIdGotten }: UpdateExpenseProps) {
     try {
       const { recordId, category } = changes;
       this.validateUpdateExpense({ changes });
 
       const oldExpense = await this.expensesService.findExpenseById(recordId);
+      if (!oldExpense) throw new NotFoundException(EXPENSE_NOT_FOUND);
+
       const { userId } = oldExpense;
       if (userIdGotten !== userId) {
         throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
       }
 
-      let categoryId = category;
-      // Used in create transfer in records service
-      if (!skipFindCategory) {
-        const categoryIdFetched =
-          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-            {
-              categoryName: category,
-              userId,
-            },
-          );
-        categoryId = categoryIdFetched.toString();
-      }
+      // Verify account and category exists
+      await this.categoriesService.validateCategoryExists({
+        categoryId: category,
+      });
 
       const changesFormatted = this.formatExpenseOnEdit({
         changes,
-        categoryId,
+        categoryId: category,
       });
 
       const hasChangedAmount = changes.amount !== oldExpense.amount;
       const hasChangedLinkedBudgets =
-        changes.linkedBudgets[0] !== oldExpense.linkedBudgets[0];
+        changes.linkedBudgets?.[0] !== oldExpense.linkedBudgets?.[0];
       console.log('hasChangedLinkedBudgets', hasChangedLinkedBudgets);
 
       // Update amount account if the amount has changed
@@ -254,6 +246,8 @@ export class ExpensesActionsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }
