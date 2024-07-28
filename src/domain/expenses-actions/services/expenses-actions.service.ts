@@ -229,6 +229,9 @@ export class ExpensesActionsService {
       });
 
       const hasChangedAmount = changes.amount !== oldExpense.amount;
+      const hasChangedLinkedBudgets =
+        changes.linkedBudgets[0] !== oldExpense.linkedBudgets[0];
+      console.log('hasChangedLinkedBudgets', hasChangedLinkedBudgets);
 
       // Update amount account if the amount has changed
       if (hasChangedAmount) {
