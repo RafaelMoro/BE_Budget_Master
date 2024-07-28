@@ -24,8 +24,6 @@ import {
   UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
 import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
-import { changeTimezone } from '../../utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from '../../utils';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
@@ -35,13 +33,7 @@ import {
   RemoveExpenseProps,
   ResponseMultipleExpenses,
   ResponseSingleExpense,
-  UpdateExpenseProps,
 } from '../expenses.interface';
-import {
-  MISSING_AMOUNT,
-  MISSING_CATEGORY,
-  MISSING_DATE,
-} from '../../records/constants';
 import { getMonthNumber } from '../../utils/getMonthNumber';
 
 @Injectable()
