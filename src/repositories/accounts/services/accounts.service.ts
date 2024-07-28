@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -66,8 +67,10 @@ export class AccountsService {
   async findById(accountId: string) {
     try {
       const account: AccountModel = await this.accountModel.findById(accountId);
+      if (!account) throw new NotFoundException(ACCOUNT_NOT_FOUND);
       return account;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }

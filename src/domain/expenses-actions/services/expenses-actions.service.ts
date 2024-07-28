@@ -114,6 +114,7 @@ export class ExpensesActionsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
       if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
