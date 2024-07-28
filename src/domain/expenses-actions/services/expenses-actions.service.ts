@@ -22,6 +22,7 @@ import {
   MISSING_AMOUNT,
   MISSING_CATEGORY,
   MISSING_DATE,
+  MISSING_LINKED_BUDGETS,
   TYPE_OF_RECORD_INVALID,
 } from '../../../records/constants';
 import { changeTimezone } from '../../../utils/changeTimezone';
@@ -34,6 +35,7 @@ import {
   UpdateExpenseProps,
 } from '../../../expenses/expenses.interface';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ExpensesActionsService {
@@ -189,11 +191,12 @@ export class ExpensesActionsService {
     }
   }
   validateUpdateExpense({ changes }: { changes: UpdateExpenseDto }) {
-    const { category, date, amount } = changes;
+    const { category, date, amount, linkedBudgets } = changes;
 
-    if (!date) throw new UnauthorizedException(MISSING_DATE);
-    if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
-    if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
+    if (!date) throw new BadRequestException(MISSING_DATE);
+    if (!category) throw new BadRequestException(MISSING_CATEGORY);
+    if (!amount) throw new BadRequestException(MISSING_AMOUNT);
+    if (!linkedBudgets) throw new BadRequestException(MISSING_LINKED_BUDGETS);
   }
 
   async updateExpense({ changes, userIdGotten }: UpdateExpenseProps) {
@@ -220,9 +223,20 @@ export class ExpensesActionsService {
       });
 
       const hasChangedAmount = changes.amount !== oldExpense.amount;
-      const hasChangedLinkedBudgets =
-        changes.linkedBudgets?.[0] !== oldExpense.linkedBudgets?.[0];
-      console.log('hasChangedLinkedBudgets', hasChangedLinkedBudgets);
+
+      let hasChangedLinkedBudgets = false;
+      changes.linkedBudgets.forEach((budget) => {
+        oldExpense.linkedBudgets.forEach((oldBudget) => {
+          if (budget !== oldBudget._id.toString()) {
+            hasChangedLinkedBudgets = true;
+          }
+        });
+      });
+
+      if (hasChangedLinkedBudgets) {
+        // Logic to remove record from budget
+        // Logic to add record to budget
+      }
 
       // Update amount account if the amount has changed
       if (hasChangedAmount) {

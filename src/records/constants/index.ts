@@ -11,3 +11,4 @@ export const MISSING_TRANSFER_RECORD = 'Transfer record is missing.';
 export const MISSING_DATE = 'date prop is missing.';
 export const MISSING_CATEGORY = 'category prop is missing.';
 export const MISSING_AMOUNT = 'amount prop is missing.';
+export const MISSING_LINKED_BUDGETS = 'linkedBudgets prop is missing.';
