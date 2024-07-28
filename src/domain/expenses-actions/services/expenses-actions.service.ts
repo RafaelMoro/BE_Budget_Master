@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { CategoriesService } from '../../../categories/services/categories.service';
 import {
   CreateExpenseDto,
@@ -90,6 +91,7 @@ export class ExpensesActionsService {
               amountRecord: data.amount,
             },
             sub: userId,
+            expenseOperation: 'addExpense',
           });
 
           await this.budgetHistoryService.addRecordToBudgetHistory({
@@ -235,10 +237,33 @@ export class ExpensesActionsService {
           newArray: oldLinkedBudgetsIds,
         });
 
-      if (oldBudgetsToRemove.length > 0 || newBudgetsToAdd.length > 0) {
-        console.log('delete or add budgets');
-        // Logic to remove record from budget
+      // If there's budgets that this record does not form part of, rest the amount to the current amount of the budget
+      if (oldBudgetsToRemove.length > 0) {
+        for await (const budgetId of oldBudgetsToRemove) {
+          await this.budgetService.updateBudgetAmount({
+            changes: {
+              budgetId: new Types.ObjectId(budgetId),
+              amountRecord: changes.amount,
+            },
+            sub: userId,
+            expenseOperation: 'removeExpense',
+          });
+        }
+      }
+
+      // If there's budgets that this record is part of, add the amount to the current amount of the budget
+      if (newBudgetsToAdd.length > 0) {
         // Logic to add record to budget
+        for await (const budgetId of newBudgetsToAdd) {
+          await this.budgetService.updateBudgetAmount({
+            changes: {
+              budgetId: new Types.ObjectId(budgetId),
+              amountRecord: changes.amount,
+            },
+            sub: userId,
+            expenseOperation: 'addExpense',
+          });
+        }
       }
 
       // Update amount account if the amount has changed
