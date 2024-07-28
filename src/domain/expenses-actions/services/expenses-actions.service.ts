@@ -54,29 +54,27 @@ export class ExpensesActionsService {
       const { category, typeOfRecord, date } = data;
       this.validateCreateExpenseData(data);
 
-      const categoryId =
-        await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-          {
-            categoryName: category,
-            userId,
-          },
-        );
+      // Verify account and category exists
+      await this.categoriesService.validateCategoryExists({
+        categoryId: category,
+      });
+      // Find account
+      const account = await this.accountsService.findById(data.account);
+
       const dataFormatted = this.formatExpenseOnCreate({
         data,
-        categoryId: categoryId.toString(),
+        categoryId: category,
         userId,
       });
       const expense = await this.expensesService.createExpense(dataFormatted);
 
-      // Find account
-      const account = await this.accountsService.findById(data.account);
       const { amount: currentAmount } = account;
       const newAmount = currentAmount - data.amount;
 
       // Modify amount of the account
       await this.accountsService.modifyAccountBalance({
         amount: newAmount,
-        accountId: expense.account.toString(),
+        accountId: data.account,
       });
 
       // Add record to budget history and modify budget current amount

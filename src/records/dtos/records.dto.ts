@@ -53,7 +53,7 @@ export class CreateRecordDto {
   @IsNotEmpty()
   readonly date: Date;
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   readonly category: string;
 

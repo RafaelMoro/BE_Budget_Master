@@ -111,6 +111,17 @@ export class CategoriesService {
     }
   }
 
+  async validateCategoryExists({ categoryId }: { categoryId: string }) {
+    try {
+      console.log('categoryId', categoryId);
+      const category = await this.categoryModel.findById(categoryId).exec();
+      if (!category) throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
+      return !!category;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async findOrCreateCategoriesByNameAndUserIdForRecords({
     categoryName,
     userId,
