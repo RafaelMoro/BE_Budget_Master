@@ -35,7 +35,7 @@ import {
   UpdateExpenseProps,
 } from '../../../expenses/expenses.interface';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
-import { Types } from 'mongoose';
+import { symmetricDifference } from '../../../utils/symmetricDifference';
 
 @Injectable()
 export class ExpensesActionsService {
@@ -224,16 +224,19 @@ export class ExpensesActionsService {
 
       const hasChangedAmount = changes.amount !== oldExpense.amount;
 
-      let hasChangedLinkedBudgets = false;
-      changes.linkedBudgets.forEach((budget) => {
-        oldExpense.linkedBudgets.forEach((oldBudget) => {
-          if (budget !== oldBudget._id.toString()) {
-            hasChangedLinkedBudgets = true;
-          }
-        });
-      });
+      const oldLinkedBudgetsIds: string[] = oldExpense.linkedBudgets.map(
+        (budget) => budget._id.toString(),
+      );
 
-      if (hasChangedLinkedBudgets) {
+      const { oldValues: oldBudgetsToRemove, newValues: newBudgetsToAdd } =
+        symmetricDifference({
+          // The type is Budget but in the changes we receive the id as string
+          oldArray: changes.linkedBudgets as unknown as string[],
+          newArray: oldLinkedBudgetsIds,
+        });
+
+      if (oldBudgetsToRemove.length > 0 || newBudgetsToAdd.length > 0) {
+        console.log('delete or add budgets');
         // Logic to remove record from budget
         // Logic to add record to budget
       }
