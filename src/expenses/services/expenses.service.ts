@@ -17,12 +17,8 @@ import {
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   EXPENSES_NOT_FOUND,
-  MAXIMUM_BUDGETS_LIMIT_ERROR,
-  TRANSFER_RECORD_LINKED_BUDGET_ERROR,
-  TYPE_OF_RECORD_INVALID,
   UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
-import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
   BatchExpensesResponse,
@@ -70,24 +66,6 @@ export class ExpensesService {
       return modelPopulated;
     } catch (error) {
       throw new BadRequestException(error.message);
-    }
-  }
-
-  validateCreateExpenseData(data: CreateExpenseDto) {
-    const { typeOfRecord, linkedBudgets } = data;
-
-    // Validate that records type transfer cannot have linked budgets
-    if (linkedBudgets?.length > 0 && typeOfRecord === 'transfer') {
-      throw new BadRequestException(TRANSFER_RECORD_LINKED_BUDGET_ERROR);
-    }
-
-    // Validate the type of record should be expense or transfer
-    if (isTypeOfRecord(typeOfRecord) === false || typeOfRecord !== 'expense') {
-      throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-    }
-
-    if (linkedBudgets.length > 3) {
-      throw new BadRequestException(MAXIMUM_BUDGETS_LIMIT_ERROR);
     }
   }
 
