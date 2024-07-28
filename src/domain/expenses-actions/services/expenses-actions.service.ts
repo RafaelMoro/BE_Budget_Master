@@ -68,9 +68,14 @@ export class ExpensesActionsService {
       });
       const expense = await this.expensesService.createExpense(dataFormatted);
 
+      // Find account
+      const account = await this.accountsService.findById(data.account);
+      const { amount: currentAmount } = account;
+      const newAmount = currentAmount - data.amount;
+
       // Modify amount of the account
       await this.accountsService.modifyAccountBalance({
-        amount: data.amount,
+        amount: newAmount,
         accountId: expense.account.toString(),
       });
 

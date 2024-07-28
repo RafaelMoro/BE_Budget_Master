@@ -125,12 +125,9 @@ export class AccountsService {
     accountId: string;
   }) {
     try {
-      const accountToEdit = await this.findById(accountId);
-      const { amount: currentAmount } = accountToEdit;
-      const newAmount = currentAmount - amount;
       const updatedAccount = await this.accountModel.findByIdAndUpdate(
         accountId,
-        { $set: { amount: newAmount } },
+        { $set: { amount } },
         { new: true },
       );
       return updatedAccount;
