@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -113,11 +117,11 @@ export class CategoriesService {
 
   async validateCategoryExists({ categoryId }: { categoryId: string }) {
     try {
-      console.log('categoryId', categoryId);
       const category = await this.categoryModel.findById(categoryId).exec();
-      if (!category) throw new BadRequestException(CATEGORY_NOT_FOUND_ERROR);
+      if (!category) throw new NotFoundException(CATEGORY_NOT_FOUND_ERROR);
       return !!category;
     } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }
