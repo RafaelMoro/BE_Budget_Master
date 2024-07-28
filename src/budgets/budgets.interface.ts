@@ -30,7 +30,8 @@ export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
 }
 
 export interface UpdateAmountBudgetResponse {
-  budget: Budget;
+  oldBudget: Budget;
+  updatedBudget: Budget;
   message: string | null;
 }
 

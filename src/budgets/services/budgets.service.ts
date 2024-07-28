@@ -246,7 +246,8 @@ export class BudgetsService {
         .exec();
       if (!budget) {
         return {
-          budget: budget,
+          oldBudget: budget,
+          updatedBudget: null,
           message: BUDGET_NOT_FOUND_ERROR,
         };
       }
@@ -268,7 +269,8 @@ export class BudgetsService {
         .exec();
 
       return {
-        budget: updatedBudget,
+        oldBudget: budget,
+        updatedBudget,
         message: null,
       };
     } catch (error) {

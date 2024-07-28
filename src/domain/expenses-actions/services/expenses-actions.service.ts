@@ -13,7 +13,6 @@ import {
 import { ExpensesService } from '../../../expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
-  EXPENSE_CREATED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
@@ -119,6 +118,7 @@ export class ExpensesActionsService {
         }
       }
 
+      // 7. Return the response
       const response: ResponseSingleExpense = {
         version: VERSION_RESPONSE,
         success: true,
@@ -273,15 +273,30 @@ export class ExpensesActionsService {
       if (newBudgetsToAdd.length > 0) {
         // Logic to add record to budget
         for await (const budgetId of newBudgetsToAdd) {
-          await this.budgetService.updateBudgetAmount({
-            changes: {
-              budgetId: new Types.ObjectId(budgetId),
-              amountRecord: changes.amount,
-            },
-            sub: userId,
-            expenseOperation: 'addExpense',
-          });
+          const { updatedBudget, oldBudget } =
+            await this.budgetService.updateBudgetAmount({
+              changes: {
+                budgetId: new Types.ObjectId(budgetId),
+                amountRecord: changes.amount,
+              },
+              sub: userId,
+              expenseOperation: 'addExpense',
+            });
           messages.push(`Added budget ${budgetId}`);
+
+          await this.budgetHistoryService.addRecordToBudgetHistory({
+            budgetId: new Types.ObjectId(budgetId),
+            sub: userId,
+            newRecord: {
+              recordId: changes.recordId,
+              recordName: changes.shortName,
+              recordDate: changes.date,
+              recordAmount: changes.amount,
+              budgetCurrentAmount: oldBudget.currentAmount,
+              budgetUpdatedAmount: updatedBudget.currentAmount,
+            },
+          });
+          messages.push(`Added into budget history ${budgetId}`);
         }
       }
 
