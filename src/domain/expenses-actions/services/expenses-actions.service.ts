@@ -56,33 +56,41 @@ export class ExpensesActionsService {
     userId: string;
   }) {
     try {
+      const messages: string[] = [];
+      // 1. Validate data
       const { category, typeOfRecord, date } = data;
       this.validateCreateExpenseData(data);
 
-      // Verify account and category exists
+      // 2. Verify category exists
       await this.categoriesService.validateCategoryExists({
         categoryId: category,
       });
-      // Find account
+
+      // 2. Verify account exists
       const account = await this.accountsService.findById(data.account);
 
+      // 3. Format data
       const dataFormatted = this.formatExpenseOnCreate({
         data,
         categoryId: category,
         userId,
       });
+
+      // 4. Create the expense
       const expense = await this.expensesService.createExpense(dataFormatted);
+      messages.push('Expense created');
 
       const { amount: currentAmount } = account;
       const newAmount = currentAmount - data.amount;
 
-      // Modify amount of the account
+      // 5. Update account's amount
       await this.accountsService.modifyAccountBalance({
         amount: newAmount,
         accountId: data.account,
       });
+      messages.push('Account updated');
 
-      // Add record to budget history and modify budget current amount
+      // 6. Add record to budget history and modify budget's current amount if applies
       if (expense.linkedBudgets?.length > 0 && typeOfRecord === 'expense') {
         for await (const budget of expense.linkedBudgets) {
           await this.budgetService.updateBudgetAmount({
@@ -93,6 +101,7 @@ export class ExpensesActionsService {
             sub: userId,
             expenseOperation: 'addExpense',
           });
+          messages.push(`Budget updated ${budget._id}`);
 
           await this.budgetHistoryService.addRecordToBudgetHistory({
             budgetId: budget._id,
@@ -106,13 +115,14 @@ export class ExpensesActionsService {
               budgetUpdatedAmount: budget.currentAmount + expense.amount,
             },
           });
+          messages.push(`Budget history updated ${budget._id}`);
         }
       }
 
       const response: ResponseSingleExpense = {
         version: VERSION_RESPONSE,
         success: true,
-        message: EXPENSE_CREATED_MESSAGE,
+        messages,
         data: {
           expense: expense,
         },
@@ -203,33 +213,39 @@ export class ExpensesActionsService {
 
   async updateExpense({ changes, userIdGotten }: UpdateExpenseProps) {
     try {
+      // 1. Validate changes
+      const messages: string[] = [];
       const { recordId, category } = changes;
       this.validateUpdateExpense({ changes });
 
+      // 2. Verify the expense exist
       const oldExpense = await this.expensesService.findExpenseById(recordId);
       if (!oldExpense) throw new NotFoundException(EXPENSE_NOT_FOUND);
 
+      // 3. Verify the expense belongs to the user
       const { userId } = oldExpense;
       if (userIdGotten !== userId) {
         throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
       }
 
-      // Verify account and category exists
+      // 4. Verify category exists
       await this.categoriesService.validateCategoryExists({
         categoryId: category,
       });
 
+      // 5. Format changes
       const changesFormatted = this.formatExpenseOnEdit({
         changes,
         categoryId: category,
       });
 
+      // 6. Verify if the amount has changed
       const hasChangedAmount = changes.amount !== oldExpense.amount;
 
+      // 7. Verify if the linked budgets has changed
       const oldLinkedBudgetsIds: string[] = oldExpense.linkedBudgets.map(
         (budget) => budget._id.toString(),
       );
-
       const { oldValues: oldBudgetsToRemove, newValues: newBudgetsToAdd } =
         symmetricDifference({
           // The type is Budget but in the changes we receive the id as string
@@ -237,6 +253,7 @@ export class ExpensesActionsService {
           newArray: oldLinkedBudgetsIds,
         });
 
+      // 8. Update budgets amount if there were changes in linked budgets and budget history
       // If there's budgets that this record does not form part of, rest the amount to the current amount of the budget
       if (oldBudgetsToRemove.length > 0) {
         for await (const budgetId of oldBudgetsToRemove) {
@@ -248,6 +265,7 @@ export class ExpensesActionsService {
             sub: userId,
             expenseOperation: 'removeExpense',
           });
+          messages.push(`Remove budget ${budgetId}`);
         }
       }
 
@@ -263,28 +281,33 @@ export class ExpensesActionsService {
             sub: userId,
             expenseOperation: 'addExpense',
           });
+          messages.push(`Added budget ${budgetId}`);
         }
       }
 
-      // Update amount account if the amount has changed
+      // 9. Update account's amount if the amount has changed
       if (hasChangedAmount) {
         await this.accountsService.modifyAccountBalanceOnExpense({
           newAmount: changes.amount,
           previousAmount: oldExpense.amount,
           accountId: oldExpense.account.toString(),
         });
+        messages.push("Account's amount updated");
       }
 
+      // 10. Update the record
       const updatedRecord = await this.expensesService.updateExpense({
         changes: changesFormatted,
       });
+      messages.push('Updated expense');
 
-      /** Return response */
+      // 11. Return the response
       const response: ResponseSingleExpense = {
         ...INITIAL_RESPONSE,
         data: {
           expense: updatedRecord,
         },
+        messages,
       };
       return response;
     } catch (error) {

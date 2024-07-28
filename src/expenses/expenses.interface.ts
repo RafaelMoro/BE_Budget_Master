@@ -2,10 +2,12 @@ import { GeneralResponse } from '../response.interface';
 import { DeleteExpenseDto, UpdateExpenseDto } from './expenses.dto';
 import { Expense } from './expenses.entity';
 
-export interface ResponseSingleExpense extends Omit<GeneralResponse, 'data'> {
+export interface ResponseSingleExpense
+  extends Omit<GeneralResponse, 'data' | 'message'> {
   data: {
     expense: Expense;
   };
+  messages: string[];
 }
 
 export interface ResponseMultipleExpenses
