@@ -306,6 +306,7 @@ export class ExpensesService {
 
   async removeExpense({ payload, userId }: RemoveExpenseProps) {
     try {
+      const messages: string[] = [];
       const { recordId } = payload;
       await this.verifyRecordBelongsUser(recordId, userId);
 
@@ -313,10 +314,11 @@ export class ExpensesService {
         recordId,
       );
       if (!recordDeleted) throw new BadRequestException(EXPENSE_NOT_FOUND);
+      messages.push(EXPENSE_DELETED_MESSAGE);
 
       const response: ResponseSingleExpense = {
         ...INITIAL_RESPONSE,
-        message: EXPENSE_DELETED_MESSAGE,
+        messages,
         data: {
           expense: recordDeleted,
         },
