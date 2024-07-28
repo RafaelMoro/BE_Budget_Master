@@ -15,9 +15,6 @@ export class UpdateExpenseDto extends PartialType(CreateExpenseDto) {
   @IsMongoId()
   @IsNotEmpty()
   readonly recordId: string;
-
-  @IsMongoId()
-  readonly userId: string;
 }
 
 export class DeleteExpenseDto {

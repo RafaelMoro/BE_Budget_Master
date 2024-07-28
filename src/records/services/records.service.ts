@@ -3,7 +3,6 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Expense } from '../../expenses/expenses.entity';
 import { Income } from '../../incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
-import { BudgetHistoryService } from '../../budget-history/services/budget-history.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
   NO_EXPENSES_FOUND,
@@ -106,7 +105,7 @@ export class RecordsService {
         date: expense.date,
         category: newDataExpense.category.toString(),
         amount: expense.amount,
-        userId,
+        // userId,
         transferRecord: {
           transferId: incomeId.toString(),
           account: accountIncome.toString(),
@@ -124,12 +123,11 @@ export class RecordsService {
         },
       };
 
-      const updateExpenseResponse = await this.expensesService.updateExpense({
+      const updatedTransferExpense = await this.expensesService.updateExpense({
         changes: updatedExpense,
-        skipFindCategory: true,
-        userId,
+        // skipFindCategory: true,
+        // userId,
       });
-      const updatedTransferExpense = updateExpenseResponse?.data?.expense;
       const updatedIncomeResponse = await this.incomesService.updateIncome({
         changes: updatedIncome,
         skipFindCategory: true,

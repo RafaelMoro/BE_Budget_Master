@@ -37,7 +37,7 @@ export interface DeleteMultipleExpensesResponse {
 
 export interface UpdateExpenseProps {
   changes: UpdateExpenseDto;
-  userId: string;
+  userIdGotten: string;
   skipFindCategory?: boolean;
 }
 

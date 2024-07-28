@@ -277,62 +277,12 @@ export class ExpensesService {
     }
   }
 
-  async updateExpense({
-    changes,
-    userId,
-    skipFindCategory = false,
-  }: UpdateExpenseProps) {
+  async updateExpense({ changes }: { changes: UpdateExpenseDto }) {
     try {
-      const {
-        recordId,
-        category,
-        date,
-        amount,
-        userId: userIdChanges,
-      } = changes;
-
-      /** Validation */
-      // Verify that the record belongs to the user
-      if (userId !== userIdChanges) {
-        throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
-      }
-      if (!date) throw new UnauthorizedException(MISSING_DATE);
-      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
-      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
-
-      /** Format data and prepare it to modify it in db */
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-
-      let categoryId = category;
-      // Used in create transfer in records service
-      if (!skipFindCategory) {
-        const categoryIdFetched =
-          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-            {
-              categoryName: category,
-              userId,
-            },
-          );
-        categoryId = categoryIdFetched.toString();
-      }
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newChanges = {
-        ...changes,
-        category: categoryId,
-        fullDate,
-        formattedTime,
-        amountFormatted,
-      };
-
-      const oldExpense = await this.findExpenseById(recordId);
-      const hasChangedAmount = changes.amount !== oldExpense.amount;
-
-      // Update amount account
-
+      const { recordId } = changes;
       /** Update record in DB */
       const updatedRecord: Expense = await this.expenseModel
-        .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
         .populate({
           path: 'category',
           select: '_id categoryName icon',
@@ -341,14 +291,7 @@ export class ExpensesService {
 
       if (!updatedRecord) throw new BadRequestException(EXPENSE_NOT_FOUND);
 
-      /** Return response */
-      const response: ResponseSingleExpense = {
-        ...INITIAL_RESPONSE,
-        data: {
-          expense: updatedRecord,
-        },
-      };
-      return response;
+      return updatedRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

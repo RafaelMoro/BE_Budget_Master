@@ -17,12 +17,6 @@ import { DeleteExpenseDto, UpdateExpenseDto } from '../expenses.dto';
 export class ExpensesController {
   constructor(private expensesService: ExpensesService) {}
 
-  @Put()
-  updateExpense(@Body() payload: UpdateExpenseDto, @Request() req) {
-    const userId = req.user.sub;
-    return this.expensesService.updateExpense({ changes: payload, userId });
-  }
-
   @Put('/multiple')
   updateMultipleExpense(@Body() payload: UpdateExpenseDto[]) {
     return this.expensesService.updateMultipleExpenses(payload);

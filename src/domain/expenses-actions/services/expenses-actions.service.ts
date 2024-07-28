@@ -1,21 +1,37 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CategoriesService } from '../../../categories/services/categories.service';
-import { CreateExpenseDto } from '../../../expenses/expenses.dto';
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+} from '../../../expenses/expenses.dto';
 import { ExpensesService } from '../../../expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
   EXPENSE_CREATED_MESSAGE,
+  EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
   TRANSFER_RECORD_LINKED_BUDGET_ERROR,
 } from '../../../expenses/expenses.constants';
-import { TYPE_OF_RECORD_INVALID } from '../../../records/constants';
+import {
+  MISSING_AMOUNT,
+  MISSING_CATEGORY,
+  MISSING_DATE,
+  TYPE_OF_RECORD_INVALID,
+} from '../../../records/constants';
 import { changeTimezone } from '../../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../../utils';
-import { Types } from 'mongoose';
 import { BudgetsService } from '../../../budgets/services/budgets.service';
 import { BudgetHistoryService } from '../../../budget-history/services/budget-history.service';
-import { VERSION_RESPONSE } from 'src/constants';
-import { ResponseSingleExpense } from 'src/expenses/expenses.interface';
+import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
+import {
+  ResponseSingleExpense,
+  UpdateExpenseProps,
+} from '../../../expenses/expenses.interface';
+import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
 
 @Injectable()
 export class ExpensesActionsService {
@@ -24,6 +40,7 @@ export class ExpensesActionsService {
     private categoriesService: CategoriesService,
     private budgetService: BudgetsService,
     private budgetHistoryService: BudgetHistoryService,
+    private accountsService: AccountsService,
   ) {}
 
   async createExpense({
@@ -44,9 +61,9 @@ export class ExpensesActionsService {
             userId,
           },
         );
-      const dataFormatted = this.formatCreateExpense({
+      const dataFormatted = this.formatExpenseOnCreate({
         data,
-        categoryId,
+        categoryId: categoryId.toString(),
         userId,
       });
       const expense = await this.expensesService.createExpense(dataFormatted);
@@ -88,17 +105,18 @@ export class ExpensesActionsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }
 
-  formatCreateExpense({
+  formatExpenseOnCreate({
     data,
     categoryId,
     userId,
   }: {
     data: CreateExpenseDto;
-    categoryId: Types.ObjectId;
+    categoryId: string;
     userId: string;
   }) {
     const { amount, typeOfRecord, date } = data;
@@ -110,12 +128,35 @@ export class ExpensesActionsService {
       ...data,
       fullDate,
       formattedTime,
-      category: categoryId.toString(),
+      category: categoryId,
       amountFormatted,
       userId,
       typeOfRecord,
     };
+
     return newData;
+  }
+
+  formatExpenseOnEdit({
+    changes,
+    categoryId,
+  }: {
+    changes: UpdateExpenseDto;
+    categoryId: string;
+  }) {
+    const { date, amount } = changes;
+    const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+    const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+    const amountFormatted = formatNumberToCurrency(amount);
+    const newChanges = {
+      ...changes,
+      category: categoryId,
+      fullDate,
+      formattedTime,
+      amountFormatted,
+    };
+
+    return newChanges;
   }
 
   validateCreateExpenseData(data: CreateExpenseDto) {
@@ -133,6 +174,74 @@ export class ExpensesActionsService {
 
     if (linkedBudgets.length > 3) {
       throw new BadRequestException(MAXIMUM_BUDGETS_LIMIT_ERROR);
+    }
+  }
+  validateUpdateExpense({ changes }: { changes: UpdateExpenseDto }) {
+    const { category, date, amount } = changes;
+
+    if (!date) throw new UnauthorizedException(MISSING_DATE);
+    if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
+    if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
+  }
+
+  async updateExpense({
+    changes,
+    userIdGotten,
+    skipFindCategory = false,
+  }: UpdateExpenseProps) {
+    try {
+      const { recordId, category } = changes;
+      this.validateUpdateExpense({ changes });
+
+      const oldExpense = await this.expensesService.findExpenseById(recordId);
+      const { userId } = oldExpense;
+      if (userIdGotten !== userId) {
+        throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
+      }
+
+      let categoryId = category;
+      // Used in create transfer in records service
+      if (!skipFindCategory) {
+        const categoryIdFetched =
+          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
+            {
+              categoryName: category,
+              userId,
+            },
+          );
+        categoryId = categoryIdFetched.toString();
+      }
+
+      const changesFormatted = this.formatExpenseOnEdit({
+        changes,
+        categoryId,
+      });
+
+      const hasChangedAmount = changes.amount !== oldExpense.amount;
+
+      // Update amount account if the amount has changed
+      if (hasChangedAmount) {
+        await this.accountsService.modifyAccountBalanceOnExpense({
+          newAmount: changes.amount,
+          previousAmount: oldExpense.amount,
+          accountId: oldExpense.account.toString(),
+        });
+      }
+
+      const updatedRecord = await this.expensesService.updateExpense({
+        changes: changesFormatted,
+      });
+
+      /** Return response */
+      const response: ResponseSingleExpense = {
+        ...INITIAL_RESPONSE,
+        data: {
+          expense: updatedRecord,
+        },
+      };
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 }
