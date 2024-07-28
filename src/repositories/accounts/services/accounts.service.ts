@@ -113,6 +113,32 @@ export class AccountsService {
     }
   }
 
+  /**
+   * Method to create records.
+   * This method is used in expenses actions service.
+   */
+  async modifyAccountBalance({
+    amount,
+    accountId,
+  }: {
+    amount: number;
+    accountId: string;
+  }) {
+    try {
+      const accountToEdit = await this.findById(accountId);
+      const { amount: currentAmount } = accountToEdit;
+      const newAmount = currentAmount - amount;
+      const updatedAccount = await this.accountModel.findByIdAndUpdate(
+        accountId,
+        { $set: { amount: newAmount } },
+        { new: true },
+      );
+      return updatedAccount;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async modifyAccountBalanceOnIncome({
     newAmount,
     previousAmount,

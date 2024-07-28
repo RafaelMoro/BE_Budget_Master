@@ -68,6 +68,12 @@ export class ExpensesActionsService {
       });
       const expense = await this.expensesService.createExpense(dataFormatted);
 
+      // Modify amount of the account
+      await this.accountsService.modifyAccountBalance({
+        amount: data.amount,
+        accountId: expense.account.toString(),
+      });
+
       // Add record to budget history and modify budget current amount
       if (expense.linkedBudgets?.length > 0 && typeOfRecord === 'expense') {
         for await (const budget of expense.linkedBudgets) {
