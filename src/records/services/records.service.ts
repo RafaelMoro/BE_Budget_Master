@@ -48,6 +48,7 @@ export class RecordsService {
 
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
+      const messages: string[] = [];
       const { category } = expense;
 
       // 1. Validate data:
@@ -82,8 +83,10 @@ export class RecordsService {
       // 5. Create expense and income
       const { expenseId, accountExpense } =
         await this.expensesService.createTransferExpense(expenseFormatted);
+      messages.push('Expense transfer record created');
       const { incomeId, accountIncome } =
         await this.incomesService.createTransferIncome(incomeFormatted);
+      messages.push('Income transfer record created');
 
       // 6. Add transderRecord data to each document.
       const expenseTransferRecordData: TransferRecord = {
@@ -101,11 +104,28 @@ export class RecordsService {
           expenseId: expenseId.toString(),
           transferRecordData: expenseTransferRecordData,
         });
+      messages.push('Transfer record data added to expense transfer.');
       const updateTransferIncome =
         await this.incomesService.addTransferDataToIncome({
           incomeId: incomeId.toString(),
           transferRecordData: incomeTransferRecordData,
         });
+      messages.push('Transfer record data added to income transfer.');
+
+      // 8. Modify account's amount
+      const updatedAmountAccountExpense =
+        expenseAccount.amount - expense.amount;
+      const updatedAmountAccountIncome = incomeAccount.amount - income.amount;
+      await this.accountsService.modifyAccountBalance({
+        amount: updatedAmountAccountExpense,
+        accountId: expense.account,
+      });
+      messages.push("Expense account's amount updated");
+      await this.accountsService.modifyAccountBalance({
+        amount: updatedAmountAccountIncome,
+        accountId: income.account,
+      });
+      messages.push("Income account's amount updated");
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
