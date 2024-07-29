@@ -1,17 +1,33 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CategoriesService } from '../../../categories/services/categories.service';
-import { CreateIncomeDto } from '../../../incomes/incomes.dto';
+import { CreateIncomeDto, UpdateIncomeDto } from '../../../incomes/incomes.dto';
 import { IncomesService } from '../../../incomes/services/incomes.service';
-import { TYPE_OF_RECORD_INVALID } from '../../../records/constants';
+import {
+  MISSING_AMOUNT,
+  MISSING_CATEGORY,
+  MISSING_DATE,
+  TYPE_OF_RECORD_INVALID,
+} from '../../../records/constants';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../../utils';
 import { UpdateExpensePaidStatusDto } from '../../../expenses/expenses.dto';
 import { ExpensesService } from '../../../expenses/services/expenses.service';
-import { INCOME_CREATED_MESSAGE } from '../../../incomes/incomes.constants';
-import { VERSION_RESPONSE } from '../../../constants';
-import { ResponseSingleIncome } from '../../../incomes/incomes.interface';
+import {
+  INCOME_CREATED_MESSAGE,
+  UNAUTHORIZED_INCOMES_ERROR,
+} from '../../../incomes/incomes.constants';
+import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
+import {
+  ResponseSingleIncome,
+  UpdateIncomeProps,
+} from '../../../incomes/incomes.interface';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
+import { symmetricDifference } from 'src/utils/symmetricDifference';
 
 @Injectable()
 export class IncomesActionsService {
@@ -49,6 +65,20 @@ export class IncomesActionsService {
       typeOfRecord,
     };
     return newData;
+  }
+
+  formatEditIncome({ changes }: { changes: UpdateIncomeDto }) {
+    const { date, amount } = changes;
+    const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+    const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+    const amountFormatted = formatNumberToCurrency(amount);
+    const newChanges = {
+      ...changes,
+      fullDate,
+      formattedTime,
+      amountFormatted,
+    };
+    return newChanges;
   }
 
   async createIncome({
@@ -123,5 +153,113 @@ export class IncomesActionsService {
       if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
+  }
+
+  async updateIncome({ changes, userIdGotten }: UpdateIncomeProps) {
+    try {
+      const messages: string[] = [];
+      const { recordId, category } = changes;
+      // 1. Validate changes
+      this.validateUpdateIncome({ changes });
+
+      // 2. Verify the expense exist
+      const oldIncome = await this.incomesService.findIncomeById(recordId);
+
+      // 3. Verify the income belongs to the user
+      const { userId } = oldIncome;
+      if (userIdGotten !== userId) {
+        throw new UnauthorizedException(UNAUTHORIZED_INCOMES_ERROR);
+      }
+
+      // 4. Verify if category exists.
+      await this.categoriesService.validateCategoryExists({
+        categoryId: category,
+      });
+
+      // 5. Format edit income changes
+      const incomeChangesFormatted = this.formatEditIncome({ changes });
+
+      // 6. Update income
+      const updatedRecord = await this.incomesService.updateIncome({
+        changes: incomeChangesFormatted,
+      });
+      messages.push('Income updated');
+
+      // 7. Verify if the amount has changed
+      const hasChangedAmount = changes.amount !== oldIncome.amount;
+
+      // 8. Update account's amount if the amount has changed
+      if (hasChangedAmount) {
+        await this.accountsService.modifyAccountBalanceOnIncome({
+          newAmount: changes.amount,
+          previousAmount: oldIncome.amount,
+          accountId: oldIncome.account.toString(),
+        });
+        messages.push("Account's amount updated");
+      }
+
+      // 9. Verify if the expensesPaids has changed
+      const oldExpensesPaid: string[] = oldIncome.expensesPaid.map((expense) =>
+        expense._id.toString(),
+      );
+      const { oldValues: oldExpensesToRemove, newValues: newExpensesToAdd } =
+        symmetricDifference({
+          // The type is CreateExpense but in the changes we receive the id as string
+          oldArray: changes.expensesPaid as unknown as string[],
+          newArray: oldExpensesPaid,
+        });
+
+      // 10. Update paid status of old expenses if exists
+      if (oldExpensesToRemove.length > 0) {
+        const payloadOldExpenses: UpdateExpensePaidStatusDto[] =
+          oldExpensesPaid.map((expenseId) => ({
+            recordId: expenseId,
+            paidStatus: false,
+          }));
+        await this.expensesService.updateMultipleExpensesPaidStatus(
+          payloadOldExpenses,
+        );
+        messages.push(
+          `Old expenses paid status updated: ${payloadOldExpenses.length}`,
+        );
+      }
+
+      // 11. Update paid status of new expenses if exists
+      if (newExpensesToAdd.length > 0) {
+        const payloadNewExpenses: UpdateExpensePaidStatusDto[] =
+          newExpensesToAdd.map((expenseId) => ({
+            recordId: expenseId,
+            paidStatus: true,
+          }));
+        await this.expensesService.updateMultipleExpensesPaidStatus(
+          payloadNewExpenses,
+        );
+        messages.push(
+          `New expenses paid status updated: ${payloadNewExpenses.length}`,
+        );
+      }
+
+      // 12. Return response
+      const response: ResponseSingleIncome = {
+        ...INITIAL_RESPONSE,
+        message: messages,
+        data: {
+          income: updatedRecord,
+        },
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  validateUpdateIncome({ changes }: { changes: UpdateIncomeDto }) {
+    const { category, date, amount } = changes;
+
+    if (!date) throw new BadRequestException(MISSING_DATE);
+    if (!category) throw new BadRequestException(MISSING_CATEGORY);
+    if (!amount) throw new BadRequestException(MISSING_AMOUNT);
   }
 }

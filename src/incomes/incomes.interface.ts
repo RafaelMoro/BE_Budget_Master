@@ -32,9 +32,7 @@ export interface DeleteMultipleIncomesResponse {
 
 export interface UpdateIncomeProps {
   changes: UpdateIncomeDto;
-  userId: string;
-  skipFindCategory?: boolean;
-  skipUpdateExpensesPaid?: boolean;
+  userIdGotten: string;
 }
 
 export interface RemoveIncomeProps {

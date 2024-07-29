@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -42,8 +43,11 @@ export class ExpensesService {
       const expense: Expense = await this.expenseModel
         .findById(expenseId)
         .exec();
+      if (!expense) throw new NotFoundException(EXPENSE_NOT_FOUND);
       return expense;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

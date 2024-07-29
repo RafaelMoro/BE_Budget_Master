@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Types } from 'mongoose';
@@ -14,7 +13,6 @@ import { ExpensesService } from '../../../expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
   EXPENSE_DELETED_MESSAGE,
-  EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
   TRANSFER_RECORD_LINKED_BUDGET_ERROR,
@@ -225,7 +223,6 @@ export class ExpensesActionsService {
 
       // 2. Verify the expense exist
       const oldExpense = await this.expensesService.findExpenseById(recordId);
-      if (!oldExpense) throw new NotFoundException(EXPENSE_NOT_FOUND);
 
       // 3. Verify the expense belongs to the user
       const { userId } = oldExpense;

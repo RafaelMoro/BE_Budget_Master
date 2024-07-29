@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -41,6 +42,7 @@ import {
 } from '../incomes.constants';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 import { getMonthNumber } from '../../utils/getMonthNumber';
+import { EXPENSE_NOT_FOUND } from 'src/expenses/expenses.constants';
 
 @Injectable()
 export class IncomesService {
@@ -71,54 +73,34 @@ export class IncomesService {
     }
   }
 
+  /**
+   * Method to get the income to modify and validate if exists.
+   * This method is used by incomes actions service
+   */
+  async findIncomeById(incomeId: string) {
+    try {
+      const income: Income = await this.incomeModel.findById(incomeId).exec();
+      if (!income) throw new NotFoundException(EXPENSE_NOT_FOUND);
+      return income;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async updateIncome({
     changes,
-    userId,
-    skipFindCategory = false,
-    skipUpdateExpensesPaid = false,
-  }: UpdateIncomeProps) {
+  }: // userId,
+  // skipFindCategory = false,
+  // skipUpdateExpensesPaid = false,
+  {
+    changes: UpdateIncomeDto;
+  }) {
     try {
-      const {
-        recordId,
-        category,
-        date,
-        amount,
-        userId: userIdChanges,
-      } = changes;
-
-      // Verify that the record belongs to the user
-      if (userId !== userIdChanges) {
-        throw new UnauthorizedException(INCOME_UNAUTHORIZED_ERROR);
-      }
-      if (!date) throw new UnauthorizedException(MISSING_DATE);
-      if (!category) throw new UnauthorizedException(MISSING_CATEGORY);
-      if (!amount) throw new UnauthorizedException(MISSING_AMOUNT);
-
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-
-      let categoryId = category;
-      if (!skipFindCategory) {
-        const categoryIdFetched =
-          await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-            {
-              categoryName: category,
-              userId,
-            },
-          );
-        categoryId = categoryIdFetched.toString();
-      }
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newChanges = {
-        ...changes,
-        category: categoryId,
-        fullDate,
-        formattedTime,
-        amountFormatted,
-      };
-
+      const { recordId } = changes;
       const updatedRecord: Income = await this.incomeModel
-        .findByIdAndUpdate(recordId, { $set: newChanges }, { new: true })
+        .findByIdAndUpdate(recordId, { $set: changes }, { new: true })
         .populate({
           path: 'expensesPaid',
           select: '_id shortName amountFormatted fullDate formattedTime',
@@ -130,27 +112,7 @@ export class IncomesService {
         .exec();
 
       if (!updatedRecord) throw new BadRequestException(INCOME_NOT_FOUND);
-
-      // Update the prop isPaid to true of the expenses related to this income
-      if (changes.expensesPaid?.length > 0 && !skipUpdateExpensesPaid) {
-        const expensesIds: CreateExpense[] = (changes as CreateIncomeDto)
-          .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
-          recordId: expense._id,
-          isPaid: true,
-          userId,
-        }));
-        await this.expensesService.updateMultipleExpenses(payload);
-      }
-
-      const response: ResponseSingleIncome = {
-        ...INITIAL_RESPONSE,
-        message: [],
-        data: {
-          income: updatedRecord,
-        },
-      };
-      return response;
+      return updatedRecord;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

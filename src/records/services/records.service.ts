@@ -116,7 +116,7 @@ export class RecordsService {
         date: income.date,
         category: newDataIncome.category.toString(),
         amount: income.amount,
-        userId,
+        // userId,
         transferRecord: {
           transferId: expenseId.toString(),
           account: accountExpense.toString(),
@@ -128,13 +128,12 @@ export class RecordsService {
         // skipFindCategory: true,
         // userId,
       });
-      const updatedIncomeResponse = await this.incomesService.updateIncome({
+      const updateTransferIncome = await this.incomesService.updateIncome({
         changes: updatedIncome,
-        skipFindCategory: true,
-        skipUpdateExpensesPaid: true,
-        userId,
+        // skipFindCategory: true,
+        // skipUpdateExpensesPaid: true,
+        // userId,
       });
-      const updateTransferIncome = updatedIncomeResponse?.data?.income;
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
