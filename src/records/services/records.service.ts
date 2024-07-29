@@ -20,17 +20,21 @@ import {
   TransferCreated,
 } from '../interface';
 import {
+  CreateExpenseDto,
   DeleteExpenseDto,
   UpdateExpenseDto,
 } from '../../expenses/expenses.dto';
-import { DeleteIncomeDto, UpdateIncomeDto } from '../../incomes/incomes.dto';
+import {
+  CreateIncomeDto,
+  DeleteIncomeDto,
+  UpdateIncomeDto,
+} from '../../incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
   formatNumberToCurrency,
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
-import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 import { IncomesService } from '../../incomes/services/incomes.service';
@@ -48,17 +52,8 @@ export class RecordsService {
       const { category, amount, typeOfRecord, date } = expense;
       const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
 
-      // Validations
-      if (
-        expense.typeOfRecord !== 'transfer' ||
-        income.typeOfRecord !== 'transfer' ||
-        isTypeOfRecord(typeOfRecord) === false
-      ) {
-        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
-      if (expense.account === income.account) {
-        throw new BadRequestException(TRANSFER_ACCOUNT_ERROR);
-      }
+      // 1. Validate data
+      this.validateTransferData({ expense, income });
 
       // Get category data
       const {
@@ -169,6 +164,57 @@ export class RecordsService {
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  validateTransferData({
+    expense,
+    income,
+  }: {
+    expense: CreateExpenseDto;
+    income: CreateIncomeDto;
+  }) {
+    if (
+      expense.typeOfRecord !== 'transfer' ||
+      income.typeOfRecord !== 'transfer'
+    ) {
+      throw new BadRequestException(TYPE_OF_RECORD_INVALID);
+    }
+
+    if (!expense.isPaid) {
+      throw new BadRequestException(
+        'The expense transfer record must have value isPaid as true',
+      );
+    }
+
+    // Validate income and expense has same value on the following fields.
+    if (expense.account === income.account) {
+      throw new BadRequestException(TRANSFER_ACCOUNT_ERROR);
+    }
+    if (expense.shortName !== income.shortName) {
+      throw new BadRequestException(
+        'Transfer records has different short name. Both must have the same value',
+      );
+    }
+    if (expense.amount !== income.amount) {
+      throw new BadRequestException(
+        'Transfer records has different amounts. Both must have the same value',
+      );
+    }
+    if (expense.date !== income.date) {
+      throw new BadRequestException(
+        'Transfer records has different dates. Both must have the same value',
+      );
+    }
+    if (expense.category !== income.category) {
+      throw new BadRequestException(
+        'Transfer records has different category. Both must have the same value',
+      );
+    }
+    if (expense.subCategory !== income.subCategory) {
+      throw new BadRequestException(
+        'Transfer records has different subCategory. Both must have the same value',
+      );
     }
   }
 
