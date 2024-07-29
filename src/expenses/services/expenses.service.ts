@@ -31,6 +31,7 @@ import {
   UpdateMultipleExpensesPaidStatusResponse,
 } from '../expenses.interface';
 import { getMonthNumber } from '../../utils/getMonthNumber';
+import { TransferRecord } from 'src/records/dtos/records.dto';
 
 @Injectable()
 export class ExpensesService {
@@ -79,6 +80,30 @@ export class ExpensesService {
       const modelSaved: Expense = await model.save();
       const { _id: expenseId, account: accountExpense } = modelSaved;
       return { expenseId, accountExpense };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async addTransferDataToExpense({
+    expenseId,
+    transferRecordData,
+  }: {
+    expenseId: string;
+    transferRecordData: TransferRecord;
+  }) {
+    try {
+      const expense: Expense = await this.expenseModel.findById(expenseId);
+      const expenseWithTransferRecordData = {
+        ...expense,
+        transferRecord: transferRecordData,
+      };
+      const updatedExpense: Expense = await this.expenseModel.findByIdAndUpdate(
+        expenseId,
+        { $set: expenseWithTransferRecordData },
+        { new: true },
+      );
+      return updatedExpense;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
