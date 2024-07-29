@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { IncomesController } from './controllers/incomes.controller';
 import { IncomesService } from './services/incomes.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CreateIncome, IncomeSchema } from './incomes.entity';
@@ -13,7 +12,6 @@ import { CreateIncome, IncomeSchema } from './incomes.entity';
       },
     ]),
   ],
-  controllers: [IncomesController],
   providers: [IncomesService],
   exports: [IncomesService],
 })
