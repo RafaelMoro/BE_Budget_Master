@@ -274,9 +274,25 @@ export class IncomesActionsService {
         payload,
         userId,
       });
+      console.log('incomeDeleted', incomeDeleted);
+      const { amount, account } = incomeDeleted;
       messages.push(INCOME_DELETED_MESSAGE);
 
       // 2. Update account's amount.
+      // Validate accounts exists and belong to user.
+      const accountFetched =
+        await this.accountsService.findAccountByIdForRecords({
+          // Does not populate accounts so it's a mongo id as string
+          accountId: incomeDeleted.account.toString(),
+          userId,
+        });
+      const { amount: currentAmount } = accountFetched;
+      const newAmount = currentAmount - amount;
+      await this.accountsService.modifyAccountBalance({
+        amount: newAmount,
+        accountId: account.toString(),
+      });
+      messages.push("Account's amount updated");
 
       // 2. Check if there are any expenses related to this income and change their status
       if (incomeDeleted?.expensesPaid?.length > 0) {

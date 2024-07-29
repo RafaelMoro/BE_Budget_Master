@@ -358,6 +358,7 @@ export class ExpensesActionsService {
       // 2. Update account's amount
       // Validate accounts exists and belong to user.
       const account = await this.accountsService.findAccountByIdForRecords({
+        // Does not populate accounts so it's a mongo id as string
         accountId: accountId.toString(),
         userId,
       });
@@ -365,6 +366,7 @@ export class ExpensesActionsService {
       const newAmount = currentAmount + amount;
       await this.accountsService.modifyAccountBalance({
         amount: newAmount,
+        // Does not populate accounts so it's a mongo id as string
         accountId: accountId.toString(),
       });
       messages.push("Account's amount updated");
