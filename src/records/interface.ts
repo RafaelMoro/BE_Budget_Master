@@ -29,7 +29,9 @@ export interface MultipleRecordsResponse extends Omit<GeneralResponse, 'data'> {
   };
 }
 
-export interface TransferCreated extends Omit<GeneralResponse, 'category'> {
+export interface TransferCreated
+  extends Omit<GeneralResponse, 'data' | 'message'> {
+  message: string[];
   data: {
     expense: Expense;
     income: Income;

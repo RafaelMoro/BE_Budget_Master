@@ -8,7 +8,6 @@ import {
   NO_EXPENSES_FOUND,
   NO_EXPENSES_INCOMES_FOUND,
   NO_INCOMES_FOUND,
-  RECORD_CREATED_MESSAGE,
   TYPE_OF_RECORD_INVALID,
   TRANSFER_ACCOUNT_ERROR,
   MISSING_TRANSFER_RECORD,
@@ -22,7 +21,7 @@ import {
 import {
   CreateExpenseDto,
   DeleteExpenseDto,
-  UpdateExpenseDto,
+  UpdateExpensePaidStatusDto,
 } from '../../expenses/expenses.dto';
 import { CreateIncomeDto, DeleteIncomeDto } from '../../incomes/incomes.dto';
 import {
@@ -116,28 +115,31 @@ export class RecordsService {
       const updatedAmountAccountExpense =
         expenseAccount.amount - expense.amount;
       const updatedAmountAccountIncome = incomeAccount.amount - income.amount;
+
       await this.accountsService.modifyAccountBalance({
         amount: updatedAmountAccountExpense,
         accountId: expense.account,
       });
       messages.push("Expense account's amount updated");
+
       await this.accountsService.modifyAccountBalance({
         amount: updatedAmountAccountIncome,
         accountId: income.account,
       });
       messages.push("Income account's amount updated");
 
-      // Update the prop isPaid to true of the expenses related to this income
+      // 9. Update paid status of the related expenses
       if (income.expensesPaid.length > 0) {
-        const expensesIds = updateTransferIncome.expensesPaid.map(
-          (expense) => expense._id,
+        // Typescript thinks is a CreateIncome[] but it's a string[]
+        const expensesIds = income.expensesPaid as unknown as string[];
+        const payload: UpdateExpensePaidStatusDto[] = expensesIds.map(
+          (expenseId) => ({
+            recordId: expenseId,
+            paidStatus: true,
+          }),
         );
-        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
-          recordId: expense,
-          isPaid: true,
-          userId,
-        }));
-        await this.expensesService.updateMultipleExpenses(payload);
+        await this.expensesService.updateMultipleExpensesPaidStatus(payload);
+        messages.push('Expenses paid updated');
       }
 
       // Validation if any of the transfer records has a missing transfer record
@@ -151,7 +153,7 @@ export class RecordsService {
       const response: TransferCreated = {
         version: VERSION_RESPONSE,
         success: true,
-        message: RECORD_CREATED_MESSAGE,
+        message: messages,
         data: {
           expense: updatedTransferExpense,
           income: updateTransferIncome,
