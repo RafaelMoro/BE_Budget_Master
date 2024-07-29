@@ -24,11 +24,7 @@ import {
   DeleteExpenseDto,
   UpdateExpenseDto,
 } from '../../expenses/expenses.dto';
-import {
-  CreateIncomeDto,
-  DeleteIncomeDto,
-  UpdateIncomeDto,
-} from '../../incomes/incomes.dto';
+import { CreateIncomeDto, DeleteIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
@@ -39,6 +35,7 @@ import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 import { IncomesService } from '../../incomes/services/incomes.service';
 import { AccountsService } from '../../repositories/accounts/services/accounts.service';
+import { TransferRecord } from '../dtos/records.dto';
 
 @Injectable()
 export class RecordsService {
@@ -88,42 +85,27 @@ export class RecordsService {
       const { incomeId, accountIncome } =
         await this.incomesService.createTransferIncome(incomeFormatted);
 
-      // Add transderRecord data to each document.
-      const updatedExpense: UpdateExpenseDto = {
-        // Transform ObjectIds to string
-        recordId: expenseId.toString(),
-        date: expense.date,
-        category,
-        amount: expense.amount,
-        // userId,
-        transferRecord: {
-          transferId: incomeId.toString(),
-          account: accountIncome.toString(),
-        },
+      // 6. Add transderRecord data to each document.
+      const expenseTransferRecordData: TransferRecord = {
+        transferId: incomeId.toString(),
+        account: accountIncome.toString(),
       };
-      const updatedIncome: UpdateIncomeDto = {
-        recordId: incomeId.toString(),
-        date: income.date,
-        category,
-        amount: income.amount,
-        // userId,
-        transferRecord: {
-          transferId: expenseId.toString(),
-          account: accountExpense.toString(),
-        },
+      const incomeTransferRecordData: TransferRecord = {
+        transferId: expenseId.toString(),
+        account: accountExpense.toString(),
       };
 
-      const updatedTransferExpense = await this.expensesService.updateExpense({
-        changes: updatedExpense,
-        // skipFindCategory: true,
-        // userId,
-      });
-      const updateTransferIncome = await this.incomesService.updateIncome({
-        changes: updatedIncome,
-        // skipFindCategory: true,
-        // skipUpdateExpensesPaid: true,
-        // userId,
-      });
+      // 7. Modify expense and income adding transfer data
+      const updatedTransferExpense =
+        await this.expensesService.addTransferDataToExpense({
+          expenseId: expenseId.toString(),
+          transferRecordData: expenseTransferRecordData,
+        });
+      const updateTransferIncome =
+        await this.incomesService.addTransferDataToIncome({
+          incomeId: incomeId.toString(),
+          transferRecordData: incomeTransferRecordData,
+        });
 
       // Update the prop isPaid to true of the expenses related to this income
       if (income.expensesPaid.length > 0) {
