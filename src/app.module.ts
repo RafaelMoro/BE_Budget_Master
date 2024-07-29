@@ -12,7 +12,7 @@ import { AccountsModule } from './repositories/accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExpensesModule } from './repositories/expenses/expenses.module';
-import { IncomesModule } from './incomes/incomes.module';
+import { IncomesModule } from './repositories/incomes/incomes.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { BudgetHistoryModule } from './budget-history/budget-history.module';
 import { UserActionsModule } from './domain/user-accounts-actions/user-actions.module';

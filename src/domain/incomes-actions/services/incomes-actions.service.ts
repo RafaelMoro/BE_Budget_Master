@@ -4,8 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CategoriesService } from '../../../categories/services/categories.service';
-import { CreateIncomeDto, UpdateIncomeDto } from '../../../incomes/incomes.dto';
-import { IncomesService } from '../../../incomes/services/incomes.service';
+import {
+  CreateIncomeDto,
+  UpdateIncomeDto,
+} from '../../../repositories/incomes/incomes.dto';
+import { IncomesService } from '../../../repositories/incomes/services/incomes.service';
 import {
   MISSING_AMOUNT,
   MISSING_CATEGORY,
@@ -21,13 +24,13 @@ import {
   INCOME_CREATED_MESSAGE,
   INCOME_DELETED_MESSAGE,
   UNAUTHORIZED_INCOMES_ERROR,
-} from '../../../incomes/incomes.constants';
+} from '../../../repositories/incomes/incomes.constants';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
 import {
   RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
-} from '../../../incomes/incomes.interface';
+} from '../../../repositories/incomes/incomes.interface';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
 import { symmetricDifference } from 'src/utils/symmetricDifference';
 
@@ -278,7 +281,6 @@ export class IncomesActionsService {
         payload,
         userId,
       });
-      console.log('incomeDeleted', incomeDeleted);
       const { amount, account } = incomeDeleted;
       messages.push(INCOME_DELETED_MESSAGE);
 

@@ -25,9 +25,9 @@ import {
   INCOMES_NOT_FOUND,
   UNAUTHORIZED_INCOMES_ERROR,
 } from '../incomes.constants';
-import { getMonthNumber } from '../../utils/getMonthNumber';
-import { EXPENSE_NOT_FOUND } from '../../repositories/expenses/expenses.constants';
-import { TransferRecord } from '../../records/dtos/records.dto';
+import { getMonthNumber } from '../../../utils/getMonthNumber';
+import { EXPENSE_NOT_FOUND } from '../../expenses/expenses.constants';
+import { TransferRecord } from '../../../records/dtos/records.dto';
 
 @Injectable()
 export class IncomesService {

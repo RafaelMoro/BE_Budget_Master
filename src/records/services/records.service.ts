@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
 import { Expense } from '../../repositories/expenses/expenses.entity';
-import { Income } from '../../incomes/incomes.entity';
+import { Income } from '../../repositories/incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
@@ -23,7 +23,7 @@ import {
   DeleteExpenseDto,
   UpdateExpensePaidStatusDto,
 } from '../../repositories/expenses/expenses.dto';
-import { CreateIncomeDto, DeleteIncomeDto } from '../../incomes/incomes.dto';
+import { CreateIncomeDto, DeleteIncomeDto } from '../../repositories/incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
@@ -32,7 +32,7 @@ import {
 import { VERSION_RESPONSE } from '../../constants';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../repositories/expenses/services/expenses.service';
-import { IncomesService } from '../../incomes/services/incomes.service';
+import { IncomesService } from '../../repositories/incomes/services/incomes.service';
 import { AccountsService } from '../../repositories/accounts/services/accounts.service';
 import { TransferRecord } from '../dtos/records.dto';
 

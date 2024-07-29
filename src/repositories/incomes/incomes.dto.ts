@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty, IsArray } from 'class-validator';
-import { CreateRecordDto } from '../records/dtos/records.dto';
+import { CreateRecordDto } from '../../records/dtos/records.dto';
 import { PartialType } from '@nestjs/swagger';
-import { CreateExpense } from '../repositories/expenses/expenses.entity';
+import { CreateExpense } from '../expenses/expenses.entity';
 
 export class CreateIncomeDto extends CreateRecordDto {
   @IsArray()

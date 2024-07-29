@@ -1,7 +1,7 @@
 import { Expense } from '../repositories/expenses/expenses.entity';
 import { GeneralResponse } from '../response.interface';
-import { Income } from '../incomes/incomes.entity';
-import { CreateIncomeDto } from '../incomes/incomes.dto';
+import { Income } from '../repositories/incomes/incomes.entity';
+import { CreateIncomeDto } from '../repositories/incomes/incomes.dto';
 import { CreateExpenseDto } from '../repositories/expenses/expenses.dto';
 
 /** Interfaces of services */

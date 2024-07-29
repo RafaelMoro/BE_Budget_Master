@@ -13,7 +13,7 @@ import {
   CreateIncomeDto,
   DeleteIncomeDto,
   UpdateIncomeDto,
-} from '../../../incomes/incomes.dto';
+} from '../../../repositories/incomes/incomes.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('incomes-actions')
