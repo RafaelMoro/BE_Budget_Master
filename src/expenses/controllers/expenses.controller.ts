@@ -16,10 +16,10 @@ import { UpdateExpenseDto } from '../expenses.dto';
 export class ExpensesController {
   constructor(private expensesService: ExpensesService) {}
 
-  @Put('/multiple')
-  updateMultipleExpense(@Body() payload: UpdateExpenseDto[]) {
-    return this.expensesService.updateMultipleExpenses(payload);
-  }
+  // @Put('/multiple')
+  // updateMultipleExpense(@Body() payload: UpdateExpenseDto[]) {
+  //   return this.expensesService.updateMultipleExpenses(payload);
+  // }
 
   @Get(':accountId/:month/:year')
   findExpensesByAccountMonthAndYear(
