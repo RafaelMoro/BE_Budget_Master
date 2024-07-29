@@ -135,8 +135,12 @@ export class IncomesActionsService {
             paidStatus: true,
           }),
         );
-        await this.expensesService.updateMultipleExpensesPaidStatus(payload);
-        messages.push('Expenses paid updated');
+        const { recordsNotUpdated, recordsUpdated } =
+          await this.expensesService.updateMultipleExpensesPaidStatus(payload);
+        messages.push(`Expenses paid updated: ${recordsUpdated.length}`);
+        messages.push(
+          `Expenses paid failed to update ${recordsNotUpdated.length}`,
+        );
       }
 
       // 8. Return response
