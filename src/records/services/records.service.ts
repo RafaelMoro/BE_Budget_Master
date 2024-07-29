@@ -49,56 +49,39 @@ export class RecordsService {
 
   async createTransfer({ expense, income, userId }: CreateTransferProps) {
     try {
-      const { category, amount, typeOfRecord, date } = expense;
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+      const { category } = expense;
 
-      // 1. Validate data
+      // 1. Validate data:
+      // Expense and income values are the same: amount, date, shortName, category, subCategory
+      // Validate accounts are different
       this.validateTransferData({ expense, income });
 
-      // Get category data
-      const {
-        data: { categories },
-      } = await this.categoriesService.findOrCreateByNameAndUserId({
-        categoryName: category,
+      // 2. Validate category exists
+      await this.categoriesService.validateCategoryExists({
+        categoryId: category,
+      });
+
+      // 3. Validate accounts exist
+
+      // 4. Format new income and expense
+      const { expenseFormatted, incomeFormatted } = this.formatTransferRecords({
+        expense,
+        income,
         userId,
       });
-      const [categoryFoundOrCreated] = categories;
-      const { _id: categoryId } = categoryFoundOrCreated;
 
-      // Format data
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newDataExpense = {
-        ...expense,
-        fullDate,
-        formattedTime,
-        category: categoryId.toString(),
-        amountFormatted,
-        userId,
-        typeOfRecord,
-      };
-      const newDataIncome = {
-        ...income,
-        fullDate,
-        formattedTime,
-        category: categoryId.toString(),
-        amountFormatted,
-        userId,
-        typeOfRecord,
-      };
-
-      // Create expense and income
+      // 5. Create expense and income
       const { expenseId, accountExpense } =
-        await this.expensesService.createTransferExpense(newDataExpense);
+        await this.expensesService.createTransferExpense(expenseFormatted);
       const { incomeId, accountIncome } =
-        await this.incomesService.createTransferIncome(newDataIncome);
+        await this.incomesService.createTransferIncome(incomeFormatted);
 
       // Add transderRecord data to each document.
       const updatedExpense: UpdateExpenseDto = {
         // Transform ObjectIds to string
         recordId: expenseId.toString(),
         date: expense.date,
-        category: newDataExpense.category.toString(),
+        category,
         amount: expense.amount,
         // userId,
         transferRecord: {
@@ -109,7 +92,7 @@ export class RecordsService {
       const updatedIncome: UpdateIncomeDto = {
         recordId: incomeId.toString(),
         date: income.date,
-        category: newDataIncome.category.toString(),
+        category,
         amount: income.amount,
         // userId,
         transferRecord: {
@@ -167,6 +150,11 @@ export class RecordsService {
     }
   }
 
+  /**
+   * Method that validates data and ensure expense and income has same data.
+   * Expense and income values are the same: amount, date, shortName, category, subCategory
+   * Validate accounts are different
+   */
   validateTransferData({
     expense,
     income,
@@ -216,6 +204,43 @@ export class RecordsService {
         'Transfer records has different subCategory. Both must have the same value',
       );
     }
+  }
+
+  formatTransferRecords({
+    expense,
+    income,
+    userId,
+  }: {
+    expense: CreateExpenseDto;
+    income: CreateIncomeDto;
+    userId: string;
+  }) {
+    // It has been validated with method validateTransferData that expense and income has same date, amount
+    const { amount, date } = expense;
+    const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
+
+    const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+    const amountFormatted = formatNumberToCurrency(amount);
+
+    const newDataExpense = {
+      ...expense,
+      fullDate,
+      formattedTime,
+      amountFormatted,
+      userId,
+    };
+    const newDataIncome = {
+      ...income,
+      fullDate,
+      formattedTime,
+      amountFormatted,
+      userId,
+    };
+
+    return {
+      expenseFormatted: newDataExpense,
+      incomeFormatted: newDataIncome,
+    };
   }
 
   /**
