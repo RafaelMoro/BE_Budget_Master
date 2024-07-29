@@ -8,27 +8,23 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { CreateIncome, Income } from '../incomes.entity';
-import { CategoriesService } from '../../categories/services/categories.service';
 import {
   CreateIncomeDto,
   DeleteIncomeDto,
   UpdateIncomeDto,
 } from '../incomes.dto';
 import {
-  BatchIncomesResponse,
   DeleteMultipleIncomesResponse,
   FindAllIncomesByAccountResponse,
   FindIncomesByMonthYearProps,
   RemoveIncomeProps,
 } from '../incomes.interface';
-import { INITIAL_RESPONSE } from '../../constants';
 import {
   INCOME_NOT_FOUND,
   INCOME_UNAUTHORIZED_ERROR,
   INCOMES_NOT_FOUND,
   UNAUTHORIZED_INCOMES_ERROR,
 } from '../incomes.constants';
-import { ExpensesService } from '../../expenses/services/expenses.service';
 import { getMonthNumber } from '../../utils/getMonthNumber';
 import { EXPENSE_NOT_FOUND } from 'src/expenses/expenses.constants';
 
@@ -36,8 +32,6 @@ import { EXPENSE_NOT_FOUND } from 'src/expenses/expenses.constants';
 export class IncomesService {
   constructor(
     @InjectModel(CreateIncome.name) private incomeModel: Model<CreateIncome>,
-    private categoriesService: CategoriesService,
-    private expensesService: ExpensesService,
   ) {}
 
   async createIncome(data: CreateIncomeDto) {
@@ -77,14 +71,7 @@ export class IncomesService {
     }
   }
 
-  async updateIncome({
-    changes,
-  }: // userId,
-  // skipFindCategory = false,
-  // skipUpdateExpensesPaid = false,
-  {
-    changes: UpdateIncomeDto;
-  }) {
+  async updateIncome({ changes }: { changes: UpdateIncomeDto }) {
     try {
       const { recordId } = changes;
       const updatedRecord: Income = await this.incomeModel
@@ -142,31 +129,6 @@ export class IncomesService {
     } catch (error) {
       if (error.status === 404) throw error;
       if (error.status === 401) throw error;
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async updateMultipleIncomes(changes: UpdateIncomeDto[]) {
-    try {
-      const updatedRecords = await Promise.all(
-        changes.map((change) =>
-          this.incomeModel.findByIdAndUpdate(
-            change.recordId,
-            { $set: change },
-            { new: true },
-          ),
-        ),
-      );
-      const checkUpdatedRecords = updatedRecords.map((record, index) => {
-        if (!record) return `record id ${changes[index].recordId} not found`;
-        return record;
-      });
-      const response: BatchIncomesResponse = {
-        ...INITIAL_RESPONSE,
-        data: checkUpdatedRecords,
-      };
-      return response;
-    } catch (error) {
       throw new BadRequestException(error.message);
     }
   }

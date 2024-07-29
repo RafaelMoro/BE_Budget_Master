@@ -3,8 +3,6 @@ import { IncomesController } from './controllers/incomes.controller';
 import { IncomesService } from './services/incomes.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CreateIncome, IncomeSchema } from './incomes.entity';
-import { CategoriesModule } from '../categories/categories.module';
-import { ExpensesModule } from '../expenses/expenses.module';
 
 @Module({
   imports: [
@@ -14,8 +12,6 @@ import { ExpensesModule } from '../expenses/expenses.module';
         schema: IncomeSchema,
       },
     ]),
-    CategoriesModule,
-    ExpensesModule,
   ],
   controllers: [IncomesController],
   providers: [IncomesService],
