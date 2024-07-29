@@ -14,14 +14,6 @@ import {
   DeleteIncomeDto,
   UpdateIncomeDto,
 } from '../incomes.dto';
-import {
-  MISSING_AMOUNT,
-  MISSING_CATEGORY,
-  MISSING_DATE,
-} from '../../records/constants';
-import { changeTimezone } from '../../utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from '../../utils';
-import { CreateExpense } from '../../expenses/expenses.entity';
 import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import {
   BatchIncomesResponse,
@@ -30,7 +22,6 @@ import {
   FindIncomesByMonthYearProps,
   RemoveIncomeProps,
   ResponseSingleIncome,
-  UpdateIncomeProps,
 } from '../incomes.interface';
 import { INITIAL_RESPONSE } from '../../constants';
 import {

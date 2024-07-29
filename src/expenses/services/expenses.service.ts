@@ -282,7 +282,6 @@ export class ExpensesService {
           ),
         ),
       );
-      console.log('updatedRecords', updatedRecords);
       const response = updatedRecords.map((record, index) => {
         if (!record) {
           return {

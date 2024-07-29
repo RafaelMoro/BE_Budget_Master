@@ -204,9 +204,9 @@ export class IncomesActionsService {
       );
       const { oldValues: oldExpensesToRemove, newValues: newExpensesToAdd } =
         symmetricDifference({
+          oldArray: oldExpensesPaid,
           // The type is CreateExpense but in the changes we receive the id as string
-          oldArray: changes.expensesPaid as unknown as string[],
-          newArray: oldExpensesPaid,
+          newArray: changes.expensesPaid as unknown as string[],
         });
 
       // 10. Update paid status of old expenses if exists
