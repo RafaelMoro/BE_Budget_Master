@@ -347,14 +347,15 @@ export class ExpensesActionsService {
 
       // 1. Delete record
       // In the service removeExpense, it validates if the record belongs to the user.
+      const { recordId } = payload;
       const recordDeleted = await this.expensesService.removeExpense({
         payload,
         userId,
       });
-      const { account: accountId, amount } = recordDeleted;
+      const { account: accountId, amount, linkedBudgets } = recordDeleted;
       messages.push(EXPENSE_DELETED_MESSAGE);
 
-      // Update account's amount
+      // 2. Update account's amount
       const account = await this.accountsService.findById(accountId.toString());
       const { amount: currentAmount } = account;
       const newAmount = currentAmount + amount;
@@ -363,6 +364,28 @@ export class ExpensesActionsService {
         accountId: accountId.toString(),
       });
       messages.push("Account's amount updated");
+
+      // 3. Update budget's amount and budget history
+      if (linkedBudgets.length > 0) {
+        for await (const budget of linkedBudgets) {
+          await this.budgetService.updateBudgetAmount({
+            changes: {
+              budgetId: budget._id,
+              amountRecord: amount,
+            },
+            sub: userId,
+            expenseOperation: 'removeExpense',
+          });
+          messages.push(`Removed budget: ${budget}`);
+
+          await this.budgetHistoryService.removeRecordFromBudgetHistory({
+            budgetId: budget._id,
+            sub: userId,
+            recordToBeDeleted: recordId,
+          });
+          messages.push(`Deleted from budget history: ${budget}`);
+        }
+      }
 
       // Return response
       const response: ResponseSingleExpense = {
