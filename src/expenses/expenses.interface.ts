@@ -42,6 +42,12 @@ export interface UpdateExpenseProps {
   userIdGotten: string;
 }
 
+export interface UpdateMultipleExpensesPaidStatusResponse {
+  message: string;
+  recordId: string;
+  recordName: string;
+}
+
 export interface RemoveExpenseProps {
   payload: DeleteExpenseDto;
   userId: string;

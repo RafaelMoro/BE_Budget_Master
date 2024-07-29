@@ -2,7 +2,9 @@ import { GeneralResponse } from 'src/response.interface';
 import { Income } from './incomes.entity';
 import { DeleteIncomeDto, UpdateIncomeDto } from './incomes.dto';
 
-export interface ResponseSingleIncome extends Omit<GeneralResponse, 'data'> {
+export interface ResponseSingleIncome
+  extends Omit<GeneralResponse, 'data' | 'message'> {
+  message: string[];
   data: {
     income: Income;
   };

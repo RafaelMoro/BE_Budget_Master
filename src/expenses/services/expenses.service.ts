@@ -11,6 +11,7 @@ import {
   CreateExpenseDto,
   DeleteExpenseDto,
   UpdateExpenseDto,
+  UpdateExpensePaidStatusDto,
 } from '../expenses.dto';
 import {
   EXPENSE_NOT_FOUND,
@@ -26,6 +27,7 @@ import {
   FindExpensesByMonthYearProps,
   RemoveExpenseProps,
   ResponseMultipleExpenses,
+  UpdateMultipleExpensesPaidStatusResponse,
 } from '../expenses.interface';
 import { getMonthNumber } from '../../utils/getMonthNumber';
 
@@ -258,6 +260,41 @@ export class ExpensesService {
       if (!updatedRecord) throw new BadRequestException(EXPENSE_NOT_FOUND);
 
       return updatedRecord;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async updateMultipleExpensesPaidStatus(
+    changes: UpdateExpensePaidStatusDto[],
+  ): Promise<UpdateMultipleExpensesPaidStatusResponse[]> {
+    try {
+      const updatedRecords = await Promise.all(
+        changes.map((change) =>
+          this.expenseModel.findByIdAndUpdate(
+            change.recordId,
+            { $set: { isPaid: change.paidStatus } },
+            { new: true },
+          ),
+        ),
+      );
+      console.log('updatedRecords', updatedRecords);
+      const response = updatedRecords.map((record, index) => {
+        if (!record) {
+          return {
+            message: `record id ${changes[index].recordId} not found`,
+            recordId: null,
+            recordName: null,
+          };
+        }
+
+        return {
+          message: null,
+          recordId: record._id,
+          recordName: record.shortName,
+        };
+      });
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

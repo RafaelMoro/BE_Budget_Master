@@ -53,68 +53,20 @@ export class IncomesService {
     private expensesService: ExpensesService,
   ) {}
 
-  async createIncome(data: CreateIncomeDto, userId: string) {
+  async createIncome(data: CreateIncomeDto) {
     try {
-      const { category, amount, typeOfRecord, date } = data;
-      const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-
-      if (isTypeOfRecord(typeOfRecord) === false || typeOfRecord !== 'income') {
-        throw new BadRequestException(TYPE_OF_RECORD_INVALID);
-      }
-
-      const categoryId =
-        await this.categoriesService.findOrCreateCategoriesByNameAndUserIdForRecords(
-          {
-            categoryName: category,
-            userId,
-          },
-        );
-      const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
-      const amountFormatted = formatNumberToCurrency(amount);
-      const newData = {
-        ...data,
-        fullDate,
-        formattedTime,
-        category: categoryId,
-        amountFormatted,
-        userId,
-        typeOfRecord,
-      };
-
-      const model = new this.incomeModel(newData);
+      const model = new this.incomeModel(data);
       const modelSaved: Income = await model.save();
-      let modelPopulated: Income;
+      return modelSaved;
 
-      if (modelSaved.expensesPaid.length > 0) {
-        const expensesIds: CreateExpense[] = (data as CreateIncomeDto)
-          .expensesPaid;
-        const payload: UpdateExpenseDto[] = expensesIds.map((expense) => ({
-          recordId: expense._id,
-          isPaid: true,
-          userId,
-        }));
-        await this.expensesService.updateMultipleExpenses(payload);
-      }
-
-      modelPopulated = await this.incomeModel.populate(modelSaved, {
-        path: 'expensesPaid',
-        select: '_id shortName amountFormatted fullDate formattedTime',
-      });
-      modelPopulated = await this.incomeModel.populate(modelPopulated, {
-        path: 'category',
-        select: '_id categoryName icon',
-      });
-
-      const response: ResponseSingleIncome = {
-        version: VERSION_RESPONSE,
-        success: true,
-        message: INCOME_CREATED_MESSAGE,
-        data: {
-          income: modelPopulated,
-        },
-        error: null,
-      };
-      return response;
+      // modelPopulated = await this.incomeModel.populate(modelSaved, {
+      //   path: 'expensesPaid',
+      //   select: '_id shortName amountFormatted fullDate formattedTime',
+      // });
+      // modelPopulated = await this.incomeModel.populate(modelPopulated, {
+      //   path: 'category',
+      //   select: '_id categoryName icon',
+      // });
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -205,6 +157,7 @@ export class IncomesService {
 
       const response: ResponseSingleIncome = {
         ...INITIAL_RESPONSE,
+        message: [],
         data: {
           income: updatedRecord,
         },
@@ -256,7 +209,7 @@ export class IncomesService {
 
       const response: ResponseSingleIncome = {
         ...INITIAL_RESPONSE,
-        message: INCOME_DELETED_MESSAGE,
+        message: [INCOME_DELETED_MESSAGE],
         data: {
           income: recordDeleted,
         },
