@@ -7,7 +7,7 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { ACCOUNT_NOT_FOUND } from '../constants';
+import { ACCOUNT_NOT_FOUND, ACCOUNT_UNAUTHORIZED_ERROR } from '../constants';
 import { AccountModel } from '../accounts.interface';
 import { Account as AccountEntity } from '../entities/accounts.entity';
 import {
@@ -30,7 +30,7 @@ export class AccountsService {
     userId: string;
   }) {
     try {
-      const account = await this.findById(accountId);
+      const account = await this.accountModel.findById(accountId);
       if (!account) throw new BadRequestException(ACCOUNT_NOT_FOUND);
 
       if (String(account.sub) !== userId) {
@@ -64,12 +64,26 @@ export class AccountsService {
     }
   }
 
-  async findById(accountId: string) {
+  /**
+   * Method used to get account by id, validate if exists and validate it belongs to user.
+   * This method is used by expenses actions and incomes actions services.
+   */
+  async findAccountByIdForRecords({
+    accountId,
+    userId,
+  }: {
+    accountId: string;
+    userId: string;
+  }) {
     try {
       const account: AccountModel = await this.accountModel.findById(accountId);
       if (!account) throw new NotFoundException(ACCOUNT_NOT_FOUND);
+      if (String(account.sub) !== userId) {
+        throw new UnauthorizedException(ACCOUNT_UNAUTHORIZED_ERROR);
+      }
       return account;
     } catch (error) {
+      if (error.status === 401) throw error;
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
@@ -99,7 +113,7 @@ export class AccountsService {
     accountId: string;
   }) {
     try {
-      const account = await this.findById(accountId);
+      const account = await this.accountModel.findById(accountId);
       if (!account) throw new BadRequestException('Account not found');
 
       const { amount: currentAmount } = account;
@@ -149,7 +163,7 @@ export class AccountsService {
     accountId: string;
   }) {
     try {
-      const account = await this.findById(accountId);
+      const account = await this.accountModel.findById(accountId);
       if (!account) throw new BadRequestException('Account not found');
 
       const { amount: currentAmount } = account;

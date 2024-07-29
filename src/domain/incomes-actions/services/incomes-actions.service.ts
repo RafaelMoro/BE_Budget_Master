@@ -4,20 +4,21 @@ import { CreateIncomeDto } from '../../../incomes/incomes.dto';
 import { IncomesService } from '../../../incomes/services/incomes.service';
 import { TYPE_OF_RECORD_INVALID } from '../../../records/constants';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
-import { changeTimezone } from 'src/utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from 'src/utils';
-import { CreateExpense } from 'src/expenses/expenses.entity';
-import { UpdateExpensePaidStatusDto } from 'src/expenses/expenses.dto';
-import { ExpensesService } from 'src/expenses/services/expenses.service';
-import { INCOME_CREATED_MESSAGE } from 'src/incomes/incomes.constants';
-import { VERSION_RESPONSE } from 'src/constants';
-import { ResponseSingleIncome } from 'src/incomes/incomes.interface';
+import { changeTimezone } from '../../../utils/changeTimezone';
+import { formatDateToString, formatNumberToCurrency } from '../../../utils';
+import { UpdateExpensePaidStatusDto } from '../../../expenses/expenses.dto';
+import { ExpensesService } from '../../../expenses/services/expenses.service';
+import { INCOME_CREATED_MESSAGE } from '../../../incomes/incomes.constants';
+import { VERSION_RESPONSE } from '../../../constants';
+import { ResponseSingleIncome } from '../../../incomes/incomes.interface';
+import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
 
 @Injectable()
 export class IncomesActionsService {
   constructor(
     private incomesService: IncomesService,
     private expensesService: ExpensesService,
+    private accountsService: AccountsService,
     private categoriesService: CategoriesService,
   ) {}
 
@@ -61,23 +62,38 @@ export class IncomesActionsService {
       const messages: string[] = [];
       // 1. Validate data
       this.validateIncome(data);
-      const { category } = data;
+      const { category, amount } = data;
 
       // 2. Verify category exists
       await this.categoriesService.validateCategoryExists({
         categoryId: category,
       });
 
-      // 3. Format income
+      // 3. Verify account exists and it validate belongs to user
+      const account = await this.accountsService.findAccountByIdForRecords({
+        accountId: data.account,
+        userId,
+      });
+      const { amount: currentAmount } = account;
+      const newAmount = currentAmount + amount;
+
+      // 4. Format income
       const dataFormatted = this.formatCreateIncome({ data, userId });
 
-      // 4. Create income
+      // 5. Create income
       const incomeCreated = await this.incomesService.createIncome(
         dataFormatted,
       );
       messages.push(INCOME_CREATED_MESSAGE);
 
-      // 5. Update expenses paid if there are any.
+      // 6. Update account's amount
+      await this.accountsService.modifyAccountBalance({
+        amount: newAmount,
+        accountId: data.account,
+      });
+      messages.push("Account's amount updated");
+
+      // 7. Update expenses paid if there are any.
       if (incomeCreated.expensesPaid.length > 0) {
         // Typescript thinks is a CreateIncome[] but it's a string[]
         const expensesIds = data.expensesPaid as unknown as string[];
@@ -91,16 +107,7 @@ export class IncomesActionsService {
         messages.push('Expenses paid updated');
       }
 
-      // modelPopulated = await this.incomeModel.populate(modelSaved, {
-      //   path: 'expensesPaid',
-      //   select: '_id shortName amountFormatted fullDate formattedTime',
-      // });
-      // modelPopulated = await this.incomeModel.populate(modelPopulated, {
-      //   path: 'category',
-      //   select: '_id categoryName icon',
-      // });
-
-      // 6. Return response
+      // 8. Return response
       const response: ResponseSingleIncome = {
         version: VERSION_RESPONSE,
         success: true,
@@ -112,6 +119,8 @@ export class IncomesActionsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

@@ -4,9 +4,10 @@ import { IncomesActionsService } from './services/incomes-actions.service';
 import { IncomesModule } from 'src/incomes/incomes.module';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ExpensesModule } from 'src/expenses/expenses.module';
+import { AccountsModule } from 'src/repositories/accounts/accounts.module';
 
 @Module({
-  imports: [IncomesModule, CategoriesModule, ExpensesModule],
+  imports: [IncomesModule, CategoriesModule, ExpensesModule, AccountsModule],
   providers: [IncomesActionsService],
   controllers: [IncomesActionsController],
 })

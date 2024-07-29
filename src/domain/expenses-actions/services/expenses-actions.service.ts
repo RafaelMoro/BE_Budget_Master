@@ -67,8 +67,11 @@ export class ExpensesActionsService {
         categoryId: category,
       });
 
-      // 2. Verify account exists
-      const account = await this.accountsService.findById(data.account);
+      // 2. Verify account exists and belongs to user
+      const account = await this.accountsService.findAccountByIdForRecords({
+        accountId: data.account,
+        userId,
+      });
 
       // 3. Format data
       const dataFormatted = this.formatExpenseOnCreate({
@@ -356,7 +359,11 @@ export class ExpensesActionsService {
       messages.push(EXPENSE_DELETED_MESSAGE);
 
       // 2. Update account's amount
-      const account = await this.accountsService.findById(accountId.toString());
+      // Validate accounts exists and belong to user.
+      const account = await this.accountsService.findAccountByIdForRecords({
+        accountId: accountId.toString(),
+        userId,
+      });
       const { amount: currentAmount } = account;
       const newAmount = currentAmount + amount;
       await this.accountsService.modifyAccountBalance({
@@ -397,6 +404,8 @@ export class ExpensesActionsService {
       };
       return response;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

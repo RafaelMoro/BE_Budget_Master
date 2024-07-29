@@ -13,12 +13,10 @@ import {
   DeleteIncomeDto,
   UpdateIncomeDto,
 } from '../incomes.dto';
-import { isTypeOfRecord } from '../../utils/isTypeOfRecord';
 import {
   MISSING_AMOUNT,
   MISSING_CATEGORY,
   MISSING_DATE,
-  TYPE_OF_RECORD_INVALID,
 } from '../../records/constants';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../utils';
@@ -33,9 +31,8 @@ import {
   ResponseSingleIncome,
   UpdateIncomeProps,
 } from '../incomes.interface';
-import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../constants';
+import { INITIAL_RESPONSE } from '../../constants';
 import {
-  INCOME_CREATED_MESSAGE,
   INCOME_DELETED_MESSAGE,
   INCOME_NOT_FOUND,
   INCOME_UNAUTHORIZED_ERROR,
@@ -58,15 +55,6 @@ export class IncomesService {
       const model = new this.incomeModel(data);
       const modelSaved: Income = await model.save();
       return modelSaved;
-
-      // modelPopulated = await this.incomeModel.populate(modelSaved, {
-      //   path: 'expensesPaid',
-      //   select: '_id shortName amountFormatted fullDate formattedTime',
-      // });
-      // modelPopulated = await this.incomeModel.populate(modelPopulated, {
-      //   path: 'category',
-      //   select: '_id categoryName icon',
-      // });
     } catch (error) {
       throw new BadRequestException(error.message);
     }
