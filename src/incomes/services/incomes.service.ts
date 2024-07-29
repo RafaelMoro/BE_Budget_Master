@@ -26,7 +26,8 @@ import {
   UNAUTHORIZED_INCOMES_ERROR,
 } from '../incomes.constants';
 import { getMonthNumber } from '../../utils/getMonthNumber';
-import { EXPENSE_NOT_FOUND } from 'src/expenses/expenses.constants';
+import { EXPENSE_NOT_FOUND } from '../../expenses/expenses.constants';
+import { TransferRecord } from '../../records/dtos/records.dto';
 
 @Injectable()
 export class IncomesService {
@@ -88,6 +89,25 @@ export class IncomesService {
 
       if (!updatedRecord) throw new BadRequestException(INCOME_NOT_FOUND);
       return updatedRecord;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async addTransferDataToIncome({
+    incomeId,
+    transferRecordData,
+  }: {
+    incomeId: string;
+    transferRecordData: TransferRecord;
+  }) {
+    try {
+      const updatedIncome: Income = await this.incomeModel.findByIdAndUpdate(
+        incomeId,
+        { $set: { transferRecord: transferRecordData } },
+        { new: true },
+      );
+      return updatedIncome;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

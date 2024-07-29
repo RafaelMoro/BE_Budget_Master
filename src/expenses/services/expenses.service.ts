@@ -93,14 +93,9 @@ export class ExpensesService {
     transferRecordData: TransferRecord;
   }) {
     try {
-      const expense: Expense = await this.expenseModel.findById(expenseId);
-      const expenseWithTransferRecordData = {
-        ...expense,
-        transferRecord: transferRecordData,
-      };
       const updatedExpense: Expense = await this.expenseModel.findByIdAndUpdate(
         expenseId,
-        { $set: expenseWithTransferRecordData },
+        { $set: { transferRecord: transferRecordData } },
         { new: true },
       );
       return updatedExpense;
