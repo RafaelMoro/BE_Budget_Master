@@ -4,9 +4,10 @@ import { RecordsService } from './services/records.service';
 import { CategoriesModule } from '../categories/categories.module';
 import { ExpensesModule } from '../expenses/expenses.module';
 import { IncomesModule } from '../incomes/incomes.module';
+import { AccountsModule } from 'src/repositories/accounts/accounts.module';
 
 @Module({
-  imports: [CategoriesModule, ExpensesModule, IncomesModule],
+  imports: [CategoriesModule, ExpensesModule, IncomesModule, AccountsModule],
   controllers: [RecordsController],
   providers: [RecordsService],
   exports: [RecordsService],

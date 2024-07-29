@@ -38,11 +38,13 @@ import { VERSION_RESPONSE } from '../../constants';
 import { changeTimezone } from '../../utils/changeTimezone';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 import { IncomesService } from '../../incomes/services/incomes.service';
+import { AccountsService } from '../../repositories/accounts/services/accounts.service';
 
 @Injectable()
 export class RecordsService {
   constructor(
     private categoriesService: CategoriesService,
+    private accountsService: AccountsService,
     private expensesService: ExpensesService,
     private incomesService: IncomesService,
   ) {}
@@ -62,6 +64,16 @@ export class RecordsService {
       });
 
       // 3. Validate accounts exist
+      const expenseAccount =
+        await this.accountsService.findAccountByIdForRecords({
+          accountId: expense.account,
+          userId,
+        });
+      const incomeAccount =
+        await this.accountsService.findAccountByIdForRecords({
+          accountId: income.account,
+          userId,
+        });
 
       // 4. Format new income and expense
       const { expenseFormatted, incomeFormatted } = this.formatTransferRecords({
