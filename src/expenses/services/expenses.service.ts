@@ -291,8 +291,12 @@ export class ExpensesService {
 
   async updateMultipleExpensesPaidStatus(
     changes: UpdateExpensePaidStatusDto[],
-  ): Promise<UpdateMultipleExpensesPaidStatusResponse[]> {
+  ): Promise<UpdateMultipleExpensesPaidStatusResponse> {
     try {
+      const response: UpdateMultipleExpensesPaidStatusResponse = {
+        recordsNotUpdated: [],
+        recordsUpdated: [],
+      };
       const updatedRecords = await Promise.all(
         changes.map((change) =>
           this.expenseModel.findByIdAndUpdate(
@@ -302,20 +306,20 @@ export class ExpensesService {
           ),
         ),
       );
-      const response = updatedRecords.map((record, index) => {
+      updatedRecords.forEach((record) => {
         if (!record) {
-          return {
-            message: `record id ${changes[index].recordId} not found`,
-            recordId: null,
-            recordName: null,
-          };
+          response.recordsNotUpdated.push({
+            wasFound: false,
+            recordId: record._id,
+            recordName: record.shortName,
+          });
         }
 
-        return {
-          message: null,
+        response.recordsUpdated.push({
+          wasFound: true,
           recordId: record._id,
           recordName: record.shortName,
-        };
+        });
       });
       return response;
     } catch (error) {

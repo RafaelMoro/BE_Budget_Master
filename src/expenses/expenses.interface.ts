@@ -42,10 +42,15 @@ export interface UpdateExpenseProps {
   userIdGotten: string;
 }
 
-export interface UpdateMultipleExpensesPaidStatusResponse {
-  message: string;
+export interface ExpensePaidStatus {
+  wasFound: boolean;
   recordId: string;
   recordName: string;
+}
+
+export interface UpdateMultipleExpensesPaidStatusResponse {
+  recordsNotUpdated: ExpensePaidStatus[];
+  recordsUpdated: ExpensePaidStatus[];
 }
 
 export interface RemoveExpenseProps {
