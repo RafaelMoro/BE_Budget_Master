@@ -13,6 +13,7 @@ import {
 import { ExpensesService } from '../../../expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
+  EXPENSE_DELETED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
@@ -31,6 +32,7 @@ import { BudgetsService } from '../../../budgets/services/budgets.service';
 import { BudgetHistoryService } from '../../../budget-history/services/budget-history.service';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
 import {
+  RemoveExpenseProps,
   ResponseSingleExpense,
   UpdateExpenseProps,
 } from '../../../expenses/expenses.interface';
@@ -335,6 +337,43 @@ export class ExpensesActionsService {
     } catch (error) {
       if (error.status === 404) throw error;
       if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async removeExpense({ payload, userId }: RemoveExpenseProps) {
+    try {
+      const messages: string[] = [];
+
+      // 1. Delete record
+      // In the service removeExpense, it validates if the record belongs to the user.
+      const recordDeleted = await this.expensesService.removeExpense({
+        payload,
+        userId,
+      });
+      const { account: accountId, amount } = recordDeleted;
+      messages.push(EXPENSE_DELETED_MESSAGE);
+
+      // Update account's amount
+      const account = await this.accountsService.findById(accountId.toString());
+      const { amount: currentAmount } = account;
+      const newAmount = currentAmount + amount;
+      await this.accountsService.modifyAccountBalance({
+        amount: newAmount,
+        accountId: accountId.toString(),
+      });
+      messages.push("Account's amount updated");
+
+      // Return response
+      const response: ResponseSingleExpense = {
+        ...INITIAL_RESPONSE,
+        message: messages,
+        data: {
+          expense: recordDeleted,
+        },
+      };
+      return response;
+    } catch (error) {
       throw new BadRequestException(error.message);
     }
   }

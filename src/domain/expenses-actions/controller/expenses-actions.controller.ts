@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Post,
   Put,
   Request,
@@ -9,6 +10,7 @@ import {
 import { ExpensesActionsService } from '../services/expenses-actions.service';
 import {
   CreateExpenseDto,
+  DeleteExpenseDto,
   UpdateExpenseDto,
 } from '../../../expenses/expenses.dto';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
@@ -31,5 +33,11 @@ export class ExpensesActionsController {
       changes: payload,
       userIdGotten: userId,
     });
+  }
+
+  @Delete()
+  removeExpense(@Body() payload: DeleteExpenseDto, @Request() req) {
+    const userId = req.user.sub;
+    return this.expenseActionsService.removeExpense({ payload, userId });
   }
 }

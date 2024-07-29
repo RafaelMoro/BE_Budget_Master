@@ -13,7 +13,6 @@ import {
   UpdateExpenseDto,
 } from '../expenses.dto';
 import {
-  EXPENSE_DELETED_MESSAGE,
   EXPENSE_NOT_FOUND,
   EXPENSE_UNAUTHORIZED_ERROR,
   EXPENSES_NOT_FOUND,
@@ -27,7 +26,6 @@ import {
   FindExpensesByMonthYearProps,
   RemoveExpenseProps,
   ResponseMultipleExpenses,
-  ResponseSingleExpense,
 } from '../expenses.interface';
 import { getMonthNumber } from '../../utils/getMonthNumber';
 
@@ -306,24 +304,16 @@ export class ExpensesService {
 
   async removeExpense({ payload, userId }: RemoveExpenseProps) {
     try {
-      const messages: string[] = [];
       const { recordId } = payload;
+      // Verify the expense belongs to the user
       await this.verifyRecordBelongsUser(recordId, userId);
 
       const recordDeleted: Expense = await this.expenseModel.findByIdAndDelete(
         recordId,
       );
       if (!recordDeleted) throw new BadRequestException(EXPENSE_NOT_FOUND);
-      messages.push(EXPENSE_DELETED_MESSAGE);
 
-      const response: ResponseSingleExpense = {
-        ...INITIAL_RESPONSE,
-        message: messages,
-        data: {
-          expense: recordDeleted,
-        },
-      };
-      return response;
+      return recordDeleted;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
