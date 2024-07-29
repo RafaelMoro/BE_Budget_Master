@@ -16,6 +16,7 @@ import {
 import {
   Budget,
   CreateBudgetResponse,
+  ExpenseOperation,
   GeneralBudgetsResponse,
   RemoveBudgetResponse,
   SingleBudgetResponse,
@@ -232,30 +233,44 @@ export class BudgetsService {
   async updateBudgetAmount({
     changes,
     sub,
+    expenseOperation,
   }: {
     changes: UpdateAmountBudgetDto;
     sub: string;
+    expenseOperation: ExpenseOperation;
   }): Promise<UpdateAmountBudgetResponse> {
     try {
-      const { budgetId } = changes;
+      const { budgetId, amountRecord } = changes;
       const budget: Budget = await this.budgetModel
         .findOne({ _id: budgetId, sub })
         .exec();
       if (!budget) {
         return {
-          budget: budget,
+          oldBudget: budget,
+          updatedBudget: null,
           message: BUDGET_NOT_FOUND_ERROR,
         };
       }
       const { currentAmount } = budget;
-      const updatedAmount = currentAmount + changes.amountRecord;
-      const newChanges = { currentAmount: updatedAmount };
+
+      let updatedAmount: number;
+      if (expenseOperation === 'removeExpense') {
+        updatedAmount = currentAmount - amountRecord;
+      } else {
+        updatedAmount = currentAmount + amountRecord;
+      }
+
       const updatedBudget = await this.budgetModel
-        .findByIdAndUpdate(budget._id, { $set: newChanges }, { new: true })
+        .findByIdAndUpdate(
+          budget._id,
+          { $set: { currentAmount: updatedAmount } },
+          { new: true },
+        )
         .exec();
 
       return {
-        budget: updatedBudget,
+        oldBudget: budget,
+        updatedBudget,
         message: null,
       };
     } catch (error) {

@@ -3,6 +3,8 @@ import { GeneralResponse } from '../response.interface';
 import { BudgetModel } from './budgets.entity';
 import { BudgetHistory } from '../budget-history/budget-history.interface';
 
+export type ExpenseOperation = 'removeExpense' | 'addExpense';
+
 export interface Budget extends BudgetModel {
   _id: Types.ObjectId;
 }
@@ -28,7 +30,8 @@ export interface CreateBudgetResponse extends Omit<GeneralResponse, 'data'> {
 }
 
 export interface UpdateAmountBudgetResponse {
-  budget: Budget;
+  oldBudget: Budget;
+  updatedBudget: Budget;
   message: string | null;
 }
 

@@ -77,7 +77,7 @@ export class AddRecordToBudgetHistoryDto {
 export class RemoveRecordFromBudgetHistoryDto {
   @IsMongoId()
   @IsNotEmpty()
-  readonly budgetHistoryId: Types.ObjectId;
+  readonly budgetId: Types.ObjectId;
 
   @IsMongoId()
   readonly record: string;
