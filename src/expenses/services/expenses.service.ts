@@ -20,13 +20,12 @@ import {
   EXPENSES_NOT_FOUND,
   UNAUTHORIZED_EXPENSES_ERROR,
 } from '../expenses.constants';
-import { INITIAL_RESPONSE } from '../../constants';
 import {
   DeleteMultipleExpensesResponse,
   FindAllExpensesByAccountResponse,
   FindExpensesByMonthYearProps,
+  FindOnlyExpensesByMonthAndYearResponse,
   RemoveExpenseProps,
-  ResponseMultipleExpenses,
   UpdateMultipleExpensesPaidStatusResponse,
 } from '../expenses.interface';
 import { getMonthNumber } from '../../utils/getMonthNumber';
@@ -130,7 +129,7 @@ export class ExpensesService {
     month,
     year,
     userId,
-  }: FindExpensesByMonthYearProps): Promise<ResponseMultipleExpenses> {
+  }: FindExpensesByMonthYearProps): Promise<FindOnlyExpensesByMonthAndYearResponse> {
     try {
       const { startDate, endDate } = this.getStartEndDate({ month, year });
       const expenses: Expense[] = await this.expenseModel
@@ -152,9 +151,8 @@ export class ExpensesService {
       this.verifyExpensesBelongsToUser(expenses, userId);
       if (expenses.length === 0) {
         return {
-          ...INITIAL_RESPONSE,
           message: EXPENSES_NOT_FOUND,
-          data: { expenses },
+          expenses,
         };
       }
 
@@ -169,11 +167,10 @@ export class ExpensesService {
         path: 'linkedBudgets',
       });
 
-      const response: ResponseMultipleExpenses = {
-        ...INITIAL_RESPONSE,
-        data: { expenses: expensesPopulated },
+      return {
+        message: null,
+        expenses: expensesPopulated,
       };
-      return response;
     } catch (error) {
       if (error.status === 404) throw error;
       throw new BadRequestException(error.message);

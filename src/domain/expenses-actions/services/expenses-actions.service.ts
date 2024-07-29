@@ -30,7 +30,9 @@ import { BudgetsService } from '../../../budgets/services/budgets.service';
 import { BudgetHistoryService } from '../../../budget-history/services/budget-history.service';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
 import {
+  FindExpensesByMonthYearProps,
   RemoveExpenseProps,
+  ResponseMultipleExpenses,
   ResponseSingleExpense,
   UpdateExpenseProps,
 } from '../../../expenses/expenses.interface';
@@ -405,6 +407,36 @@ export class ExpensesActionsService {
     } catch (error) {
       if (error.status === 404) throw error;
       if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  /**
+   * Method used to search for expenses (only record type expense) that are related to an income.
+   */
+  async findOnlyExpensesByMonthAndYear({
+    accountId,
+    month,
+    year,
+    userId,
+  }: FindExpensesByMonthYearProps): Promise<ResponseMultipleExpenses> {
+    try {
+      const { expenses, message } =
+        await this.expensesService.findOnlyExpensesByMonthAndYear({
+          accountId,
+          month,
+          year,
+          userId,
+        });
+
+      const response: ResponseMultipleExpenses = {
+        ...INITIAL_RESPONSE,
+        message,
+        data: { expenses },
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
       throw new BadRequestException(error.message);
     }
   }

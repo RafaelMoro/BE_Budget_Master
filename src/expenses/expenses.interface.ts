@@ -16,6 +16,10 @@ export interface ResponseMultipleExpenses
     expenses: Expense[];
   };
 }
+export interface FindOnlyExpensesByMonthAndYearResponse {
+  message: string;
+  expenses: Expense[];
+}
 
 export interface BatchExpensesResponse extends Omit<GeneralResponse, 'data'> {
   data: (Expense | string)[];

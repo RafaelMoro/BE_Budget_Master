@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
+  Param,
   Post,
   Put,
   Request,
@@ -39,5 +41,21 @@ export class ExpensesActionsController {
   removeExpense(@Body() payload: DeleteExpenseDto, @Request() req) {
     const userId = req.user.sub;
     return this.expenseActionsService.removeExpense({ payload, userId });
+  }
+
+  @Get(':accountId/:month/:year')
+  findExpensesByAccountMonthAndYear(
+    @Param('accountId') accountId: string,
+    @Param('month') month: string,
+    @Param('year') year: string,
+    @Request() req,
+  ) {
+    const userId = req.user.sub;
+    return this.expenseActionsService.findOnlyExpensesByMonthAndYear({
+      accountId,
+      month,
+      year,
+      userId,
+    });
   }
 }
