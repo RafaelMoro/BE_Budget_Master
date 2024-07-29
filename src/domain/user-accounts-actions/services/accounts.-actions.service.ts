@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
 import { RecordsService } from '../../../records/services/records.service';
-import { EXPENSES_NOT_FOUND } from '../../../expenses/expenses.constants';
+import { EXPENSES_NOT_FOUND } from '../../../repositories/expenses/expenses.constants';
 import { INCOMES_NOT_FOUND } from '../../../incomes/incomes.constants';
 import {
   CreateAccountDto,

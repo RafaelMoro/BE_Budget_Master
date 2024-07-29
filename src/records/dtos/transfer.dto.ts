@@ -1,6 +1,6 @@
 import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateExpenseDto } from '../../expenses/expenses.dto';
+import { CreateExpenseDto } from '../../repositories/expenses/expenses.dto';
 import { CreateIncomeDto } from '../../incomes/incomes.dto';
 
 export class CreateTransferDto {

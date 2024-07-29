@@ -3,7 +3,7 @@ import { IncomesActionsController } from './controller/incomes-actions.controlle
 import { IncomesActionsService } from './services/incomes-actions.service';
 import { IncomesModule } from 'src/incomes/incomes.module';
 import { CategoriesModule } from 'src/categories/categories.module';
-import { ExpensesModule } from 'src/expenses/expenses.module';
+import { ExpensesModule } from 'src/repositories/expenses/expenses.module';
 import { AccountsModule } from 'src/repositories/accounts/accounts.module';
 
 @Module({

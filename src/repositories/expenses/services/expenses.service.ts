@@ -28,7 +28,7 @@ import {
   RemoveExpenseProps,
   UpdateMultipleExpensesPaidStatusResponse,
 } from '../expenses.interface';
-import { getMonthNumber } from '../../utils/getMonthNumber';
+import { getMonthNumber } from '../../../utils/getMonthNumber';
 import { TransferRecord } from 'src/records/dtos/records.dto';
 
 @Injectable()

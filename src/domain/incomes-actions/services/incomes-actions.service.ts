@@ -15,8 +15,8 @@ import {
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import { changeTimezone } from '../../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../../utils';
-import { UpdateExpensePaidStatusDto } from '../../../expenses/expenses.dto';
-import { ExpensesService } from '../../../expenses/services/expenses.service';
+import { UpdateExpensePaidStatusDto } from '../../../repositories/expenses/expenses.dto';
+import { ExpensesService } from '../../../repositories/expenses/services/expenses.service';
 import {
   INCOME_CREATED_MESSAGE,
   INCOME_DELETED_MESSAGE,

@@ -14,7 +14,7 @@ import {
   CreateExpenseDto,
   DeleteExpenseDto,
   UpdateExpenseDto,
-} from '../../../expenses/expenses.dto';
+} from '../../../repositories/expenses/expenses.dto';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)

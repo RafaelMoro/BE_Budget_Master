@@ -8,15 +8,15 @@ import { CategoriesService } from '../../../categories/services/categories.servi
 import {
   CreateExpenseDto,
   UpdateExpenseDto,
-} from '../../../expenses/expenses.dto';
-import { ExpensesService } from '../../../expenses/services/expenses.service';
+} from '../../../repositories/expenses/expenses.dto';
+import { ExpensesService } from '../../../repositories/expenses/services/expenses.service';
 import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
 import {
   EXPENSE_DELETED_MESSAGE,
   EXPENSE_UNAUTHORIZED_ERROR,
   MAXIMUM_BUDGETS_LIMIT_ERROR,
   TRANSFER_RECORD_LINKED_BUDGET_ERROR,
-} from '../../../expenses/expenses.constants';
+} from '../../../repositories/expenses/expenses.constants';
 import {
   MISSING_AMOUNT,
   MISSING_CATEGORY,
@@ -35,7 +35,7 @@ import {
   ResponseMultipleExpenses,
   ResponseSingleExpense,
   UpdateExpenseProps,
-} from '../../../expenses/expenses.interface';
+} from '../../../repositories/expenses/expenses.interface';
 import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
 import { symmetricDifference } from '../../../utils/symmetricDifference';
 

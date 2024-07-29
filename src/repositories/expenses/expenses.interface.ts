@@ -1,4 +1,4 @@
-import { GeneralResponse } from '../response.interface';
+import { GeneralResponse } from '../../response.interface';
 import { DeleteExpenseDto, UpdateExpenseDto } from './expenses.dto';
 import { Expense } from './expenses.entity';
 

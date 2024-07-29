@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { AccountRecord } from '../records/entities/records.entity';
-import { CreateExpense } from '../expenses/expenses.entity';
+import { CreateExpense } from '../repositories/expenses/expenses.entity';
 
 @Schema()
 export class CreateIncome extends AccountRecord {

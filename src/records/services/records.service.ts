@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
-import { Expense } from '../../expenses/expenses.entity';
+import { Expense } from '../../repositories/expenses/expenses.entity';
 import { Income } from '../../incomes/incomes.entity';
 import { CategoriesService } from '../../categories/services/categories.service';
 import { INITIAL_RESPONSE } from '../../constants';
@@ -22,7 +22,7 @@ import {
   CreateExpenseDto,
   DeleteExpenseDto,
   UpdateExpensePaidStatusDto,
-} from '../../expenses/expenses.dto';
+} from '../../repositories/expenses/expenses.dto';
 import { CreateIncomeDto, DeleteIncomeDto } from '../../incomes/incomes.dto';
 import {
   formatDateToString,
@@ -31,7 +31,7 @@ import {
 } from '../../utils';
 import { VERSION_RESPONSE } from '../../constants';
 import { changeTimezone } from '../../utils/changeTimezone';
-import { ExpensesService } from '../../expenses/services/expenses.service';
+import { ExpensesService } from '../../repositories/expenses/services/expenses.service';
 import { IncomesService } from '../../incomes/services/incomes.service';
 import { AccountsService } from '../../repositories/accounts/services/accounts.service';
 import { TransferRecord } from '../dtos/records.dto';

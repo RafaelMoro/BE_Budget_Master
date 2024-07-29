@@ -11,7 +11,7 @@ import { MailModule } from './mail/mail.module';
 import { AccountsModule } from './repositories/accounts/accounts.module';
 import { RecordsModule } from './records/records.module';
 import { CategoriesModule } from './categories/categories.module';
-import { ExpensesModule } from './expenses/expenses.module';
+import { ExpensesModule } from './repositories/expenses/expenses.module';
 import { IncomesModule } from './incomes/incomes.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { BudgetHistoryModule } from './budget-history/budget-history.module';
