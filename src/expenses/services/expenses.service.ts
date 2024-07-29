@@ -22,7 +22,6 @@ import {
 } from '../expenses.constants';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
-  BatchExpensesResponse,
   DeleteMultipleExpensesResponse,
   FindAllExpensesByAccountResponse,
   FindExpensesByMonthYearProps,
@@ -321,31 +320,6 @@ export class ExpensesService {
           recordName: record.shortName,
         });
       });
-      return response;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async updateMultipleExpenses(changes: UpdateExpenseDto[]) {
-    try {
-      const updatedRecords = await Promise.all(
-        changes.map((change) =>
-          this.expenseModel.findByIdAndUpdate(
-            change.recordId,
-            { $set: change },
-            { new: true },
-          ),
-        ),
-      );
-      const checkUpdatedRecords = updatedRecords.map((record, index) => {
-        if (!record) return `record id ${changes[index].recordId} not found`;
-        return record;
-      });
-      const response: BatchExpensesResponse = {
-        ...INITIAL_RESPONSE,
-        data: checkUpdatedRecords,
-      };
       return response;
     } catch (error) {
       throw new BadRequestException(error.message);
