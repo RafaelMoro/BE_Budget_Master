@@ -1,24 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
-import { RecordsService } from '../../../records/services/records.service';
-import { EXPENSES_NOT_FOUND } from '../../../repositories/expenses/expenses.constants';
-import { INCOMES_NOT_FOUND } from '../../../repositories/incomes/incomes.constants';
+import { AccountsService } from '@repositories/accounts/services/accounts.service';
+import { RecordsService } from '@domain/records/services/records.service';
+import { EXPENSES_NOT_FOUND } from '@repositories/expenses/expenses.constants';
+import { INCOMES_NOT_FOUND } from '@repositories/incomes/incomes.constants';
 import {
   CreateAccountDto,
   DeleteAccountDto,
   UpdateAccountDto,
-} from '../../../repositories/accounts/dtos/accounts.dto';
+} from '@repositories/accounts/dtos/accounts.dto';
 import {
   ACCOUNT_CREATED_MESSAGE,
   ACCOUNT_DELETED_MESSAGE,
   ACCOUNT_UPDATED_MESSAGE,
-} from '../../../repositories/accounts/constants';
-import { VERSION_RESPONSE } from '../../../constants';
+} from '@repositories/accounts/constants';
+import { VERSION_RESPONSE } from '@/constants';
 import {
   DeleteAccountResponse,
   GeneralAccountResponse,
   GetAccountResponse,
-} from '../../../repositories/accounts/accounts.interface';
+} from '@repositories/accounts/accounts.interface';
 
 @Injectable()
 export class AccountsActionsService {

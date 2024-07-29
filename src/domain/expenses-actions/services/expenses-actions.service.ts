@@ -23,7 +23,7 @@ import {
   MISSING_DATE,
   MISSING_LINKED_BUDGETS,
   TYPE_OF_RECORD_INVALID,
-} from '../../../records/constants';
+} from '@domain/records/constants';
 import { changeTimezone } from '../../../utils/changeTimezone';
 import { formatDateToString, formatNumberToCurrency } from '../../../utils';
 import { BudgetsService } from '../../../budgets/services/budgets.service';

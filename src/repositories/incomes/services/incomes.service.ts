@@ -27,7 +27,7 @@ import {
 } from '../incomes.constants';
 import { getMonthNumber } from '../../../utils/getMonthNumber';
 import { EXPENSE_NOT_FOUND } from '../../expenses/expenses.constants';
-import { TransferRecord } from '../../../records/dtos/records.dto';
+import { TransferRecord } from '@domain/records/dtos/records.dto';
 
 @Injectable()
 export class IncomesService {

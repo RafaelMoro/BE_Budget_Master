@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
-import { Expense } from '../../repositories/expenses/expenses.entity';
-import { Income } from '../../repositories/incomes/incomes.entity';
-import { CategoriesService } from '../../categories/services/categories.service';
-import { INITIAL_RESPONSE } from '../../constants';
+import { Expense } from '@repositories/expenses/expenses.entity';
+import { Income } from '@repositories/incomes/incomes.entity';
+import { CategoriesService } from '@/categories/services/categories.service';
+import { INITIAL_RESPONSE } from '@/constants';
 import {
   NO_EXPENSES_FOUND,
   NO_EXPENSES_INCOMES_FOUND,
@@ -22,18 +22,21 @@ import {
   CreateExpenseDto,
   DeleteExpenseDto,
   UpdateExpensePaidStatusDto,
-} from '../../repositories/expenses/expenses.dto';
-import { CreateIncomeDto, DeleteIncomeDto } from '../../repositories/incomes/incomes.dto';
+} from '@repositories/expenses/expenses.dto';
+import {
+  CreateIncomeDto,
+  DeleteIncomeDto,
+} from '@repositories/incomes/incomes.dto';
 import {
   formatDateToString,
   compareDateAndTime,
   formatNumberToCurrency,
-} from '../../utils';
-import { VERSION_RESPONSE } from '../../constants';
-import { changeTimezone } from '../../utils/changeTimezone';
-import { ExpensesService } from '../../repositories/expenses/services/expenses.service';
-import { IncomesService } from '../../repositories/incomes/services/incomes.service';
-import { AccountsService } from '../../repositories/accounts/services/accounts.service';
+} from '@/utils';
+import { VERSION_RESPONSE } from '@/constants';
+import { changeTimezone } from '@/utils/changeTimezone';
+import { ExpensesService } from '@repositories/expenses/services/expenses.service';
+import { IncomesService } from '@repositories/incomes/services/incomes.service';
+import { AccountsService } from '@repositories/accounts/services/accounts.service';
 import { TransferRecord } from '../dtos/records.dto';
 
 @Injectable()

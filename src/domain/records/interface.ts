@@ -1,8 +1,8 @@
-import { Expense } from '../repositories/expenses/expenses.entity';
-import { GeneralResponse } from '../response.interface';
-import { Income } from '../repositories/incomes/incomes.entity';
-import { CreateIncomeDto } from '../repositories/incomes/incomes.dto';
-import { CreateExpenseDto } from '../repositories/expenses/expenses.dto';
+import { Expense } from '@repositories/expenses/expenses.entity';
+import { GeneralResponse } from '@/response.interface';
+import { Income } from '@repositories/incomes/incomes.entity';
+import { CreateIncomeDto } from '@repositories/incomes/incomes.dto';
+import { CreateExpenseDto } from '@repositories/expenses/expenses.dto';
 
 /** Interfaces of services */
 export interface FindRecordsByAccountProps {

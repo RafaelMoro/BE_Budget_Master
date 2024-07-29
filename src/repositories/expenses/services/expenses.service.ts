@@ -29,7 +29,7 @@ import {
   UpdateMultipleExpensesPaidStatusResponse,
 } from '../expenses.interface';
 import { getMonthNumber } from '../../../utils/getMonthNumber';
-import { TransferRecord } from 'src/records/dtos/records.dto';
+import { TransferRecord } from '@domain/records/dtos/records.dto';
 
 @Injectable()
 export class ExpensesService {

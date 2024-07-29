@@ -3,36 +3,36 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CategoriesService } from '../../../categories/services/categories.service';
+import { CategoriesService } from '@/categories/services/categories.service';
 import {
   CreateIncomeDto,
   UpdateIncomeDto,
-} from '../../../repositories/incomes/incomes.dto';
-import { IncomesService } from '../../../repositories/incomes/services/incomes.service';
+} from '@repositories/incomes/incomes.dto';
+import { IncomesService } from '@repositories/incomes/services/incomes.service';
 import {
   MISSING_AMOUNT,
   MISSING_CATEGORY,
   MISSING_DATE,
   TYPE_OF_RECORD_INVALID,
-} from '../../../records/constants';
-import { isTypeOfRecord } from '../../../utils/isTypeOfRecord';
-import { changeTimezone } from '../../../utils/changeTimezone';
-import { formatDateToString, formatNumberToCurrency } from '../../../utils';
-import { UpdateExpensePaidStatusDto } from '../../../repositories/expenses/expenses.dto';
-import { ExpensesService } from '../../../repositories/expenses/services/expenses.service';
+} from '../../records/constants';
+import { isTypeOfRecord } from '@/utils/isTypeOfRecord';
+import { changeTimezone } from '@/utils/changeTimezone';
+import { formatDateToString, formatNumberToCurrency } from '@/utils';
+import { UpdateExpensePaidStatusDto } from '@repositories/expenses/expenses.dto';
+import { ExpensesService } from '@repositories/expenses/services/expenses.service';
 import {
   INCOME_CREATED_MESSAGE,
   INCOME_DELETED_MESSAGE,
   UNAUTHORIZED_INCOMES_ERROR,
-} from '../../../repositories/incomes/incomes.constants';
-import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
+} from '@repositories/incomes/incomes.constants';
+import { INITIAL_RESPONSE, VERSION_RESPONSE } from '@/constants';
 import {
   RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
-} from '../../../repositories/incomes/incomes.interface';
-import { AccountsService } from '../../../repositories/accounts/services/accounts.service';
-import { symmetricDifference } from 'src/utils/symmetricDifference';
+} from '@/repositories/incomes/incomes.interface';
+import { AccountsService } from '@/repositories/accounts/services/accounts.service';
+import { symmetricDifference } from '@/utils/symmetricDifference';
 
 @Injectable()
 export class IncomesActionsService {

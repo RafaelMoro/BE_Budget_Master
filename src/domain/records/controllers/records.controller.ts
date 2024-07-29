@@ -5,11 +5,11 @@ import {
   Get,
   UseGuards,
   Request,
+  Param,
 } from '@nestjs/common';
 
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RecordsService } from '../services/records.service';
-import { Param } from '@nestjs/common/decorators';
 import { CreateTransferDto } from '../dtos/transfer.dto';
 @UseGuards(JwtAuthGuard)
 @Controller('records')

@@ -9,7 +9,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { MailModule } from './mail/mail.module';
 import { AccountsModule } from './repositories/accounts/accounts.module';
-import { RecordsModule } from './records/records.module';
+import { RecordsModule } from './domain/records/records.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ExpensesModule } from './repositories/expenses/expenses.module';
 import { IncomesModule } from './repositories/incomes/incomes.module';
