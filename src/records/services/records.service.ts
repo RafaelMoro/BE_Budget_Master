@@ -194,6 +194,11 @@ export class RecordsService {
         'The expense transfer record must have value isPaid as true',
       );
     }
+    if (expense.linkedBudgets.length > 0) {
+      throw new BadRequestException(
+        'The expense transfer record cannot have linked budgets',
+      );
+    }
 
     // Validate income and expense has same value on the following fields.
     if (expense.account === income.account) {
@@ -209,7 +214,7 @@ export class RecordsService {
         'Transfer records has different amounts. Both must have the same value',
       );
     }
-    if (expense.date !== income.date) {
+    if (expense.date.getTime() !== income.date.getTime()) {
       throw new BadRequestException(
         'Transfer records has different dates. Both must have the same value',
       );
