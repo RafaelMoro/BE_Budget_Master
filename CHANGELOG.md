@@ -1,3 +1,9 @@
+## v1.0.0 (2024-07-29)
+
+### Pull Requests
+[#30](https://github.com/RafaelMoro/BE_Budget_Master/pull/30) | Refactor modules, add clean arquitecture
+
+
 ## v0.9.1 (2024-07-21)
 
 ### Pull Requests
