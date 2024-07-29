@@ -14,18 +14,15 @@ import {
   DeleteIncomeDto,
   UpdateIncomeDto,
 } from '../incomes.dto';
-import { UpdateExpenseDto } from '../../expenses/expenses.dto';
 import {
   BatchIncomesResponse,
   DeleteMultipleIncomesResponse,
   FindAllIncomesByAccountResponse,
   FindIncomesByMonthYearProps,
   RemoveIncomeProps,
-  ResponseSingleIncome,
 } from '../incomes.interface';
 import { INITIAL_RESPONSE } from '../../constants';
 import {
-  INCOME_DELETED_MESSAGE,
   INCOME_NOT_FOUND,
   INCOME_UNAUTHORIZED_ERROR,
   INCOMES_NOT_FOUND,
@@ -109,54 +106,42 @@ export class IncomesService {
     }
   }
 
+  /**
+   * Method to verify if the income exists and belongs to the user.
+   */
   async verifyRecordBelongsUser(recordId: string, userId: string) {
     try {
-      const record = await this.incomeModel.findById(recordId);
-      if (!record) throw new UnauthorizedException(INCOME_NOT_FOUND);
+      const income = await this.incomeModel.findById(recordId);
+      if (!income) throw new NotFoundException(INCOME_NOT_FOUND);
 
-      const { userId: recordUserId } = record;
+      const { userId: recordUserId } = income;
       if (userId !== recordUserId) {
         throw new UnauthorizedException(INCOME_UNAUTHORIZED_ERROR);
       }
+      return income;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }
 
+  /**
+   * Deletes the income, verify if the income exists and belongs to the user.
+   */
   async removeIncome({ payload, userId }: RemoveIncomeProps) {
     try {
       const { recordId } = payload;
+      // Verifies if the income exists and belongs to the user.
       await this.verifyRecordBelongsUser(recordId, userId);
-
-      const income = await this.incomeModel.findById(recordId);
-
-      // Check if there are any expenses related to this income
-      if (income?.expensesPaid?.length > 0) {
-        // set expenses as not paid
-        const payload: UpdateExpenseDto[] = income.expensesPaid.map(
-          (expense) => ({
-            recordId: expense._id,
-            isPaid: false,
-            userId,
-          }),
-        );
-        await this.expensesService.updateMultipleExpenses(payload);
-      }
 
       const recordDeleted: Income = await this.incomeModel.findByIdAndDelete(
         recordId,
       );
-      if (!recordDeleted) throw new BadRequestException(INCOME_NOT_FOUND);
-
-      const response: ResponseSingleIncome = {
-        ...INITIAL_RESPONSE,
-        message: [INCOME_DELETED_MESSAGE],
-        data: {
-          income: recordDeleted,
-        },
-      };
-      return response;
+      return recordDeleted;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

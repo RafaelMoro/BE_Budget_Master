@@ -328,20 +328,28 @@ export class ExpensesService {
     }
   }
 
+  /**
+   * Method to verify if the expense exists and belongs to the user.
+   */
   async verifyRecordBelongsUser(recordId: string, userId: string) {
     try {
       const record = await this.expenseModel.findById(recordId);
-      if (!record) throw new UnauthorizedException(EXPENSE_NOT_FOUND);
+      if (!record) throw new NotFoundException(EXPENSE_NOT_FOUND);
 
       const { userId: recordUserId } = record;
       if (userId !== recordUserId) {
         throw new UnauthorizedException(EXPENSE_UNAUTHORIZED_ERROR);
       }
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }
 
+  /**
+   * Method to delete expense by Id. It verifies if the record belongs to the user.
+   */
   async removeExpense({ payload, userId }: RemoveExpenseProps) {
     try {
       const { recordId } = payload;
@@ -351,10 +359,11 @@ export class ExpensesService {
       const recordDeleted: Expense = await this.expenseModel.findByIdAndDelete(
         recordId,
       );
-      if (!recordDeleted) throw new BadRequestException(EXPENSE_NOT_FOUND);
 
       return recordDeleted;
     } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
       throw new BadRequestException(error.message);
     }
   }

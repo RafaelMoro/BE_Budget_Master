@@ -19,10 +19,12 @@ import { UpdateExpensePaidStatusDto } from '../../../expenses/expenses.dto';
 import { ExpensesService } from '../../../expenses/services/expenses.service';
 import {
   INCOME_CREATED_MESSAGE,
+  INCOME_DELETED_MESSAGE,
   UNAUTHORIZED_INCOMES_ERROR,
 } from '../../../incomes/incomes.constants';
 import { INITIAL_RESPONSE, VERSION_RESPONSE } from '../../../constants';
 import {
+  RemoveIncomeProps,
   ResponseSingleIncome,
   UpdateIncomeProps,
 } from '../../../incomes/incomes.interface';
@@ -261,5 +263,48 @@ export class IncomesActionsService {
     if (!date) throw new BadRequestException(MISSING_DATE);
     if (!category) throw new BadRequestException(MISSING_CATEGORY);
     if (!amount) throw new BadRequestException(MISSING_AMOUNT);
+  }
+
+  async removeIncome({ payload, userId }: RemoveIncomeProps) {
+    try {
+      const messages: string[] = [];
+
+      // 1. Delete income
+      const incomeDeleted = await this.incomesService.removeIncome({
+        payload,
+        userId,
+      });
+      messages.push(INCOME_DELETED_MESSAGE);
+
+      // 2. Update account's amount.
+
+      // 2. Check if there are any expenses related to this income and change their status
+      if (incomeDeleted?.expensesPaid?.length > 0) {
+        // set expenses as not paid
+        const payloadExpensesPaid: UpdateExpensePaidStatusDto[] =
+          incomeDeleted?.expensesPaid.map((expense) => ({
+            recordId: expense._id,
+            paidStatus: false,
+          }));
+        await this.expensesService.updateMultipleExpensesPaidStatus(
+          payloadExpensesPaid,
+        );
+        messages.push(`Expenses paid updated: ${payloadExpensesPaid.length}`);
+      }
+
+      // 3. Return response
+      const response: ResponseSingleIncome = {
+        ...INITIAL_RESPONSE,
+        message: messages,
+        data: {
+          income: incomeDeleted,
+        },
+      };
+      return response;
+    } catch (error) {
+      if (error.status === 404) throw error;
+      if (error.status === 401) throw error;
+      throw new BadRequestException(error.message);
+    }
   }
 }
