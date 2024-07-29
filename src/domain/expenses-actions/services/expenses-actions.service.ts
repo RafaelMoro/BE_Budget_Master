@@ -250,9 +250,9 @@ export class ExpensesActionsService {
       );
       const { oldValues: oldBudgetsToRemove, newValues: newBudgetsToAdd } =
         symmetricDifference({
+          oldArray: oldLinkedBudgetsIds,
           // The type is Budget but in the changes we receive the id as string
-          oldArray: changes.linkedBudgets as unknown as string[],
-          newArray: oldLinkedBudgetsIds,
+          newArray: changes.linkedBudgets as unknown as string[],
         });
 
       // 8. Update budgets amount if there were changes in linked budgets and budget history
