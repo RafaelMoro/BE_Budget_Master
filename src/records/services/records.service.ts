@@ -138,8 +138,12 @@ export class RecordsService {
             paidStatus: true,
           }),
         );
-        await this.expensesService.updateMultipleExpensesPaidStatus(payload);
-        messages.push('Expenses paid updated');
+        const { recordsNotUpdated, recordsUpdated } =
+          await this.expensesService.updateMultipleExpensesPaidStatus(payload);
+        messages.push(`Expenses paid updated: ${recordsUpdated.length}`);
+        messages.push(
+          `Expenses paid failed to update ${recordsNotUpdated.length}`,
+        );
       }
 
       // Validation if any of the transfer records has a missing transfer record
