@@ -209,13 +209,16 @@ export class ExpensesService {
         return expenses;
       }
 
-      const expensesPopulated: Expense[] = await this.expenseModel.populate(
+      let expensesPopulated: Expense[] = await this.expenseModel.populate(
         expenses,
         {
           path: 'category',
           select: '_id categoryName icon',
         },
       );
+      expensesPopulated = await this.expenseModel.populate(expensesPopulated, {
+        path: 'linkedBudgets',
+      });
 
       return expensesPopulated;
     } catch (error) {
