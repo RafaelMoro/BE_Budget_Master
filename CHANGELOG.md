@@ -1,3 +1,9 @@
+## v1.0.1 (2024-07-30)
+
+### Pull Requests
+[#31](https://github.com/RafaelMoro/BE_Budget_Master/pull/31) | Populate linked budgets on get all records by account month and year
+
+
 ## v1.0.0 (2024-07-29)
 
 ### Pull Requests
