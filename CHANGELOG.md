@@ -1,3 +1,27 @@
+## v1.0.1 (2024-07-30)
+
+### Pull Requests
+[#31](https://github.com/RafaelMoro/BE_Budget_Master/pull/31) | Populate linked budgets on get all records by account month and year
+
+
+## v1.0.0 (2024-07-29)
+
+### Pull Requests
+[#30](https://github.com/RafaelMoro/BE_Budget_Master/pull/30) | Refactor modules, add clean arquitecture
+
+
+## v0.9.1 (2024-07-21)
+
+### Pull Requests
+[#29](https://github.com/RafaelMoro/BE_Budget_Master/pull/29) | Return response on get budgets and get single budget
+
+
+## v0.9.0 (2024-07-17)
+
+### Pull Requests
+[#25](https://github.com/RafaelMoro/BE_Budget_Master/pull/25) | Feature: Add budgets
+
+
 ## v0.8.1 (2024-07-14)
 
 ### Pull Requests
