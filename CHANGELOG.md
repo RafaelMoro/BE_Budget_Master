@@ -1,3 +1,9 @@
+## v1.0.2 (2024-07-31)
+
+### Pull Requests
+[#33](https://github.com/RafaelMoro/BE_Budget_Master/pull/33) | Fix on create transfer not updating correctly the destination amount
+
+
 ## v1.0.1 (2024-07-30)
 
 ### Pull Requests
