@@ -117,7 +117,7 @@ export class RecordsService {
       // 8. Modify account's amount
       const updatedAmountAccountExpense =
         expenseAccount.amount - expense.amount;
-      const updatedAmountAccountIncome = incomeAccount.amount - income.amount;
+      const updatedAmountAccountIncome = incomeAccount.amount + income.amount;
 
       await this.accountsService.modifyAccountBalance({
         amount: updatedAmountAccountExpense,
