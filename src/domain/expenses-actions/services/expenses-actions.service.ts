@@ -157,6 +157,7 @@ export class ExpensesActionsService {
     const amountFormatted = formatNumberToCurrency(amount);
     const newData = {
       ...data,
+      date: dateWithTimezone,
       fullDate,
       formattedTime,
       category: categoryId,

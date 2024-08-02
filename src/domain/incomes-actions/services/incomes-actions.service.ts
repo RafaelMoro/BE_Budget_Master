@@ -63,6 +63,7 @@ export class IncomesActionsService {
     const amountFormatted = formatNumberToCurrency(amount);
     const newData = {
       ...data,
+      date: dateWithTimezone,
       fullDate,
       formattedTime,
       amountFormatted,
