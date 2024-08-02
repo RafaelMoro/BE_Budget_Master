@@ -176,9 +176,9 @@ export class ExpensesActionsService {
     changes: UpdateExpenseDto;
     categoryId: string;
   }) {
+    // Do not format date because it's already formatted when it was created
     const { date, amount } = changes;
-    const dateWithTimezone = changeTimezone(date, 'America/Mexico_City');
-    const { fullDate, formattedTime } = formatDateToString(dateWithTimezone);
+    const { fullDate, formattedTime } = formatDateToString(date);
     const amountFormatted = formatNumberToCurrency(amount);
     const newChanges = {
       ...changes,
