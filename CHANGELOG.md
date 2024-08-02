@@ -1,3 +1,9 @@
+## v1.0.3 (2024-08-02)
+
+### Pull Requests
+[#35](https://github.com/RafaelMoro/BE_Budget_Master/pull/35) | Fix date timezone issues
+
+
 ## v1.0.2 (2024-07-31)
 
 ### Pull Requests

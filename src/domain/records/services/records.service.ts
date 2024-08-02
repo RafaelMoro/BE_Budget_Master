@@ -252,6 +252,7 @@ export class RecordsService {
 
     const newDataExpense = {
       ...expense,
+      date: dateWithTimezone,
       fullDate,
       formattedTime,
       amountFormatted,
@@ -259,6 +260,7 @@ export class RecordsService {
     };
     const newDataIncome = {
       ...income,
+      date: dateWithTimezone,
       fullDate,
       formattedTime,
       amountFormatted,
