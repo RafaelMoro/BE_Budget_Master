@@ -9,6 +9,7 @@ import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.f
 let cachedServer: Handler;
 const frontendUri = process.env.FRONTEND_URI;
 const testFrontendUri = process.env.TEST_FRONTEND_URI;
+const domainUri = process.env.DOMAIN_URI;
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,7 +21,7 @@ export async function bootstrap() {
   );
   app.useGlobalFilters(new GeneralAppExceptionFilter());
   app.enableCors({
-    origin: [frontendUri, testFrontendUri],
+    origin: [frontendUri, testFrontendUri, domainUri],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
