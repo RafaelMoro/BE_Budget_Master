@@ -1,6 +1,6 @@
 {
   "name": "be_personal_finances",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "author": "",
   "private": true,
@@ -10,7 +10,7 @@
     "build": "nest build",
     "deploy": "bun run build && sls deploy",
     "start": "node ./dist/main.js",
-    "main": "node dist/main.js",
+    "dev:sls": "serverless offline start",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "nest start",
     "watch": "nest start --watch",
