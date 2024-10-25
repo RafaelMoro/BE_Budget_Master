@@ -1,3 +1,9 @@
+## v1.0.4 (2024-10-25)
+
+### Pull Requests
+[#37](https://github.com/RafaelMoro/BE_Budget_Master/pull/37) | Hotfix/add domain uri
+
+
 ## v1.0.3 (2024-08-02)
 
 ### Pull Requests
