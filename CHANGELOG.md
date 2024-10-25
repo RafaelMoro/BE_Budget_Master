@@ -1,3 +1,9 @@
+## v1.0.5 (2024-10-25)
+
+### Pull Requests
+[#39](https://github.com/RafaelMoro/BE_Budget_Master/pull/39) | Add script to run serverless locally
+
+
 ## v1.0.4 (2024-10-25)
 
 ### Pull Requests
