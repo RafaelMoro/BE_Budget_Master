@@ -1,3 +1,9 @@
+## v1.0.6 (2024-12-19)
+
+### Pull Requests
+[#41](https://github.com/RafaelMoro/BE_Budget_Master/pull/41) | Fix link in the email termplate when forgot password
+
+
 ## v1.0.5 (2024-10-25)
 
 ### Pull Requests

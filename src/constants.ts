@@ -2,6 +2,7 @@ import { GeneralResponse } from './response.interface';
 
 export const VERSION_RESPONSE = process.env.npm_package_version;
 export const ENVIRONMENT_PRODUCTION = 'production';
+export const PROD_URI = 'https://budget-master.space';
 
 export const INITIAL_RESPONSE: GeneralResponse = {
   version: VERSION_RESPONSE,
