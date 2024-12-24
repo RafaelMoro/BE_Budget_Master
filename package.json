@@ -1,6 +1,6 @@
 {
   "name": "be_personal_finances",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "author": "",
   "private": true,
@@ -11,6 +11,8 @@
     "deploy": "bun run build && sls deploy",
     "start": "node ./dist/main.js",
     "dev:sls": "serverless offline start",
+    "dev:debug": "serverless dev",
+    "build:sls": "serverless package",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "nest start",
     "watch": "nest start --watch",
@@ -83,7 +85,7 @@
     "typescript": "^4.3.5"
   },
   "engines": {
-    "node": ">=18.19.0"
+    "node": ">=16.20.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -101,5 +103,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "volta": {
+    "node": "16.20.2"
   }
 }

@@ -1,3 +1,9 @@
+## v1.0.7 (2024-12-24)
+
+### Pull Requests
+[#43](https://github.com/RafaelMoro/BE_Budget_Master/pull/43) | Add email changes using custom domain email addresses
+
+
 ## v1.0.6 (2024-12-19)
 
 ### Pull Requests
