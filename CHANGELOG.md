@@ -1,3 +1,9 @@
+## v1.0.9 (2025-01-18)
+
+### Pull Requests
+[#47](https://github.com/RafaelMoro/BE_Budget_Master/pull/47) | Fix Fe prod uri
+
+
 ## v1.0.8 (2025-01-18)
 
 ### Pull Requests
