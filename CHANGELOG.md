@@ -1,3 +1,9 @@
+## v1.0.8 (2025-01-18)
+
+### Pull Requests
+[#45](https://github.com/RafaelMoro/BE_Budget_Master/pull/45) | Change email to spanish
+
+
 ## v1.0.7 (2024-12-24)
 
 ### Pull Requests
