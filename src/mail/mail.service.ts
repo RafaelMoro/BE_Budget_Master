@@ -15,10 +15,8 @@ export class MailService {
 
   async sendUserForgotPasswordEmail(payload: MailForgotPasswordDto) {
     try {
-      const { oneTimeToken, hostname, email, firstName, lastName } = payload;
-      const newHostname =
-        this.configService.environment !== 'development' ? PROD_URI : hostname;
-      const url = `${newHostname}/reset-password/${oneTimeToken}`;
+      const { oneTimeToken, email, firstName, lastName } = payload;
+      const url = `${PROD_URI}/reset-password/${oneTimeToken}`;
 
       // Change email for name of the user.
       await this.mailerService.sendMail({
