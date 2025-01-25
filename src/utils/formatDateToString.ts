@@ -25,7 +25,7 @@ export const formatDateToString = (date: Date) => {
   const hourString = String(hour).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  const fullDate = `${WEEKDAY[weekday]}, ${day}-${MONTHS[month]}-${year}`;
+  const fullDate = `${WEEKDAY[weekday]}, ${day} ${MONTHS[month]}, ${year}`;
   const twelveHourPeriod = hour >= 0 && hour <= 11 ? 'am' : 'pm';
   const formattedTime = `${hourString}:${minutes}${twelveHourPeriod}`;
 
