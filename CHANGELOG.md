@@ -1,3 +1,9 @@
+## v1.1.0 (2025-02-03)
+
+### Pull Requests
+[#52](https://github.com/RafaelMoro/BE_Budget_Master/pull/52) | Translate categories
+
+
 ## v1.0.11 (2025-01-30)
 
 ### Pull Requests
