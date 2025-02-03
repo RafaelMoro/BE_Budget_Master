@@ -75,7 +75,7 @@ const SUSCRIPTIONS_CATEGORY = {
 const TRANSPORTATION_CATEGORY = {
   categoryName: 'Transporte',
   subCategories: [
-    'Gassolina',
+    'Gasolina',
     'Renta de carro',
     'Mantenimiento y reparaciones del carro',
     'Tarifas de estacionamiento',
