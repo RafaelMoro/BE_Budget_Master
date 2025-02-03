@@ -189,6 +189,20 @@ const SAVINGS_CATEGORY = {
   ],
   icon: 'savings',
 };
+const INCOME_CATEGORY = {
+  categoryName: 'Ingreso',
+  subCategories: [
+    'Salario',
+    'Comisiones / bonos',
+    'Propinas',
+    'Inversiones',
+    'Negocios',
+    'Servicios profesionales',
+    'Reembolsos',
+    'Regalos',
+  ],
+  icon: 'income',
+};
 
 export const ALL_LOCAL_CATEGORIES: CreateCategoriesDto[] = [
   FOOD_AND_DRINK_CATEGORY,
@@ -202,4 +216,5 @@ export const ALL_LOCAL_CATEGORIES: CreateCategoriesDto[] = [
   SHOPPING,
   ENTERTAINMENT_AND_LEISURE_CATEGORY,
   SAVINGS_CATEGORY,
+  INCOME_CATEGORY,
 ];
