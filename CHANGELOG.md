@@ -1,3 +1,9 @@
+## v1.1.1 (2025-02-03)
+
+### Pull Requests
+[#53](https://github.com/RafaelMoro/BE_Budget_Master/pull/53) | Fix typo subcategory transport and add income category
+
+
 ## v1.1.0 (2025-02-03)
 
 ### Pull Requests
