@@ -23,4 +23,5 @@ export default registerAs('config', () => ({
     smtpPort: process.env.SMTP_PORT,
   },
   backendUri: process.env.BACKEND_URI,
+  stripeApiKey: process.env.STRIPE_API_KEY,
 }));
