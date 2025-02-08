@@ -6,7 +6,7 @@ export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Post()
-  createCheckoutSession() {
-    return this.paymentService.createCheckoutSession();
+  createCheckoutOneTimeSession() {
+    return this.paymentService.createCheckoutOneTimeSession();
   }
 }
