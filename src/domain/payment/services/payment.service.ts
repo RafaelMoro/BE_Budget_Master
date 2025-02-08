@@ -11,7 +11,7 @@ import {
   PRICE_ID_ONE_TIME_MONTLY,
   PRICE_NOT_FOUND_ERROR,
 } from '../payment.constants';
-import { PaymentDto } from '../dtos/payment.dto';
+import { PaymentDto, PortalDto } from '../dtos/payment.dto';
 import { OneTimePaymentResponse } from '../payment.interface';
 
 @Injectable()
@@ -137,7 +137,7 @@ export class PaymentService {
     }
   }
 
-  async createPortalSession({ sessionId }: { sessionId: string }) {
+  async createPortalSession({ sessionId }: PortalDto) {
     try {
       const {
         environment,

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { PaymentService } from '../services/payment.service';
-import { PaymentDto } from '../dtos/payment.dto';
+import { PaymentDto, PortalDto } from '../dtos/payment.dto';
 
 @Controller('payment')
 export class PaymentController {
@@ -14,5 +14,10 @@ export class PaymentController {
   @Post('recurrent')
   createCheckoutRecurrentSession(@Body() payload: PaymentDto) {
     return this.paymentService.createRecurrentSession(payload);
+  }
+
+  @Post('portal')
+  createPortalSession(@Body() payload: PortalDto) {
+    return this.paymentService.createPortalSession(payload);
   }
 }

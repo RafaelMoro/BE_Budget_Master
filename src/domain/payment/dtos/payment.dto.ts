@@ -5,3 +5,9 @@ export class PaymentDto {
   @IsNotEmpty()
   readonly payment: string;
 }
+
+export class PortalDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly sessionId: string;
+}
