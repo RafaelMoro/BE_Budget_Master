@@ -136,4 +136,37 @@ export class PaymentService {
       throw new BadRequestException(error.message);
     }
   }
+
+  async createPortalSession({ sessionId }: { sessionId: string }) {
+    try {
+      const {
+        environment,
+        stripeApiKey,
+        stripeTestApiKey,
+        domainUri,
+        frontendPort,
+      } = this.configService;
+      const apiKey =
+        environment === ENVIRONMENT_PRODUCTION
+          ? stripeApiKey
+          : stripeTestApiKey;
+      const frontendUri =
+        environment === ENVIRONMENT_PRODUCTION
+          ? domainUri
+          : `http://localhost:${frontendPort}`;
+      const stripe = new Stripe(apiKey);
+      // this is for demostration purposes to retrieve the customer ID.
+      // TODO: Change the obtention of the customer Id retrieving it from the db
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        sessionId,
+      );
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: checkoutSession.customer as string,
+        return_url: frontendUri,
+      });
+      return portalSession;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 }
