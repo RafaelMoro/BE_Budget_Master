@@ -10,6 +10,24 @@ export class PaymentService {
   ) {}
 
   async createCheckoutSession() {
-    const stripe = new Stripe(this.configService.stripeApiKey);
+    try {
+      const priceIdAnualSubscription = 'price_1Qq1TTKQRcBa6IkH2PexcxiH';
+      const stripe = new Stripe(this.configService.stripeApiKey);
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: priceIdAnualSubscription,
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: 'http://localhost:6006/success',
+        cancel_url: 'http://localhost:6006/cancel',
+      });
+      console.log(session);
+      return session;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
