@@ -1,3 +1,9 @@
+## v1.1.2 (2025-02-08)
+
+### Pull Requests
+[#54](https://github.com/RafaelMoro/BE_Budget_Master/pull/54) | Update env example and config schema for env variables
+
+
 ## v1.1.1 (2025-02-03)
 
 ### Pull Requests
