@@ -154,6 +154,7 @@ export class PaymentService {
         environment === ENVIRONMENT_PRODUCTION
           ? domainUri
           : `http://localhost:${frontendPort}`;
+
       const stripe = new Stripe(apiKey);
       // this is for demostration purposes to retrieve the customer ID.
       // TODO: Change the obtention of the customer Id retrieving it from the db
@@ -164,7 +165,16 @@ export class PaymentService {
         customer: checkoutSession.customer as string,
         return_url: frontendUri,
       });
-      return portalSession;
+      const response: OneTimePaymentResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        error: null,
+        data: {
+          paymentUrl: portalSession.url,
+        },
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
