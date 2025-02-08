@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import config from '@/config';
+import { ENVIRONMENT_PRODUCTION } from '@/constants';
 
 @Injectable()
 export class PaymentService {
@@ -12,7 +13,11 @@ export class PaymentService {
   async createCheckoutSession() {
     try {
       const priceIdAnualSubscription = 'price_1Qq1TTKQRcBa6IkH2PexcxiH';
-      const stripe = new Stripe(this.configService.stripeApiKey);
+      const apiKey =
+        this.configService.environment === ENVIRONMENT_PRODUCTION
+          ? this.configService.stripeApiKey
+          : this.configService.stripeTestApiKey;
+      const stripe = new Stripe(apiKey);
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
