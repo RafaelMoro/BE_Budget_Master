@@ -6,8 +6,13 @@ import { PaymentDto } from '../dtos/payment.dto';
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
-  @Post()
+  @Post('one-time')
   createCheckoutOneTimeSession(@Body() payload: PaymentDto) {
     return this.paymentService.createCheckoutOneTimeSession(payload);
+  }
+
+  @Post('recurrent')
+  createCheckoutRecurrentSession(@Body() payload: PaymentDto) {
+    return this.paymentService.createRecurrentSession(payload);
   }
 }
