@@ -1,9 +1,14 @@
 import Stripe from 'stripe';
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import config from '@/config';
 import { ENVIRONMENT_PRODUCTION } from '@/constants';
-import { PRICE_ID_ONE_TIME_MONTLY } from '../payment.constants';
+import {
+  INVALID_PERIODICITY_ERROR,
+  PRICE_ID_ONE_TIME_ANUAL,
+  PRICE_ID_ONE_TIME_MONTLY,
+} from '../payment.constants';
+import { PaymentDto } from '../dtos/payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -11,8 +16,12 @@ export class PaymentService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
-  async createCheckoutOneTimeSession() {
+  async createCheckoutOneTimeSession(payload: PaymentDto) {
     try {
+      const { payment } = payload;
+      if (payment !== 'monthly' && payment !== 'annual')
+        throw new BadRequestException(INVALID_PERIODICITY_ERROR);
+
       const {
         environment,
         stripeApiKey,
@@ -30,11 +39,16 @@ export class PaymentService {
           ? domainUri
           : `http://localhost:${frontendPort}`;
 
+      const priceId =
+        payment === 'monthly'
+          ? PRICE_ID_ONE_TIME_MONTLY
+          : PRICE_ID_ONE_TIME_ANUAL;
+
       const stripe = new Stripe(apiKey);
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
-            price: PRICE_ID_ONE_TIME_MONTLY,
+            price: priceId,
             quantity: 1,
           },
         ],
@@ -42,10 +56,9 @@ export class PaymentService {
         success_url: `${frontendUri}/payment/success`,
         cancel_url: `${frontendUri}/payment/cancel`,
       });
-      console.log(session);
       return session;
     } catch (error) {
-      console.log(error);
+      throw new BadRequestException(error.message);
     }
   }
 }
