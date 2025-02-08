@@ -2,13 +2,14 @@ import Stripe from 'stripe';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import config from '@/config';
-import { ENVIRONMENT_PRODUCTION } from '@/constants';
+import { ENVIRONMENT_PRODUCTION, VERSION_RESPONSE } from '@/constants';
 import {
   INVALID_PERIODICITY_ERROR,
   PRICE_ID_ONE_TIME_ANUAL,
   PRICE_ID_ONE_TIME_MONTLY,
 } from '../payment.constants';
 import { PaymentDto } from '../dtos/payment.dto';
+import { OneTimePaymentResponse } from '../payment.interface';
 
 @Injectable()
 export class PaymentService {
@@ -56,7 +57,17 @@ export class PaymentService {
         success_url: `${frontendUri}/payment/success`,
         cancel_url: `${frontendUri}/payment/cancel`,
       });
-      return session;
+
+      const response: OneTimePaymentResponse = {
+        version: VERSION_RESPONSE,
+        success: true,
+        message: null,
+        error: null,
+        data: {
+          paymentUrl: session.url,
+        },
+      };
+      return response;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
