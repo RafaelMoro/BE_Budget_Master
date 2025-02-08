@@ -45,6 +45,8 @@ import config from './config';
         FRONTEND_PORT: Joi.string().required(),
         ENVIRONMENT: Joi.string().required(),
         DOMAIN_URI: Joi.string().required(),
+        STRIPE_API_KEY: Joi.string().required(),
+        STRIPE_TEST_API_KEY: Joi.string().required(),
       }),
     }),
     AuthModule,
