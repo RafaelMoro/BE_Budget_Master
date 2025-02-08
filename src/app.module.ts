@@ -35,6 +35,8 @@ import config from './config';
         JWT_KEY: Joi.string().required(),
         ONE_TIME_JWT_KEY: Joi.string().required(),
         PUBLIC_KEY: Joi.string().required(),
+        FRONTEND_URI: Joi.string().required(),
+        TEST_FRONTEND_URI: Joi.string().required(),
         MAILER_MAIL: Joi.string().required(),
         MAILER_PWD: Joi.string().required(),
         SMTP_HOST: Joi.string().required(),
