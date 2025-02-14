@@ -1,3 +1,27 @@
+## v1.1.2 (2025-02-08)
+
+### Pull Requests
+[#54](https://github.com/RafaelMoro/BE_Budget_Master/pull/54) | Update env example and config schema for env variables
+
+
+## v1.1.1 (2025-02-03)
+
+### Pull Requests
+[#53](https://github.com/RafaelMoro/BE_Budget_Master/pull/53) | Fix typo subcategory transport and add income category
+
+
+## v1.1.0 (2025-02-03)
+
+### Pull Requests
+[#52](https://github.com/RafaelMoro/BE_Budget_Master/pull/52) | Translate categories
+
+
+## v1.0.11 (2025-01-30)
+
+### Pull Requests
+[#51](https://github.com/RafaelMoro/BE_Budget_Master/pull/51) | Translate format date function to mexican format date
+
+
 ## v1.0.10 (2025-01-18)
 
 ### Pull Requests

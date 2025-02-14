@@ -1,19 +1,19 @@
 const MONTHS = [
-  'Jan',
+  'Ene',
   'Feb',
   'Mar',
-  'Apr',
+  'Abr',
   'May',
   'Jun',
   'Jul',
-  'Aug',
+  'Ago',
   'Sept',
   'Oct',
   'Nov',
-  'Dec',
+  'Dic',
 ];
 
-const WEEKDAY = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
+const WEEKDAY = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 
 export const formatDateToString = (date: Date) => {
   const day = date.getUTCDate();
@@ -25,7 +25,7 @@ export const formatDateToString = (date: Date) => {
   const hourString = String(hour).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  const fullDate = `${WEEKDAY[weekday]}, ${MONTHS[month]} ${day}, ${year}`;
+  const fullDate = `${WEEKDAY[weekday]}, ${day} ${MONTHS[month]}, ${year}`;
   const twelveHourPeriod = hour >= 0 && hour <= 11 ? 'am' : 'pm';
   const formattedTime = `${hourString}:${minutes}${twelveHourPeriod}`;
 
