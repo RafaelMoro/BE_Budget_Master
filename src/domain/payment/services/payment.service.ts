@@ -179,4 +179,58 @@ export class PaymentService {
       throw new BadRequestException(error.message);
     }
   }
+
+  async getCustomer(customerId: string) {
+    try {
+      const { environment, stripeApiKey, stripeTestApiKey } =
+        this.configService;
+      const apiKey =
+        environment === ENVIRONMENT_PRODUCTION
+          ? stripeApiKey
+          : stripeTestApiKey;
+      const stripe = new Stripe(apiKey);
+      const customer = await stripe.customers.retrieve(customerId);
+      return customer;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async getEntitlements(customerId: string) {
+    try {
+      const { environment, stripeApiKey, stripeTestApiKey } =
+        this.configService;
+      const apiKey =
+        environment === ENVIRONMENT_PRODUCTION
+          ? stripeApiKey
+          : stripeTestApiKey;
+      const stripe = new Stripe(apiKey);
+      const entitlement = await stripe.entitlements.activeEntitlements.list({
+        customer: customerId,
+      });
+      return entitlement;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  // async getWebhookSubcription({
+  //   signature,
+  //   payload,
+  // }: {
+  //   signature: string;
+  //   payload: Buffer<ArrayBufferLike>;
+  // }) {
+  //   try {
+  //     const { environment, stripeApiKey, stripeTestApiKey } =
+  //       this.configService;
+  //     const apiKey =
+  //       environment === ENVIRONMENT_PRODUCTION
+  //         ? stripeApiKey
+  //         : stripeTestApiKey;
+  //     const stripe = new Stripe(apiKey);
+  //   } catch (error) {
+  //     throw new BadRequestException(error.message);
+  //   }
+  // }
 }
