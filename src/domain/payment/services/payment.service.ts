@@ -76,7 +76,7 @@ export class PaymentService {
     }
   }
 
-  async createRecurrentSession(payload: PaymentDto) {
+  async createRecurrentCheckoutSession(payload: PaymentDto) {
     try {
       const { payment } = payload;
       if (payment !== 'monthly' && payment !== 'annual')
@@ -119,6 +119,15 @@ export class PaymentService {
           },
         ],
         mode: 'subscription',
+        subscription_data: {
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'pause',
+            },
+          },
+          trial_period_days: 60,
+        },
+        payment_method_collection: 'if_required',
         success_url: `${frontendUri}/payment/recurrent?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${frontendUri}/payment/recurrent?canceled=true`,
       });

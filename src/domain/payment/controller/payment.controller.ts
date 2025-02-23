@@ -23,7 +23,7 @@ export class PaymentController {
 
   @Post('recurrent')
   createCheckoutRecurrentSession(@Body() payload: PaymentDto) {
-    return this.paymentService.createRecurrentSession(payload);
+    return this.paymentService.createRecurrentCheckoutSession(payload);
   }
 
   @Post('portal')
