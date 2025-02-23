@@ -127,7 +127,6 @@ export class PaymentService {
           },
           trial_period_days: 60,
         },
-        payment_method_collection: 'if_required',
         success_url: `${frontendUri}/payment/recurrent?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${frontendUri}/payment/recurrent?canceled=true`,
       });
