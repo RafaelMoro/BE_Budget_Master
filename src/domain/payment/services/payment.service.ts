@@ -125,7 +125,7 @@ export class PaymentService {
               missing_payment_method: 'pause',
             },
           },
-          trial_period_days: 60,
+          trial_period_days: 30,
         },
         success_url: `${frontendUri}/payment/recurrent?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${frontendUri}/payment/recurrent?canceled=true`,
