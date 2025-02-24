@@ -1,16 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  Param,
-  Post,
-  RawBodyRequest,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PaymentService } from '../services/payment.service';
 import { PaymentDto, PortalDto } from '../dtos/payment.dto';
-import { Request } from 'express';
 
 @Controller('payment')
 export class PaymentController {
@@ -39,14 +29,5 @@ export class PaymentController {
   @Get('entitlements/:customerId')
   getEntitlements(@Param('customerId') customerId: string) {
     return this.paymentService.getEntitlements(customerId);
-  }
-
-  @Post('webhook')
-  getWebhookSubcriptions(
-    @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
-  ) {
-    const payload = req.rawBody;
-    // return this.paymentService.getWebhookSubcription({ signature, payload });
   }
 }

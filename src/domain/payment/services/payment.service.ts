@@ -221,24 +221,4 @@ export class PaymentService {
       throw new BadRequestException(error.message);
     }
   }
-
-  // async getWebhookSubcription({
-  //   signature,
-  //   payload,
-  // }: {
-  //   signature: string;
-  //   payload: Buffer<ArrayBufferLike>;
-  // }) {
-  //   try {
-  //     const { environment, stripeApiKey, stripeTestApiKey } =
-  //       this.configService;
-  //     const apiKey =
-  //       environment === ENVIRONMENT_PRODUCTION
-  //         ? stripeApiKey
-  //         : stripeTestApiKey;
-  //     const stripe = new Stripe(apiKey);
-  //   } catch (error) {
-  //     throw new BadRequestException(error.message);
-  //   }
-  // }
 }
