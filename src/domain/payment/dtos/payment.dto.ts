@@ -8,6 +8,8 @@ export class PaymentDto {
 
 export class PortalDto {
   @IsString()
-  @IsNotEmpty()
   readonly sessionId: string;
+
+  @IsString()
+  readonly customerId: string;
 }
