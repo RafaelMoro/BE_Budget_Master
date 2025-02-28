@@ -145,8 +145,10 @@ export class PaymentService {
     }
   }
 
-  async createPortalSession({ sessionId }: PortalDto) {
+  async createPortalSession({ sessionId, customerId }: PortalDto) {
     try {
+      if (!customerId && !sessionId)
+        throw new BadRequestException('Session Id or customer Id are empty');
       const {
         environment,
         stripeApiKey,
@@ -164,6 +166,23 @@ export class PaymentService {
           : `http://localhost:${frontendPort}`;
 
       const stripe = new Stripe(apiKey);
+
+      if (customerId) {
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: frontendUri,
+        });
+        const response: OneTimePaymentResponse = {
+          version: VERSION_RESPONSE,
+          success: true,
+          message: null,
+          error: null,
+          data: {
+            paymentUrl: portalSession.url,
+          },
+        };
+        return response;
+      }
       // this is for demostration purposes to retrieve the customer ID.
       // TODO: Change the obtention of the customer Id retrieving it from the db
       const checkoutSession = await stripe.checkout.sessions.retrieve(
