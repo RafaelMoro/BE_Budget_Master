@@ -8,7 +8,7 @@ import { User } from '../../users/entities/users.entity';
 import { generateJWT } from '../../utils';
 import { INITIAL_RESPONSE } from '../../constants';
 import config from '../../config';
-import { LoginData, LoginResponse } from '../interface';
+import { LoginResponse } from '../interface';
 
 @Injectable()
 export class AuthService {
@@ -32,11 +32,10 @@ export class AuthService {
 
   generateJWTAuth(user: User) {
     const accessToken = generateJWT(user, this.jwtService);
-    const loginData: LoginData = {
+    const response: LoginResponse = { ...INITIAL_RESPONSE, data: { user } };
+    return {
       accessToken,
-      user,
+      response,
     };
-    const response: LoginResponse = { ...INITIAL_RESPONSE, data: loginData };
-    return response;
   }
 }

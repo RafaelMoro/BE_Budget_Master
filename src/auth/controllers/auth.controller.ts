@@ -19,12 +19,12 @@ export class AuthController {
   ) {
     const user = request.user as User;
     const res = this.authService.generateJWTAuth(user);
-    response.cookie(ACCESS_TOKEN_COOKIE_NAME, res.data.accessToken, {
+    response.cookie(ACCESS_TOKEN_COOKIE_NAME, res.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 5, // 5 days
     });
-    return res;
+    return res.response;
   }
 }
