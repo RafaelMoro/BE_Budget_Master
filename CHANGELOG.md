@@ -1,3 +1,9 @@
+## v1.2.0 (2025-06-06)
+
+### Pull Requests
+[#56](https://github.com/RafaelMoro/BE_Budget_Master/pull/56) | Add cookie for JWT
+
+
 ## v1.1.2 (2025-02-08)
 
 ### Pull Requests
