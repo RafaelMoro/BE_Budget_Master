@@ -24,8 +24,14 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const { password, ...rta } = user.toJSON();
-      return rta;
+      const rta = user.toJSON();
+      return {
+        _id: rta._id,
+        email: rta.email,
+        firstName: rta.firstName,
+        lastName: rta.lastName,
+        middleName: rta.middleName,
+      };
     }
     return null;
   }
