@@ -20,7 +20,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GeneralAppExceptionFilter());
   app.enableCors({
-    origin: [frontendUri, testFrontendUri, domainUri],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
