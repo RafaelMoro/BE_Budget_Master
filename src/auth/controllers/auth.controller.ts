@@ -1,10 +1,11 @@
-import { Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 import { AuthService } from '../services/auth.service';
 import { User } from '../../users/entities/users.entity';
 import { LOCAL_STRATEGY } from '../constants';
+import { ACCESS_TOKEN_COOKIE_NAME } from '@/constants';
 
 @Controller('auth')
 export class AuthController {
@@ -12,8 +13,18 @@ export class AuthController {
 
   @UseGuards(AuthGuard(LOCAL_STRATEGY))
   @Post()
-  login(@Req() request: Request) {
+  login(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const user = request.user as User;
-    return this.authService.generateJWTAuth(user);
+    const res = this.authService.generateJWTAuth(user);
+    response.cookie(ACCESS_TOKEN_COOKIE_NAME, res.data.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 5, // 5 days
+    });
+    return res;
   }
 }
