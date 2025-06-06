@@ -8,7 +8,7 @@ import { User } from '../../users/entities/users.entity';
 import { generateJWT } from '../../utils';
 import { INITIAL_RESPONSE } from '../../constants';
 import config from '../../config';
-import { LoginData, LoginResponse } from '../interface';
+import { LoginResponse } from '../interface';
 
 @Injectable()
 export class AuthService {
@@ -24,19 +24,24 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const { password, ...rta } = user.toJSON();
-      return rta;
+      const rta = user.toJSON();
+      return {
+        _id: rta._id,
+        email: rta.email,
+        firstName: rta.firstName,
+        lastName: rta.lastName,
+        middleName: rta.middleName,
+      };
     }
     return null;
   }
 
   generateJWTAuth(user: User) {
     const accessToken = generateJWT(user, this.jwtService);
-    const loginData: LoginData = {
+    const response: LoginResponse = { ...INITIAL_RESPONSE, data: { user } };
+    return {
       accessToken,
-      user,
+      response,
     };
-    const response: LoginResponse = { ...INITIAL_RESPONSE, data: loginData };
-    return response;
   }
 }
