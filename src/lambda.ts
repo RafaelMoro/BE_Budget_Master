@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { Callback, Context, Handler } from 'aws-lambda';
 import { AppModule } from './app.module';
 import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.filter';
+import cookieParser from 'cookie-parser';
 
 let cachedServer: Handler;
 const frontendUri = process.env.FRONTEND_URI;
@@ -13,6 +14,7 @@ const domainUri = process.env.DOMAIN_URI;
 
 export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

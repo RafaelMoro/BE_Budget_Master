@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { ValidationPipe } from '@nestjs/common/pipes';
 import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.filter';
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 const frontendUri = process.env.FRONTEND_URI;
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 8080;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
