@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
@@ -19,6 +19,7 @@ import { UserActionsModule } from './domain/user-accounts-actions/user-actions.m
 import { ExpensesActionsModule } from './domain/expenses-actions/expenses-actions.module';
 import { IncomesActionsModule } from './domain/incomes-actions/incomes-actions.module';
 import config from './config';
+import { LoggedMiddleware } from './middleware/Logged.middleware';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import config from './config';
         FRONTEND_PORT: Joi.string().required(),
         ENVIRONMENT: Joi.string().required(),
         DOMAIN_URI: Joi.string().required(),
+        NODE_ENV: Joi.string().required(),
       }),
     }),
     AuthModule,
@@ -64,4 +66,8 @@ import config from './config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggedMiddleware).forRoutes('*');
+  }
+}
