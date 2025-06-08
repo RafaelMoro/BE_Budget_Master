@@ -21,5 +21,6 @@ export default registerAs('config', () => ({
     pwd: process.env.MAILER_PWD,
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
+    resendApiKey: process.env.RESEND_API_KEY,
   },
 }));
