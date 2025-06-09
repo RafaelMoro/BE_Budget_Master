@@ -1,3 +1,9 @@
+## v1.4.0 (2025-06-09)
+
+### Pull Requests
+[#58](https://github.com/RafaelMoro/BE_Budget_Master/pull/58) | Update from node 16 to node 22
+
+
 ## v1.3.0 (2025-06-09)
 
 ### Pull Requests
