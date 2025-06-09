@@ -17,11 +17,13 @@ export class MailService {
   async sendUserForgotPasswordEmail(payload: MailForgotPasswordDto) {
     try {
       const resend = new Resend(this.configService.mailer.resendApiKey);
+      const emailSender = this.configService.mailer.email;
+
       const { oneTimeToken, email, firstName, lastName } = payload;
       const url = `${PROD_URI}/reset-password/${oneTimeToken}`;
 
       resend.emails.send({
-        from: 'no-reply@updates.budget-master.space',
+        from: emailSender,
         to: email,
         subject: 'Recupera tu contraseña en Budget Master',
         react: React.createElement(ResetPassword, { url, firstName, lastName }),
