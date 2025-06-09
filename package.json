@@ -93,8 +93,8 @@
     "typescript": "^4.3.5"
   },
   "engines": {
-    "node": ">=16.20.2",
-    "pnpm": ">=8.0.0"
+    "node": ">=22.16.0",
+    "pnpm": ">=10.11.1"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -114,6 +114,6 @@
     "testEnvironment": "node"
   },
   "volta": {
-    "node": "16.20.2"
+    "node": "22.16.0"
   }
 }
