@@ -1,4 +1,3 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Resend } from 'resend';
 import { ConfigType } from '@nestjs/config';
 import config from '@/config';
@@ -12,7 +11,6 @@ import React from 'react';
 @Injectable()
 export class MailService {
   constructor(
-    private mailerService: MailerService,
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
