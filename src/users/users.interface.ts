@@ -1,9 +1,8 @@
-import { Types } from 'mongoose';
 import { GeneralResponse } from 'src/response.interface';
 import { User } from './entities/users.entity';
 
 export interface UserResponse extends User {
-  _id: Types.ObjectId;
+  _id: unknown;
 }
 
 interface CreateUserResponseData {
