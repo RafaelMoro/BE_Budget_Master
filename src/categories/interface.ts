@@ -3,7 +3,7 @@ import { Category } from './entities/categories.entity';
 import { GeneralResponse } from '../response.interface';
 
 export interface CategoriesResponse extends Category {
-  _id: Types.ObjectId;
+  _id: unknown;
 }
 
 export interface FindByNameAndUserIdProps {
@@ -47,5 +47,5 @@ export interface SingleCategoryResponse extends Omit<GeneralResponse, 'data'> {
 
 export interface UpdateSubcategoriesResponse
   extends Omit<GeneralResponse, 'data'> {
-  categoryId: Types.ObjectId | string;
+  categoryId: unknown;
 }
