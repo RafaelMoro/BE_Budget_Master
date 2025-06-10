@@ -21,7 +21,7 @@ export class CreateExpense extends AccountRecord {
 }
 
 export interface Expense extends CreateExpense {
-  _id: Types.ObjectId;
+  _id: unknown;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(CreateExpense);

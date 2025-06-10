@@ -48,7 +48,7 @@ export interface UpdateExpenseProps {
 
 export interface ExpensePaidStatus {
   wasFound: boolean;
-  recordId: string;
+  recordId: unknown;
   recordName: string;
 }
 
