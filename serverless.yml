@@ -1,4 +1,4 @@
-service: budget-master-api
+service: budget-master-test-api
 
 provider:
   name: aws
@@ -7,8 +7,8 @@ provider:
   region: us-east-1
   logRetentionInDays: 1
   timeout: 15
-  stackName: budget-master-api
-  apiName: budget-master-api
+  stackName: budget-master-test-api
+  apiName: budget-master-test-api
 
 functions:
   api:
