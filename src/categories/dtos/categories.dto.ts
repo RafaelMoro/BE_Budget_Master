@@ -19,7 +19,7 @@ export class CreateCategoriesDto {
 export class UpdateCategoriesDto extends PartialType(CreateCategoriesDto) {
   @IsMongoId()
   @IsNotEmpty()
-  readonly categoryId: Types.ObjectId;
+  readonly categoryId: unknown;
 }
 
 export class DeleteCategoryDto {

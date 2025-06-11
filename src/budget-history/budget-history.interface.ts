@@ -1,10 +1,9 @@
-import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
 import { BudgetHistoryModel } from './budget-history.entity';
 import { RecordsHistory } from './budget-history.dto';
 
 export interface BudgetHistory extends BudgetHistoryModel {
-  _id: Types.ObjectId;
+  _id: unknown
 }
 
 export interface SingleBudgetHistoryResponse
@@ -29,11 +28,11 @@ export interface RemoveBudgetHistoryByBudgetIdResponse {
 export interface AddRecordToBudgetHistoryProps {
   newRecord: RecordsHistory;
   sub: string;
-  budgetId: Types.ObjectId;
+  budgetId: unknown;
 }
 
 export interface RemoveRecordFromBudgetHistoryProps {
   recordToBeDeleted: string;
   sub: string;
-  budgetId: Types.ObjectId;
+  budgetId: unknown;
 }

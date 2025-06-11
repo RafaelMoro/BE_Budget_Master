@@ -17,7 +17,7 @@ export class CreateIncome extends AccountRecord {
 }
 
 export interface Income extends CreateIncome {
-  _id: Types.ObjectId;
+  _id: unknown;
 }
 
 export const IncomeSchema = SchemaFactory.createForClass(CreateIncome);

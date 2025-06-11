@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { GeneralResponse } from '../response.interface';
 import { BudgetModel } from './budgets.entity';
 import { BudgetHistory } from '../budget-history/budget-history.interface';
@@ -6,7 +5,7 @@ import { BudgetHistory } from '../budget-history/budget-history.interface';
 export type ExpenseOperation = 'removeExpense' | 'addExpense';
 
 export interface Budget extends BudgetModel {
-  _id: Types.ObjectId;
+  _id: unknown
 }
 
 export interface SingleBudgetResponse extends Omit<GeneralResponse, 'data'> {

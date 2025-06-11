@@ -42,7 +42,7 @@ export class RecordsHistory {
 export class CreateBudgetHistoryDto {
   @IsNotEmpty()
   @IsString()
-  readonly budget: BudgetModel | Types.ObjectId;
+  readonly budget: BudgetModel | unknown
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -55,7 +55,7 @@ export class UpdateBudgetHistoryDto extends PartialType(
 ) {
   @IsMongoId()
   @IsNotEmpty()
-  readonly budgetHistoryId: Types.ObjectId;
+  readonly budgetHistoryId: unknown
 }
 
 export class DeleteBudgetHistoryDto {
