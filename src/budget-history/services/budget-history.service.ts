@@ -222,7 +222,7 @@ export class BudgetHistoryService {
     try {
       // Searching by converting string to object id, otherwise, it won't find it.
       const budgetsHistory = await this.budgetHistoryModel
-        .find({ budget: new Types.ObjectId(budgetId), sub })
+        .find({ budget: budgetId, sub })
         .exec();
       if (budgetsHistory.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);
@@ -265,7 +265,7 @@ export class BudgetHistoryService {
   }: RemoveRecordFromBudgetHistoryProps) {
     try {
       const budgetsHistory = await this.budgetHistoryModel
-        .find({ budget: new Types.ObjectId(budgetId), sub })
+        .find({ budget: budgetId, sub })
         .exec();
       if (budgetsHistory.length === 0) {
         throw new NotFoundException(BUDGET_HISTORY_NOT_FOUND_ERROR);

@@ -226,9 +226,10 @@ export class UsersService {
       if (!tokenVerified) throw new BadRequestException(JWT_INVALID_ERROR);
 
       const userId = tokenVerified.sub;
-      const user = await this.userModel.findOne({ _id: userId }).exec();
+      const user: UserResponse = await this.userModel.findOne({ _id: userId }).exec();
       if (!user) throw new BadRequestException(USER_NOT_FOUND_ERROR);
       const { _id } = user;
+      const userIdGotten = _id as string;
 
       const userOneTimeToken = user.oneTimeToken;
       if (!userOneTimeToken) throw new BadRequestException(JWT_NOT_FOUND);
@@ -240,7 +241,7 @@ export class UsersService {
         { _id: user.id },
         { $unset: { oneTimeToken: '' } },
       );
-      await this.updatePassword({ uid: _id, password });
+      await this.updatePassword({ uid: userIdGotten, password });
       const response: ForgotResetPasswordResponse = {
         version: VERSION_RESPONSE,
         success: true,

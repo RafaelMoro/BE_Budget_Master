@@ -4,6 +4,8 @@ export const VERSION_RESPONSE = process.env.npm_package_version;
 export const ENVIRONMENT_PRODUCTION = 'production';
 export const PROD_URI = 'https://app.budget-master.space';
 
+export const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
+
 export const INITIAL_RESPONSE: GeneralResponse = {
   version: VERSION_RESPONSE,
   success: true,

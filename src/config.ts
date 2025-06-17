@@ -18,8 +18,6 @@ export default registerAs('config', () => ({
   domainUri: process.env.DOMAIN_URI,
   mailer: {
     email: process.env.MAILER_MAIL,
-    pwd: process.env.MAILER_PWD,
-    smtpHost: process.env.SMTP_HOST,
-    smtpPort: process.env.SMTP_PORT,
+    resendApiKey: process.env.RESEND_API_KEY,
   },
 }));
