@@ -15,6 +15,7 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
+import { isCardProvider } from './card-provider.service';
 
 @Injectable()
 export class AccountsService {
@@ -44,7 +45,13 @@ export class AccountsService {
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
-      const completeData = { ...data, sub: userId };
+      const { accountProvider } = data
+      const isValidProvider = isCardProvider(accountProvider)
+      if (!isValidProvider) {
+        throw new BadRequestException('Invalid account provider');
+      }
+
+      const completeData = { ...data,  sub: userId };
       const newModel = new this.accountModel(completeData);
       const model: AccountModel = await newModel.save();
       return model;
