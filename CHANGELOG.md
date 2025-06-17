@@ -1,3 +1,9 @@
+## v1.5.1 (2025-06-17)
+
+### Pull Requests
+[#59](https://github.com/RafaelMoro/BE_Budget_Master/pull/59) | Fix/lambda node 22
+
+
 ## v1.5.0 (2025-06-11)
 
 ### Pull Requests
