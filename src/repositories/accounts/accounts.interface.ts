@@ -26,3 +26,5 @@ interface DeleteAccountResponseData {
 export interface DeleteAccountResponse extends Omit<GeneralResponse, 'data'> {
   data: DeleteAccountResponseData;
 }
+
+export type CardProvider = 'visa' | 'mastercard' | 'american-express'

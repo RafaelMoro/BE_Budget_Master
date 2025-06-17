@@ -14,6 +14,9 @@ export class Account extends Document {
   backgroundColor: string;
 
   @Prop({ required: true })
+  accountProvider: string;
+
+  @Prop({ required: true })
   color: string;
 
   @Prop({ required: true })
