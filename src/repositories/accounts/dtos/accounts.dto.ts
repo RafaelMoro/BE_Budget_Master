@@ -9,6 +9,10 @@ export class CreateAccountDto {
 
   @IsString()
   @IsNotEmpty()
+  readonly alias: string;
+
+  @IsString()
+  @IsNotEmpty()
   readonly accountType: string;
 
   @IsString()
@@ -18,6 +22,10 @@ export class CreateAccountDto {
   @IsNumber()
   @IsNotEmpty()
   readonly amount: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly terminationFourDigits: number;
 
   @IsString()
   @IsNotEmpty()

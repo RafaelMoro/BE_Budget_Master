@@ -43,10 +43,21 @@ export class AccountsService {
     }
   }
 
+  verifyAccountTermination(digits: number) {
+      // Check if the termination digits are valid (4 digits)
+      if (digits < 1000 || digits > 9999) {
+        throw new BadRequestException(
+          'Termination digits must be a 4-digit number.',
+        );
+      }
+      return true;
+    }
+
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
       const { accountProvider } = data
       const isValidProvider = isCardProvider(accountProvider)
+      this.verifyAccountTermination(data.terminationFourDigits)
       if (!isValidProvider) {
         throw new BadRequestException('Invalid account provider');
       }
