@@ -9,6 +9,10 @@ export class CreateAccountDto {
 
   @IsString()
   @IsNotEmpty()
+  readonly alias: string;
+
+  @IsString()
+  @IsNotEmpty()
   readonly accountType: string;
 
   @IsString()

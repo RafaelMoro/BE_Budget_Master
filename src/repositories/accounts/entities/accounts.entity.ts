@@ -8,6 +8,9 @@ export class Account extends Document {
   title: string;
 
   @Prop({ required: true })
+  alias: string;
+
+  @Prop({ required: true })
   accountType: string;
 
   @Prop({ required: true })
