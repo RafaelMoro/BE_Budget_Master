@@ -1,3 +1,9 @@
+## v1.5.3 (2025-06-17)
+
+### Pull Requests
+[#63](https://github.com/RafaelMoro/BE_Budget_Master/pull/63) | Add termination numbers account and alias
+
+
 ## v1.5.2 (2025-06-17)
 
 ### Pull Requests
