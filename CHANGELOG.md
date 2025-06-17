@@ -1,3 +1,9 @@
+## v1.5.2 (2025-06-17)
+
+### Pull Requests
+[#62](https://github.com/RafaelMoro/BE_Budget_Master/pull/62) | Add account provider prop into account 
+
+
 ## v1.5.1 (2025-06-17)
 
 ### Pull Requests
