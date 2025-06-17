@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsMongoId, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
+import { CardProvider } from '../accounts.interface';
 
 export class CreateAccountDto {
   @IsString()
@@ -9,6 +10,10 @@ export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
   readonly accountType: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly accountProvider: CardProvider;
 
   @IsNumber()
   @IsNotEmpty()
