@@ -17,6 +17,9 @@ export class Account extends Document {
   accountProvider: string;
 
   @Prop({ required: true })
+  terminationFourDigits: number;
+
+  @Prop({ required: true })
   color: string;
 
   @Prop({ required: true })

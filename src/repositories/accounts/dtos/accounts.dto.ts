@@ -19,6 +19,10 @@ export class CreateAccountDto {
   @IsNotEmpty()
   readonly amount: number;
 
+  @IsNumber()
+  @IsNotEmpty()
+  readonly terminationFourDigits: number;
+
   @IsString()
   @IsNotEmpty()
   readonly backgroundColor: string;
