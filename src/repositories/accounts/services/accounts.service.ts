@@ -110,12 +110,17 @@ export class AccountsService {
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
-      const { accountProvider, terminationFourDigits } = changes
-      const isValidProvider = isCardProvider(accountProvider)
-      this.verifyAccountTermination(terminationFourDigits)
+      const accountProvider = changes?.accountProvider;
+      const terminationFourDigits = changes?.terminationFourDigits;
 
-      if (!isValidProvider) {
-        throw new BadRequestException('Invalid account provider');
+      if (terminationFourDigits) {
+        this.verifyAccountTermination(terminationFourDigits)
+      }
+      if (accountProvider) {
+        const isValidProvider = isCardProvider(accountProvider)
+        if (!isValidProvider) {
+          throw new BadRequestException('Invalid account provider');
+        }
       }
 
       const updatedAccount: AccountModel = await this.accountModel
