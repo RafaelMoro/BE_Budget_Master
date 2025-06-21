@@ -1,3 +1,9 @@
+## v1.5.4 (2025-06-21)
+
+### Pull Requests
+[#64](https://github.com/RafaelMoro/BE_Budget_Master/pull/64) | Change type termination number
+
+
 ## v1.5.3 (2025-06-17)
 
 ### Pull Requests
