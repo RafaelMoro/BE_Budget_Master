@@ -43,15 +43,15 @@ export class AccountsService {
     }
   }
 
-  verifyAccountTermination(digits: number) {
-      // Check if the termination digits are valid (4 digits)
-      if (digits < 1000 || digits > 9999) {
-        throw new BadRequestException(
-          'Termination digits must be a 4-digit number.',
-        );
-      }
-      return true;
+  verifyAccountTermination(digits: string) {
+    // Check if the input is exactly 4 digits and contains only numbers
+    if (!/^[0-9]{4}$/.test(digits)) {
+      throw new BadRequestException(
+        'Termination digits must be a 4-digit number (digits only).',
+      );
     }
+    return true;
+  }
 
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
@@ -110,6 +110,19 @@ export class AccountsService {
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
+      const accountProvider = changes?.accountProvider;
+      const terminationFourDigits = changes?.terminationFourDigits;
+
+      if (terminationFourDigits) {
+        this.verifyAccountTermination(terminationFourDigits)
+      }
+      if (accountProvider) {
+        const isValidProvider = isCardProvider(accountProvider)
+        if (!isValidProvider) {
+          throw new BadRequestException('Invalid account provider');
+        }
+      }
+
       const updatedAccount: AccountModel = await this.accountModel
         .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();

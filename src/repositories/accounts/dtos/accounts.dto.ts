@@ -23,9 +23,9 @@ export class CreateAccountDto {
   @IsNotEmpty()
   readonly amount: number;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly terminationFourDigits: number;
+  readonly terminationFourDigits: string;
 
   @IsString()
   @IsNotEmpty()

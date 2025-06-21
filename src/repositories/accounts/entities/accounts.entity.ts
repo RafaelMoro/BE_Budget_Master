@@ -20,7 +20,7 @@ export class Account extends Document {
   accountProvider: string;
 
   @Prop({ required: true })
-  terminationFourDigits: number;
+  terminationFourDigits: string;
 
   @Prop({ required: true })
   color: string;
