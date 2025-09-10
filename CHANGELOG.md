@@ -1,3 +1,9 @@
+## v1.5.5 (2025-09-10)
+
+### Pull Requests
+[#66](https://github.com/RafaelMoro/BE_Budget_Master/pull/66) | Fix mail not being sent
+
+
 ## v1.5.4 (2025-06-21)
 
 ### Pull Requests
