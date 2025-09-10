@@ -22,12 +22,13 @@ export class MailService {
       const { oneTimeToken, email, firstName, lastName } = payload;
       const url = `${PROD_URI}/reset-password/${oneTimeToken}`;
 
-      resend.emails.send({
+      const res = await resend.emails.send({
         from: emailSender,
         to: email,
         subject: 'Recupera tu contraseña en Budget Master',
         react: React.createElement(ResetPassword, { url, firstName, lastName }),
       });
+      console.log('res', res)
     } catch (error) {
       throw new BadRequestException(error.message);
     }
