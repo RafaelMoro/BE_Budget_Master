@@ -3,8 +3,8 @@ import { configure as serverlessExpress } from '@codegenie/serverless-express';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Callback, Context, Handler } from 'aws-lambda';
-import { AppModule } from './app.module';
-import { GeneralAppExceptionFilter } from './exceptions/GeneralExceptionFilter.filter';
+import { AppModule } from './src/app.module';
+import { GeneralAppExceptionFilter } from './src/exceptions/GeneralExceptionFilter.filter';
 import cookieParser from 'cookie-parser';
 
 let cachedServer: Handler;
@@ -34,11 +34,17 @@ export async function bootstrap() {
   return serverlessExpress({ app: expressApp });
 }
 
+type EventPayload = {
+  [key: string]: any;
+};
+
 export const handler = async (
-  event: any,
+  event: EventPayload,
   context: Context,
   callback: Callback,
 ) => {
+  if (event.path === '' || event.path === undefined) event.path = '/';
+  
   cachedServer = cachedServer ?? (await bootstrap());
   return cachedServer(event, context, callback);
 };

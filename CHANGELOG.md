@@ -1,3 +1,33 @@
+## v1.5.5 (2025-09-10)
+
+### Pull Requests
+[#66](https://github.com/RafaelMoro/BE_Budget_Master/pull/66) | Fix mail not being sent
+
+
+## v1.5.4 (2025-06-21)
+
+### Pull Requests
+[#64](https://github.com/RafaelMoro/BE_Budget_Master/pull/64) | Change type termination number
+
+
+## v1.5.3 (2025-06-17)
+
+### Pull Requests
+[#63](https://github.com/RafaelMoro/BE_Budget_Master/pull/63) | Add termination numbers account and alias
+
+
+## v1.5.2 (2025-06-17)
+
+### Pull Requests
+[#62](https://github.com/RafaelMoro/BE_Budget_Master/pull/62) | Add account provider prop into account 
+
+
+## v1.5.1 (2025-06-17)
+
+### Pull Requests
+[#59](https://github.com/RafaelMoro/BE_Budget_Master/pull/59) | Fix/lambda node 22
+
+
 ## v1.5.0 (2025-06-11)
 
 ### Pull Requests

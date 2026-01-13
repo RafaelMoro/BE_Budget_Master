@@ -15,6 +15,7 @@ import {
   UpdateAccountDto,
   DeleteAccountDto,
 } from '../dtos/accounts.dto';
+import { isCardProvider } from './card-provider.service';
 
 @Injectable()
 export class AccountsService {
@@ -42,9 +43,26 @@ export class AccountsService {
     }
   }
 
+  verifyAccountTermination(digits: string) {
+    // Check if the input is exactly 4 digits and contains only numbers
+    if (!/^[0-9]{4}$/.test(digits)) {
+      throw new BadRequestException(
+        'Termination digits must be a 4-digit number (digits only).',
+      );
+    }
+    return true;
+  }
+
   async createOneAccount(data: CreateAccountDto, userId: string) {
     try {
-      const completeData = { ...data, sub: userId };
+      const { accountProvider } = data
+      const isValidProvider = isCardProvider(accountProvider)
+      this.verifyAccountTermination(data.terminationFourDigits)
+      if (!isValidProvider) {
+        throw new BadRequestException('Invalid account provider');
+      }
+
+      const completeData = { ...data,  sub: userId };
       const newModel = new this.accountModel(completeData);
       const model: AccountModel = await newModel.save();
       return model;
@@ -92,6 +110,19 @@ export class AccountsService {
   async update(changes: UpdateAccountDto) {
     try {
       const { accountId } = changes;
+      const accountProvider = changes?.accountProvider;
+      const terminationFourDigits = changes?.terminationFourDigits;
+
+      if (terminationFourDigits) {
+        this.verifyAccountTermination(terminationFourDigits)
+      }
+      if (accountProvider) {
+        const isValidProvider = isCardProvider(accountProvider)
+        if (!isValidProvider) {
+          throw new BadRequestException('Invalid account provider');
+        }
+      }
+
       const updatedAccount: AccountModel = await this.accountModel
         .findByIdAndUpdate(accountId, { $set: changes }, { new: true })
         .exec();
